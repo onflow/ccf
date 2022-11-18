@@ -3,7 +3,7 @@
 Author: Faye Amacker  
 Status: DRAFT  
 Date: November 17, 2022  
-Revision: 20221117a-ABRIDGED-DRAFT
+Revision: 20221117b-ABRIDGED-DRAFT
 
 To simplify initial review of the most important aspects, some verbose content is left out (e.g. list of numeric values representing each built-in Cadence type).  The omitted content will be provided in a less abridged version of this document after the first review is completed.
 
@@ -21,11 +21,13 @@ Currently, Cadence external values (e.g. transaction arguments and events) are b
 
 A need exists to provide a more compact, efficient, and deterministic encoding of Cadence external values. 
 
-CCF leverages CBOR and uses Concise Data Definition Language (CDDL) in this document to define CCF data format.
+CCF leverages CBOR's data model and Preferred Serialization to deterministically encode values to their smallest form.  This document uses CDDL notation to specify CCF.
 
-- [CDDL (RFC 8610)](https://www.rfc-editor.org/rfc/rfc8610.html) is a notation defined by RFC 8610 to unambiguously express CBOR and JSON data structures. RFC 8610 also defines Extended Diagnostic Notation (EDN) in [Appendix G](https://www.rfc-editor.org/rfc/rfc8610.html#appendix-G).
+- [CDDL (RFC 8610)](https://www.rfc-editor.org/rfc/rfc8610.html) is the Concise Data Definition Language. CDDL is a notation for unambiguously expressing CBOR and JSON data structures.
 
-- [CBOR (RFC 8949)](https://www.rfc-editor.org/rfc/rfc8949.html) is an IETF Internet Standard (not just a regular RFC) and is used by other standards, such as W3C's WebAuthn, IETF's COSE (RFC 9052), and CWT (RFC 8392).  CBOR is extensible without version negotiation and is designed to be relevant for decades.
+- [EDN (Appendix G of RFC 8610)](https://www.rfc-editor.org/rfc/rfc8610.html#appendix-G) is the Extended Diagnostic Notation.  EDN is used by this document to describe examples of CCF encoding.
+
+- [CBOR (RFC 8949)](https://www.rfc-editor.org/rfc/rfc8949.html) is an IETF Internet Standard (not just a regular RFC) and is used by other standards, such as W3C WebAuthn, IETF COSE (RFC 9052), and IETF CWT (RFC 8392).  CBOR is extensible without version negotiation and is designed to be relevant for decades.
 
 CBOR is a self-describing binary data format that (among other improvements) extends JSON's data model by allowing for binary data.  CBOR's data model is a superset of JSON's data model.  CBOR supports deterministic encoding with Preferred Serialization and Core Deterministic Encoding Requirements as defined in RFC 8949.
 
@@ -219,7 +221,7 @@ Type data item represents `128([138([h'', "S.test.Foo", [["bar", 132(4)]]])])` ,
 
 Value data item represents `130([134(131(h'')), [[1], [2], [3]]])`, where
 - `134(131(h''))` is Cadence array of type identified by ID `0`.
-- `[[1], [2], [3]]]` is array of `Foo` resouce raw feidl data.
+- `[[1], [2], [3]]]` is array of `Foo` resouce raw field data.
 
 ### `FeesDeducted` Event
 
