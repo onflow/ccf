@@ -302,6 +302,7 @@ This document uses CDDL notation to express CBOR data items:
 - `tstr`: CBOR text string
 - `bigint`: CBOR bignum
 - `? Foo`: Foo is optional
+- `(Foo)`: Foo is a group
 - `Foo / Bar`: either Foo or Bar
 - `Foo + Bar`: Foo followed by Bar
 - `[+ Foo]`: one or more Foo in CBOR array
@@ -322,9 +323,9 @@ Cadence data is encoded depending on its type.  For example, Cadence `UInt8` is 
 
 ```
 
-CCF_Message = ? CCF_CompositeTypeInfo_Message + CCF_TypeAndValue_Message
+CCF_Message = (? CCF_CompositeTypeInfo_Message) + CCF_TypeAndValue_Message
 
-CCF_CompositeTypeInfo_Message = #6.CBORTagType([+ CCF_StructTypeInfo_Message / CCF_ResourceTypeInfo_Message / CCF_ContractTypeInfo_Message / CCF_EventTypeInfo_Message / CCF_EnumTypeInfo_Message])
+CCF_CompositeTypeInfo_Message = #6.CBORTagType([+ (CCF_StructTypeInfo_Message / CCF_ResourceTypeInfo_Message / CCF_ContractTypeInfo_Message / CCF_EventTypeInfo_Message / CCF_EnumTypeInfo_Message)])
 
 composite_type_record = [
 	id: bstr,
