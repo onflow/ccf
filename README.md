@@ -3,7 +3,7 @@
 Author: Faye Amacker  
 Status: ABRIDGED DRAFT  
 Date: November 22, 2022  
-Revision: 20221122a
+Revision: 20221122b
 
 To simplify initial review of the most important aspects, some verbose content is left out (e.g. list of numeric values representing each built-in Cadence type).  The omitted content will be provided in a less abridged version of this document after the first review is completed.
 
@@ -181,6 +181,38 @@ It represents `130([134(132(4)), [1, 2, 3]])`, where
 - `134(132(4))` is Cadence array of `Int`.  
 - `[1, 2, 3]` is raw value. 
 
+### Cadence Heterogenous Array with Simple Type Elements
+
+Cadence `[AnyStruct]` type of value `[1, "a", true]` encoded to JSON is 112 bytes when minified:
+```
+{
+  "type": "Array",
+  "value": [
+    {
+      "type": "Int",
+      "value": "1"
+    },
+    {
+      "type": "String",
+      "value": "a"
+    },
+    {
+      "type": "Bool",
+      "value": true
+    }
+  ]
+}
+```
+CCF encoding is 34 bytes:
+```
+d88282d886d884182783d88282d88404c24101d88282d884016161d88282d88400f5
+```
+It represents `130([134(132(39)), [130([132(4), 1]), 130([132(1), "a"]), 130([132(0), true])]])`, where
+- `134(132(39))` is Cadence array of `AnyStruct`.
+- `130([132(4), 1])` is first element (`132(4)` is Cadence `Int`, `1` is raw value)
+- `130([132(1), "a"])` is second element (`132(1)` is Cadence `String`, `"a"` is raw value)
+- `130([132(0), true])` is third element (`132(0)` is Cadence `Boolean`, `true` is raw value)
+
 ### Cadence Homogenous Array with Composite Type Elements
 
 Cadence composite types, such as struct, resource, and event, are encoded as detachable (not inlined) type info.  Each encoded composite type info has an unique ID which is used to bind with Cadence value.  
@@ -252,6 +284,102 @@ Type data item represents `128([138([h'', "S.test.Foo", [["bar", 132(4)]]])])` ,
 Value data item represents `130([134(131(h'')), [[1], [2], [3]]])`, where
 - `134(131(h''))` is Cadence array of type identified by ID `0`.
 - `[[1], [2], [3]]]` is array of `Foo` resouce raw field data.
+
+### Cadence Homogenous Array with Composite Type Elements (One Field Type Is Abstract)
+
+Composite field `baz` is abstract type.
+
+Cadence `[Foo]` type encoded to JSON is 508 bytes when minified:
+```
+{
+  "type": "Array",
+  "value": [
+    {
+      "type": "Resource",
+      "value": {
+        "id": "S.test.Foo",
+        "fields": [
+          {
+            "name": "bar",
+            "value": {
+              "type": "Int",
+              "value": "1"
+            }
+          },
+          {
+            "name": "baz",
+            "value": {
+              "type": "Int",
+              "value": "1"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "Resource",
+      "value": {
+        "id": "S.test.Foo",
+        "fields": [
+          {
+            "name": "bar",
+            "value": {
+              "type": "Int",
+              "value": "2"
+            }
+          },
+          {
+            "name": "baz",
+            "value": {
+              "type": "String",
+              "value": "a"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "Resource",
+      "value": {
+        "id": "S.test.Foo",
+        "fields": [
+          {
+            "name": "bar",
+            "value": {
+              "type": "Int",
+              "value": "3"
+            }
+          },
+          {
+            "name": "baz",
+            "value": {
+              "type": "Bool",
+              "value": true
+            }
+          }
+        ]
+      }
+    }
+  ]
+}
+```
+CCF encoding is 81 bytes (first 36 bytes for type and next 45 bytes for raw value):
+```
+d88081d88a83406a532e746573742e466f6f828263626172d88404826362617ad8841827d88282d886d883408382c24101d88282d88404c2410182c24102d88282d88401616182c24103d88282d88400f5
+```
+It contains two data items: type and value.
+
+Type data item represents `128([138([h'', "S.test.Foo", [["bar", 132(4)], ["baz", 132(39)]]])])`, where
+- `h''` is unique ID `0`.  This ID is used inside value data item to bind type with raw value.
+- `S.test.Foo` is location and identifier.
+- `["bar", 132(4)]` is first field definition: `"bar"` field of Cadence `Int`.
+- `["baz", 132(39)]` is second field definition: `"baz"` field of Cadence `AnyStruct`.
+
+Value data item represents `130([134(131(h'')), [[1, 130([132(4), 1])], [2, 130([132(1), "a"])], [3, 130([132(0), true])]]])`, where
+- `134(131(h''))` is Cadence array of type identified by ID `0`.
+- `[1, 130([132(4), 1])]` is first resource raw field data.
+- `[2, 130([132(1), "a"])]` is second resource raw field data.
+- `[3, 130([132(0), true])]` is third resource raw field data.
 
 ### `FeesDeducted` Event
 
