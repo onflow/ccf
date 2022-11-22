@@ -1,9 +1,9 @@
 # DRAFT - Cadence Compact Format (CCF)
 
 Author: Faye Amacker  
-Status: DRAFT  
+Status: ABRIDGED DRAFT  
 Date: November 17, 2022  
-Revision: 20221117b-ABRIDGED-DRAFT
+Revision: 20221122a
 
 To simplify initial review of the most important aspects, some verbose content is left out (e.g. list of numeric values representing each built-in Cadence type).  The omitted content will be provided in a less abridged version of this document after the first review is completed.
 
@@ -63,9 +63,53 @@ CCF is designed to support:
 
 - Translation to JSON.  CCF is defined using CDDL notation.  CBOR's data model is a superset of JSON's data model.  CCF uses a subset of CBOR's data model which allows translation from CCF to JSON-based formats.
 
-## Considerations in More Detail
+## Why CBOR
 
-### Security
+It's good practice to leverage a standard data format to define more specific data formats and protocols.
+
+Concise Binary Object Representation (CBOR) is a data format defined in IETF [RFC 8949](https://www.rfc-editor.org/rfc/rfc8949.html):
+
+> The Concise Binary Object Representation (CBOR) is a data format
+   whose design goals include the possibility of extremely small code
+   size, fairly small message size, and extensibility without the need
+   for version negotiation.  These design goals make it different from
+   earlier binary serializations such as ASN.1 and MessagePack.
+
+As an [Internet Standard](https://en.wikipedia.org/wiki/Internet_Standard) (not just a common RFC), CBOR is used to define other formats and protocols such as:
+- W3C [WebAuthn](https://www.w3.org/TR/webauthn-2/) - Web Authentication
+- IETF [RFC 9052](https://www.rfc-editor.org/rfc/rfc9052.html) - CBOR Object Signing and Encryption (COSE): Structures and Process
+- IETF [RFC 8392](https://www.rfc-editor.org/rfc/rfc8392.html) - CBOR Web Tokens (CWT)
+
+This approach enables a COSE codec to use a CBOR codec under the hood.  COSE codecs can focus on providing COSE-specific features rather than reinventing the wheel, which reduces complexity, cost of development, and risks.
+
+As an Internet Standard, CBOR is designed to avoid requiring changes and remain relevant for decades.
+
+CBOR is designed to allow extremely small code size (e.g. usable on constrained devices), fairly small message size, and extensibility without version negotiation.
+
+CBOR was designed with security considerations in mind.  It allows CBOR codecs to have separate detection of malformed data and invalid data. 
+
+CBOR defines deterministic encoding with Preferred Serialization and Core Deterministic Encoding Requirements.
+
+CBOR is well-suited to replace JSON-based data formats and protocols.  CBOR's data model extends JSON's data model with:
+- compact binary encodings
+- extension points (CBOR Tags and Simple Values)
+- deterministic encoding as already mentioned
+
+As one example, CBOR Web Tokens is a modern binary alternative to the text-based JSON Web Tokens (JWT).
+
+Like CBOR Web Tokens, CCF is a modern binary alternative to an existing JSON-based data format.  CCF uses CBOR to provide a compact, efficient, and deterministic data format.
+
+Additional considerations for using CBOR include availability and quality of CBOR codecs in various programming languages.
+
+### Interoperability and Reuse of CBOR Codecs
+
+High quality CBOR codecs are available in various programming languages.
+
+In JavaScript, there are multiple CBOR codecs that are actively maintained. As one example, [hildjj/node-cbor](https://github.com/hildjj/node-cbor) is  maintained by Joe Hildebrand (former VP of Engineering at Mozilla and Distinguished Engineer at Cisco). It's a monorepo with several packages including a "cbor package compiled for use on the web, including all of its non-optional dependencies".
+
+In Go, [fxamacker/cbor](https://github.com/fxamacker/cbor) is a fuzz-tested CBOR codec [already used by Cadence](https://github.com/onflow/cadence/blob/master/runtime/interpreter/encode.go) for internal value encoding.  It's fast, easy to use, and passed multiple security assessments this year without known problems. It is used by Arm Ltd., Chainlink, ConsenSys, Dapper Labs, Duo Labs (cisco), EdgeX Foundry, Microsoft, Mozilla, Oasis Labs, Tailscale, Taurus SA, and many others.  GitHub reports fxamacker/cbor/v2 is used by over 1275 repositories.
+
+## Security Considerations
 
 CBOR security considerations are described in [Section 10 of RFC 8949 (CBOR)](https://www.rfc-editor.org/rfc/rfc8949.html#name-security-considerations).
 
@@ -78,20 +122,6 @@ CBOR defines data [well-formedness](https://www.rfc-editor.org/rfc/rfc8949.html#
 CCF message validation should be done after passing checks for well-formedness.  Invalid CCF messages should be rejected.
 
 CCF decoder should detect and reject malformed or malicious data before creating Cadence objects.  Check for well-formedness can be done on other node types without asking EN for the Cadence type info.
-
-### Interoperability and Reuse
-
-It is good practice to leverage an existing generic data format to define more specific data formats and protocols.
-
-For example, CBOR (RFC 8949) is used by COSE (RFC 9052), which allows veraison/go-cose (COSE codec) to use fxamacker/cbor (CBOR codec) under the hood.  For context, veraison/go-cose was developed by Arm Ltd., Microsoft, and Mozilla.
-
-In the same way, CBOR is used by CCF data format specification, which allows CCF codecs to use CBOR codecs.
-
-High quality CBOR codecs are available in various programming languages.
-
-In JavaScript, there are two popular CBOR codecs and one of them is maintained by Joe Hildebrand (former VP of Engineering at Mozilla and Distinguished Engineer at Cisco).
-
-In Go, a fuzz-tested CBOR codec is fxamacker/cbor. It is fast, easy to use, and passed multiple security assessments this year without known problems. It is used by Arm Ltd., Chainlink, ConsenSys, Dapper Labs, Duo Labs (cisco), EdgeX Foundry, Microsoft, Mozilla, Oasis Labs, Tailscale, Taurus SA, etc.  GitHub reports fxamacker/cbor/v2 is used by over 1275 repositories.
 
 ## CCF Examples
 
