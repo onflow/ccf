@@ -35,8 +35,6 @@ CBOR is a self-describing binary data format that (among other improvements) ext
 
 CCF leverages CBOR's data model and CBOR Preferred Serialization to deterministically encode values to their smallest form.
 
-Although using a 100% custom data format instead of leveraging an existing data format like CBOR can sometimes produce smaller encoded data size, the benefits of using CBOR outweigh this tradeoff.
-
 CCF separates Cadence type encoding from Cadence value encoding. This has two distinct advantages:
 
 - More compact encoding.  Cadence type info is not repeatedly encoded unnecessarily.  E.g. for a homogeneous array of a Cadence composite type, each element will not have its Cadence composite type info encoded repeatedly.  
@@ -65,7 +63,11 @@ CCF is designed to support:
 
 ## Why CBOR
 
-It's good practice to leverage a standard data format to define more specific data formats and protocols.
+It's good practice to leverage a standard data format (like CBOR) to define more specific data formats and protocols.
+
+Although using a 100% custom data format instead of leveraging an existing data format can sometimes produce smaller encoded data size, the benefits of using CBOR outweigh this tradeoff.
+
+Cadence is [already using CBOR](https://github.com/onflow/cadence/blob/master/runtime/interpreter/encode.go) to encode internal values.  Using CBOR to also encode external values is a good fit for multiple reasons.
 
 Concise Binary Object Representation (CBOR) is a data format defined in IETF [RFC 8949](https://www.rfc-editor.org/rfc/rfc8949.html):
 
