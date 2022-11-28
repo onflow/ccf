@@ -496,6 +496,14 @@ This document uses diagnostic notation as defined in Appendix G of RFC 8610.
 
 ## Specifications
 
+There are 2 top level CCF messages: `CCF_CompositeTypeInfo_Message` and `CCF_TypeAndValue_Message`.
+
+Cadence types are encoded either inlined as `CCF_InlineTypeInfo` or not inlined as `CCF_CompositeTypeInfo_Message`.
+
+Cadence data is encoded depending on its type.
+For example, Cadence `UInt8` is encoded as CBOR positive integer, Cadence `String` is encoded as CBOR text string,
+Cadence `Address` is encoded as CBOR byte string, and Cadence struct data is encoded as an array of its raw field data.
+
 ```cddl
 ;CDDL-BEGIN
 
@@ -627,11 +635,3 @@ cadence_value = CCF_TypeAndValue_Message / cadence_raw_simple_type_value
 
 ;CDDL-END
 ```
-
-There are 2 top level CCF messages: `CCF_CompositeTypeInfo_Message` and `CCF_TypeAndValue_Message`.
-
-Cadence types are encoded either inlined as `CCF_InlineTypeInfo` or not inlined as `CCF_CompositeTypeInfo_Message`.
-
-Cadence data is encoded depending on its type.
-For example, Cadence `UInt8` is encoded as CBOR positive integer, Cadence `String` is encoded as CBOR text string,
-Cadence `Address` is encoded as CBOR byte string, and Cadence struct data is encoded as an array of its raw field data.
