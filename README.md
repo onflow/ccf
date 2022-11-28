@@ -496,7 +496,137 @@ This document uses diagnostic notation as defined in Appendix G of RFC 8610.
 
 ## Specifications
 
-See [ccf.cddl](ccf.cddl).
+```cddl
+;CDDL-BEGIN
+
+; NOTE: when changing values, also update uses in rules!
+
+CBORTagType = 128
+CBORTagStructType = 129
+CBORTagResourceType = 130
+CBORTagContractType = 131
+CBORTagEventType = 132
+CBORTagEnumType = 133
+CBORTagSimpleType = 134
+CBORTagOptionalType = 135
+CBORTagVarArrayType = 136
+CBORTagConstArrayType = 137
+CBORTagDictType = 138
+CBORTagCapabilityType = 139
+CBORTagTypeRef = 140
+CBORTagTypeAndValue = 141
+
+CF_Message = (
+    (? CCF_CompositeTypeInfo_Message),
+    CCF_TypeAndValue_Message
+)
+
+CCF_CompositeTypeInfo_Message =
+    ; CBORTagType
+    #6.128([
+        + (
+            CCF_StructTypeInfo_Message
+            / CCF_ResourceTypeInfo_Message
+            / CCF_ContractTypeInfo_Message
+            / CCF_EventTypeInfo_Message
+            / CCF_EnumTypeInfo_Message
+        )
+    ])
+
+composite_type_record = [
+	id: bstr,
+	location_identifier: tstr,
+	fields: [
+        + [
+            field_name: tstr,
+            field_type: CCF_InlineTypeInfo
+        ]
+    ]
+]
+
+CCF_StructTypeInfo_Message =
+    ; CBORTagStructType
+    #6.129(composite_type_record)
+
+CCF_ResourceTypeInfo_Message =
+    ; CBORTagResourceType
+    #6.130(composite_type_record)
+
+CCF_ContractTypeInfo_Message =
+    ; CBORTagContractType
+    #6.131(composite_type_record)
+
+CCF_EventTypeInfo_Message =
+    ; CBORTagEventType
+    #6.132(composite_type_record)
+
+CCF_EnumTypeInfo_Message =
+    ; CBORTagEnumType
+    #6.133(composite_type_record)
+
+CCF_InlineTypeInfo =
+    CCF_SimpleTypeInfo
+    / CCF_OptionalTypeInfo
+    / CCF_VarSizedArrayTypeInfo
+    / CCF_ConstSizedArrayTypeInfo
+    / CCF_DictTypeInfo
+    / CCF_CapabilityTypeInfo
+    / CCF_TypeRef
+
+CCF_SimpleTypeInfo =
+    ; CBORTagSimpleType
+    #6.134(simple_type_id)
+
+simple_type_id = uint
+
+CCF_OptionalTypeInfo =
+    ; CBORTagOptionalType
+    #6.135(CCF_InlineTypeInfo)
+
+CCF_VarSizedArrayTypeInfo =
+    ; CBORTagVarArrayType
+    #6.136(CCF_InlineTypeInfo)
+
+CCF_ConstSizedArrayTypeInfo =
+    ; CBORTagConstArrayType
+    #6.137([
+        array_size: uint,
+        element_type: CCF_InlineTypeInfo
+    ])
+
+CCF_DictTypeInfo =
+    ; CBORTagDictType
+    #6.138([
+        key_type: CCF_InlineTypeInfo,
+        element_type: CCF_InlineTypeInfo
+    ])
+
+CCF_CapabilityTypeInfo =
+    ; CBORTagCapabilityType
+    #6.139([
+        borrow_type: CCF_InlineTypeInfo
+    ])
+
+CCF_TypeRef =
+    ; CBORTagTypeRef
+    #6.140(
+        ; composite_type_id
+        bstr
+    )
+
+CCF_TypeAndValue_Message =
+    ; CBORTagTypeAndValue
+    #6.141([
+    	type: CCF_InlineTypeInfo,
+    	value: cadence_value / [cadence_value]
+    ])
+
+cadence_raw_simple_type_value = nil / bstr / tstr / uint / nint / bigint
+
+cadence_value = CCF_TypeAndValue_Message / cadence_raw_simple_type_value
+
+;CDDL-END
+```
 
 There are 2 top level CCF messages: `CCF_CompositeTypeInfo_Message` and `CCF_TypeAndValue_Message`.
 
