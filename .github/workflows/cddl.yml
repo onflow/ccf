@@ -1,0 +1,39 @@
+name: "CDDL"
+
+# Remove default permissions.
+permissions: {}
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    # The branches below must be a subset of the branches above
+    branches: [ main ]
+
+env:
+  CCF_SPECS_DOCUMENT: README.md
+  EXTRACTED_CDDL: ccf_temp.cddl
+
+jobs:
+  analyze:
+    name: Check CDDL
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Install CDDL compiler
+      run: cargo install cddl
+      
+    - name: Extract CDDL and print SHA256
+      run: |
+        sed -n "/;CDDL-BEGIN/,/;CDDL-END/p" "${CCF_SPECS_DOCUMENT}" > "${EXTRACTED_CDDL}"
+        sha256sum "${EXTRACTED_CDDL}"
+      
+    - name: Compile CDDL
+      run: cddl compile-cddl --cddl "${EXTRACTED_CDDL}"
