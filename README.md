@@ -3,7 +3,7 @@
 Author: Faye Amacker  
 Status: ABRIDGED DRAFT  
 Date: November 28, 2022  
-Revision: 20221128a  
+Revision: 20221128b  
 
 To simplify initial review of the most important aspects, some verbose content is left out (e.g. list of numeric values representing each built-in Cadence type).  The omitted content will be provided in a less abridged version of this document after the first review is completed.
 
@@ -496,9 +496,9 @@ This document uses diagnostic notation as defined in Appendix G of RFC 8610.
 
 ## Specifications
 
-There are 2 top level CCF messages: `CCF_CompositeTypeInfo_Message` and `CCF_TypeAndValue_Message`.
+There are 2 top level CCF messages: `ccf-composite-type-message` and `ccf-type-and-value-message`.
 
-Cadence types are encoded either inlined as `CCF_InlineTypeInfo` or not inlined as `CCF_CompositeTypeInfo_Message`.
+Cadence types are encoded either inlined as `inline-type` or not inlined as `ccf-composite-type-message`.
 
 Cadence data is encoded depending on its type.
 For example, Cadence `UInt8` is encoded as CBOR positive integer, Cadence `String` is encoded as CBOR text string,
@@ -509,129 +509,129 @@ Cadence `Address` is encoded as CBOR byte string, and Cadence struct data is enc
 
 ; NOTE: when changing values, also update uses in rules!
 
-CBORTagType = 128
-CBORTagStructType = 129
-CBORTagResourceType = 130
-CBORTagContractType = 131
-CBORTagEventType = 132
-CBORTagEnumType = 133
-CBORTagSimpleType = 134
-CBORTagOptionalType = 135
-CBORTagVarArrayType = 136
-CBORTagConstArrayType = 137
-CBORTagDictType = 138
-CBORTagCapabilityType = 139
-CBORTagTypeRef = 140
-CBORTagTypeAndValue = 141
+cbor-tag-type = 128
+cbor-tag-struct-type = 129
+cbor-tag-resource-type = 130
+cbor-tag-contract-type = 131
+cbor-tag-event-type = 132
+cbor-tag-enum-type = 133
+cbor-tag-simple-type = 134
+cbor-tag-optional-type = 135
+cbor-tag-varsized-array-type = 136
+cbor-tag-constsized-array-type = 137
+cbor-tag-dict-type = 138
+cbor-tag-capability-type = 139
+cbor-tag-type-ref = 140
+cbor-tag-type-and-value = 141
 
-CF_Message = (
-    (? CCF_CompositeTypeInfo_Message),
-    CCF_TypeAndValue_Message
+ccf-message = (
+    (? ccf-composite-type-message),
+    ccf-type-and-value-message
 )
 
-CCF_CompositeTypeInfo_Message =
-    ; CBORTagType
+ccf-composite-type-message =
+    ; cbor-tag-type
     #6.128([
         + (
-            CCF_StructTypeInfo_Message
-            / CCF_ResourceTypeInfo_Message
-            / CCF_ContractTypeInfo_Message
-            / CCF_EventTypeInfo_Message
-            / CCF_EnumTypeInfo_Message
+            struct-type
+            / resource-type
+            / contract-type
+            / event-type
+            / enum-type
         )
     ])
 
-composite_type_record = [
+composite-type-record = [
 	id: bstr,
-	location_identifier: tstr,
+	location-identifier: tstr,
 	fields: [
         + [
-            field_name: tstr,
-            field_type: CCF_InlineTypeInfo
+            field-name: tstr,
+            field-type: inline-type
         ]
     ]
 ]
 
-CCF_StructTypeInfo_Message =
-    ; CBORTagStructType
-    #6.129(composite_type_record)
+struct-type =
+    ; cbor-tag-struct-type
+    #6.129(composite-type-record)
 
-CCF_ResourceTypeInfo_Message =
-    ; CBORTagResourceType
-    #6.130(composite_type_record)
+resource-type =
+    ; cbor-tag-resource-type
+    #6.130(composite-type-record)
 
-CCF_ContractTypeInfo_Message =
-    ; CBORTagContractType
-    #6.131(composite_type_record)
+contract-type =
+    ; cbor-tag-contract-type
+    #6.131(composite-type-record)
 
-CCF_EventTypeInfo_Message =
-    ; CBORTagEventType
-    #6.132(composite_type_record)
+event-type =
+    ; cbor-tag-event-type
+    #6.132(composite-type-record)
 
-CCF_EnumTypeInfo_Message =
-    ; CBORTagEnumType
-    #6.133(composite_type_record)
+enum-type =
+    ; cbor-tag-enum-type
+    #6.133(composite-type-record)
 
-CCF_InlineTypeInfo =
-    CCF_SimpleTypeInfo
-    / CCF_OptionalTypeInfo
-    / CCF_VarSizedArrayTypeInfo
-    / CCF_ConstSizedArrayTypeInfo
-    / CCF_DictTypeInfo
-    / CCF_CapabilityTypeInfo
-    / CCF_TypeRef
+inline-type =
+    simple-type
+    / optional-type
+    / varsized-array-type
+    / constsized-array-type
+    / dict-type
+    / capability-type
+    / type-ref
 
-CCF_SimpleTypeInfo =
-    ; CBORTagSimpleType
-    #6.134(simple_type_id)
+simple-type =
+    ; cbor-tag-simple-type
+    #6.134(simple-type-id)
 
-simple_type_id = uint
+simple-type-id = uint
 
-CCF_OptionalTypeInfo =
-    ; CBORTagOptionalType
-    #6.135(CCF_InlineTypeInfo)
+optional-type =
+    ; cbor-tag-optional-type
+    #6.135(inline-type)
 
-CCF_VarSizedArrayTypeInfo =
-    ; CBORTagVarArrayType
-    #6.136(CCF_InlineTypeInfo)
+varsized-array-type =
+    ; cbor-tag-varsized-array-type
+    #6.136(inline-type)
 
-CCF_ConstSizedArrayTypeInfo =
-    ; CBORTagConstArrayType
+constsized-array-type =
+    ; cbor-tag-constsized-array-type
     #6.137([
-        array_size: uint,
-        element_type: CCF_InlineTypeInfo
+        array-size: uint,
+        element-type: inline-type
     ])
 
-CCF_DictTypeInfo =
-    ; CBORTagDictType
+dict-type =
+    ; cbor-tag-dict-Type
     #6.138([
-        key_type: CCF_InlineTypeInfo,
-        element_type: CCF_InlineTypeInfo
+        key-type: inline-type,
+        element-type: inline-type
     ])
 
-CCF_CapabilityTypeInfo =
-    ; CBORTagCapabilityType
+capability-type =
+    ; cbor-tag-capability-type
     #6.139([
-        borrow_type: CCF_InlineTypeInfo
+        borrow-type: inline-type
     ])
 
-CCF_TypeRef =
-    ; CBORTagTypeRef
+type-ref =
+    ; cbor-tag-type-ref
     #6.140(
-        ; composite_type_id
+        ; composite-type-id
         bstr
     )
 
-CCF_TypeAndValue_Message =
-    ; CBORTagTypeAndValue
+ccf-type-and-value-message =
+    ; cbor-tag-type-and-value
     #6.141([
-    	type: CCF_InlineTypeInfo,
-    	value: cadence_value / [cadence_value]
+      type: inline-type,
+      value: cadence-value / [cadence-value]
     ])
 
-cadence_raw_simple_type_value = nil / bstr / tstr / uint / nint / bigint
+cadence-raw-simple-type-value = nil / bstr / tstr / uint / nint / bigint
 
-cadence_value = CCF_TypeAndValue_Message / cadence_raw_simple_type_value
+cadence-value = ccf-type-and-value-message / cadence-raw-simple-type-value
 
 ;CDDL-END
 ```
