@@ -3,7 +3,7 @@
 Author: Faye Amacker  
 Status: ABRIDGED DRAFT  
 Date: November 29, 2022  
-Revision: 20221129a  
+Revision: 20221129b  
 
 To simplify initial review of the most important aspects, some verbose content is left out (e.g. list of numeric values representing each built-in Cadence type).  The omitted content will be provided in a less abridged version of this document after the first review is completed.
 
