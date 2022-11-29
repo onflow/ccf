@@ -1,9 +1,9 @@
 # DRAFT - Cadence Compact Format (CCF)
 
-Author: Faye Amacker
-Status: ABRIDGED DRAFT
-Date: November 23, 2022
-Revision: 20221123a
+Author: Faye Amacker  
+Status: ABRIDGED DRAFT  
+Date: November 28, 2022  
+Revision: 20221128a  
 
 To simplify initial review of the most important aspects, some verbose content is left out (e.g. list of numeric values representing each built-in Cadence type).  The omitted content will be provided in a less abridged version of this document after the first review is completed.
 
