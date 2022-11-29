@@ -3,7 +3,7 @@
 Author: Faye Amacker  
 Status: ABRIDGED DRAFT  
 Date: November 28, 2022  
-Revision: 20221128b  
+Revision: 20221128c  
 
 To simplify initial review of the most important aspects, some verbose content is left out (e.g. list of numeric values representing each built-in Cadence type).  The omitted content will be provided in a less abridged version of this document after the first review is completed.
 
@@ -507,22 +507,30 @@ Cadence `Address` is encoded as CBOR byte string, and Cadence struct data is enc
 ```cddl
 ;CDDL-BEGIN
 
-; NOTE: when changing values, also update uses in rules!
+; CCF uses CBOR tag numbers 128-255, which are unassigned by [IANA](https://www.iana.org/assignments/cbor-tags/cbor-tags.xhtml).
 
+; NOTE: when changing values, also update uses in rules!
 cbor-tag-type = 128
-cbor-tag-struct-type = 129
-cbor-tag-resource-type = 130
-cbor-tag-contract-type = 131
-cbor-tag-event-type = 132
-cbor-tag-enum-type = 133
-cbor-tag-simple-type = 134
-cbor-tag-optional-type = 135
-cbor-tag-varsized-array-type = 136
-cbor-tag-constsized-array-type = 137
-cbor-tag-dict-type = 138
-cbor-tag-capability-type = 139
-cbor-tag-type-ref = 140
-cbor-tag-type-and-value = 141
+; CBOR tag number 129 is reserved
+cbor-tag-type-and-value = 130
+cbor-tag-type-ref = 131
+cbor-tag-simple-type = 132
+cbor-tag-optional-type = 133
+cbor-tag-varsized-array-type = 134
+cbor-tag-constsized-array-type = 135
+cbor-tag-dict-type = 136
+cbor-tag-struct-type = 137
+cbor-tag-resource-type = 138
+cbor-tag-event-type = 139
+cbor-tag-contract-type = 140
+cbor-tag-enum-type = 141
+cbor-tag-struct-interface-type = 142
+cbor-tag-resource-interface-type = 143
+cbor-tag-contract-interface-type = 144
+cbor-tag-function-type = 145
+cbor-tag-reference-type = 146
+cbor-tag-restricted-type = 147
+cbor-tag-capability-type = 148
 
 ccf-message = (
     (? ccf-composite-type-message),
@@ -554,23 +562,23 @@ composite-type-record = [
 
 struct-type =
     ; cbor-tag-struct-type
-    #6.129(composite-type-record)
+    #6.137(composite-type-record)
 
 resource-type =
     ; cbor-tag-resource-type
-    #6.130(composite-type-record)
+    #6.138(composite-type-record)
 
 contract-type =
     ; cbor-tag-contract-type
-    #6.131(composite-type-record)
+    #6.140(composite-type-record)
 
 event-type =
     ; cbor-tag-event-type
-    #6.132(composite-type-record)
+    #6.139(composite-type-record)
 
 enum-type =
     ; cbor-tag-enum-type
-    #6.133(composite-type-record)
+    #6.141(composite-type-record)
 
 inline-type =
     simple-type
@@ -583,48 +591,48 @@ inline-type =
 
 simple-type =
     ; cbor-tag-simple-type
-    #6.134(simple-type-id)
+    #6.132(simple-type-id)
 
 simple-type-id = uint
 
 optional-type =
     ; cbor-tag-optional-type
-    #6.135(inline-type)
+    #6.133(inline-type)
 
 varsized-array-type =
     ; cbor-tag-varsized-array-type
-    #6.136(inline-type)
+    #6.134(inline-type)
 
 constsized-array-type =
     ; cbor-tag-constsized-array-type
-    #6.137([
+    #6.135([
         array-size: uint,
         element-type: inline-type
     ])
 
 dict-type =
     ; cbor-tag-dict-Type
-    #6.138([
+    #6.136([
         key-type: inline-type,
         element-type: inline-type
     ])
 
 capability-type =
     ; cbor-tag-capability-type
-    #6.139([
+    #6.148([
         borrow-type: inline-type
     ])
 
 type-ref =
     ; cbor-tag-type-ref
-    #6.140(
+    #6.131(
         ; composite-type-id
         bstr
     )
 
 ccf-type-and-value-message =
     ; cbor-tag-type-and-value
-    #6.141([
+    #6.130([
       type: inline-type,
       value: cadence-value / [cadence-value]
     ])
