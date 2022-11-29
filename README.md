@@ -2,8 +2,8 @@
 
 Author: Faye Amacker  
 Status: ABRIDGED DRAFT  
-Date: November 28, 2022  
-Revision: 20221128e  
+Date: November 29, 2022  
+Revision: 20221129a  
 
 To simplify initial review of the most important aspects, some verbose content is left out (e.g. list of numeric values representing each built-in Cadence type).  The omitted content will be provided in a less abridged version of this document after the first review is completed.
 
@@ -628,17 +628,6 @@ type-ref =
         bstr
     )
 
-ccf-type-and-value-message =
-    ; cbor-tag-type-and-value
-    #6.130([
-      type: inline-type,
-      value: cadence-value / [cadence-value]
-    ])
-
-cadence-raw-simple-type-value = nil / bstr / tstr / uint / nint / bigint
-
-cadence-value = ccf-type-and-value-message / cadence-raw-simple-type-value
-
 simple-type-id =
     bool-type-id
     / string-type-id
@@ -743,6 +732,107 @@ fixed-point-type-id = 47
 signed-fixed-point-type-id = 48
 bytes-type-id = 49
 void-type-id = 50
+
+ccf-type-and-value-message =
+    ; cbor-tag-type-and-value
+    #6.130([
+      type: inline-type,
+      value: value
+    ])
+
+value =
+    ccf-type-and-value-message
+		/ simple-value
+		/ optional-value
+		/ array-value
+		/ dict-value
+		/ composite-value
+		/ link-value
+		/ path-value
+		/ capability-value
+
+optional-value = nil / value
+
+array-value = [* value]
+
+dict-value = [* (key: value, value: value)]
+
+; composite-value is used to encode struct, contract, enum, event, and resource.
+composite-value = [+ (field: value)]
+
+link-value = [
+    path: path-value,
+	  borrow-type: tstr,
+]
+
+path-value = [
+	  domain: path-domain,
+	  identifier: tstr,
+]
+
+path-domain = domain-storage / domain-private / domain-public
+
+domain-storage = 1
+domain-private = 2
+domain-public = 3
+
+capability-value = [
+	  address: address-value,
+	  path: path-value
+]
+
+simple-value =
+    void-value
+    / bool-value
+    / character-value
+    / string-value
+    / address-value
+    / uint-value
+    / uint8-value
+    / uint16-value
+    / uint32-value
+    / uint64-value
+    / uint128-value
+    / uint256-value
+    / int-value
+    / int8-value
+    / int16-value
+    / int32-value
+    / int64-value
+    / int128-value
+    / int256-value
+    / word8-value
+    / word16-value
+    / word32-value
+    / word64-value
+    / fix64-value
+    / ufix64-value
+
+void-value = nil
+bool-value = bool
+character-value = tstr
+string-value = tstr
+address-value = bstr .size 8
+uint-value = bigint
+uint8-value = uint
+uint16-value = uint
+uint32-value = uint
+uint64-value = uint
+uint128-value = bigint
+uint256-value = bigint
+int-value = bigint
+int8-value = int
+int16-value = int
+int32-value = int
+int64-value = int
+int128-value = bigint
+int256-value = bigint
+word8-value = uint
+word16-value = uint
+word32-value = uint
+word64-value = uint
+fix64-value = int
+ufix64-value = uint
 
 ;CDDL-END
 ```
