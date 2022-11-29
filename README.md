@@ -617,9 +617,10 @@ dict-type =
 
 capability-type =
     ; cbor-tag-capability-type
-    #6.148([
-        borrow-type: inline-type
-    ])
+    #6.148(
+        ; borrow-type
+        inline-type
+    )
 
 type-ref =
     ; cbor-tag-type-ref
