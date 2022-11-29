@@ -11,7 +11,7 @@ CCF separates encoding of Cadence type info and values to avoid unnecessarily re
 
 ## Status
 
-CCF is currently in DRAFT status.
+CCF is currently in DRAFT status as of revision 20221129b.
 
 ## Notes
 
