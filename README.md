@@ -510,9 +510,13 @@ Cadence `Address` is encoded as CBOR byte string, and Cadence struct data is enc
 ; CCF uses CBOR tag numbers 128-255, which are unassigned by [IANA](https://www.iana.org/assignments/cbor-tags/cbor-tags.xhtml).
 
 ; NOTE: when changing values, also update uses in rules!
+
+; CBOR tag numbers for root objects
 cbor-tag-type = 128
-; CBOR tag number 129 is reserved
+; 129 is reserved
 cbor-tag-type-and-value = 130
+
+; CBOR tag numbers for types
 cbor-tag-type-ref = 131
 cbor-tag-simple-type = 132
 cbor-tag-optional-type = 133
@@ -524,12 +528,6 @@ cbor-tag-resource-type = 138
 cbor-tag-event-type = 139
 cbor-tag-contract-type = 140
 cbor-tag-enum-type = 141
-cbor-tag-struct-interface-type = 142
-cbor-tag-resource-interface-type = 143
-cbor-tag-contract-interface-type = 144
-cbor-tag-function-type = 145
-cbor-tag-reference-type = 146
-cbor-tag-restricted-type = 147
 cbor-tag-capability-type = 148
 
 ccf-message = (
@@ -549,7 +547,7 @@ ccf-composite-type-message =
         )
     ])
 
-composite-type-record = [
+composite-type = [
 	id: bstr,
 	location-identifier: tstr,
 	fields: [
@@ -562,23 +560,23 @@ composite-type-record = [
 
 struct-type =
     ; cbor-tag-struct-type
-    #6.137(composite-type-record)
+    #6.137(composite-type)
 
 resource-type =
     ; cbor-tag-resource-type
-    #6.138(composite-type-record)
+    #6.138(composite-type)
 
 contract-type =
     ; cbor-tag-contract-type
-    #6.140(composite-type-record)
+    #6.140(composite-type)
 
 event-type =
     ; cbor-tag-event-type
-    #6.139(composite-type-record)
+    #6.139(composite-type)
 
 enum-type =
     ; cbor-tag-enum-type
-    #6.141(composite-type-record)
+    #6.141(composite-type)
 
 inline-type =
     simple-type
@@ -609,7 +607,7 @@ constsized-array-type =
     ])
 
 dict-type =
-    ; cbor-tag-dict-Type
+    ; cbor-tag-dict-type
     #6.136([
         key-type: inline-type,
         element-type: inline-type
