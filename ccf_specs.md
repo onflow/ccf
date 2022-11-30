@@ -648,55 +648,55 @@ type-ref =
 simple-type-id =
     bool-type-id
     / string-type-id
-		/ character-type-id
-		/ address-type-id
-		/ int-type-id
-		/ int8-type-id
-		/ int16-type-id
-		/ int32-type-id
-		/ int64-type-id
-		/ int128-type-id
-		/ int256-type-id
-		/ uint-type-id
-		/ uint8-type-id
-		/ uint16-type-id
-		/ uint32-type-id
-		/ uint64-type-id
-		/ uint128-type-id
-		/ uint256-type-id
-		/ word8-type-id
-		/ word16-type-id
-		/ word32-type-id
-		/ word64-type-id
-		/ fix64-type-id
-		/ ufix64-type-id
-		/ path-type-id
-		/ capability-path-type-id
-		/ storage-path-type-id
-		/ public-path-type-id
-		/ private-path-type-id
-		/ auth-account-type-id
-		/ public-account-type-id
-		/ auth-account-keys-type-id
-		/ public-account-keys-type-id
-		/ auth-account-contracts-type-id
-		/ public-account-contracts-type-id
-		/ deployed-contract-type-id
-		/ account-key-type-id
-		/ block-type-id
-		/ any-type-id
-		/ any-struct-type-id
-		/ any-resource-type-id
-		/ meta-type-type-id
-		/ never-type-id
-		/ number-type-id
-		/ signed-number-type-id
-		/ integer-type-id
-		/ signed-integer-type-id
-		/ fixed-point-type-id
-		/ signed-fixed-point-type-id
-		/ bytes-type-id
-		/ void-type-id
+    / character-type-id
+    / address-type-id
+    / int-type-id
+    / int8-type-id
+    / int16-type-id
+    / int32-type-id
+    / int64-type-id
+    / int128-type-id
+    / int256-type-id
+    / uint-type-id
+    / uint8-type-id
+    / uint16-type-id
+    / uint32-type-id
+    / uint64-type-id
+    / uint128-type-id
+    / uint256-type-id
+    / word8-type-id
+    / word16-type-id
+    / word32-type-id
+    / word64-type-id
+    / fix64-type-id
+    / ufix64-type-id
+    / path-type-id
+    / capability-path-type-id
+    / storage-path-type-id
+    / public-path-type-id
+    / private-path-type-id
+    / auth-account-type-id
+    / public-account-type-id
+    / auth-account-keys-type-id
+    / public-account-keys-type-id
+    / auth-account-contracts-type-id
+    / public-account-contracts-type-id
+    / deployed-contract-type-id
+    / account-key-type-id
+    / block-type-id
+    / any-type-id
+    / any-struct-type-id
+    / any-resource-type-id
+    / meta-type-type-id
+    / never-type-id
+    / number-type-id
+    / signed-number-type-id
+    / integer-type-id
+    / signed-integer-type-id
+    / fixed-point-type-id
+    / signed-fixed-point-type-id
+    / bytes-type-id
+    / void-type-id
 
 bool-type-id = 0
 string-type-id = 1
@@ -759,14 +759,14 @@ ccf-type-and-value-message =
 
 value =
     ccf-type-and-value-message
-		/ simple-value
-		/ optional-value
-		/ array-value
-		/ dict-value
-		/ composite-value
-		/ link-value
-		/ path-value
-		/ capability-value
+    / simple-value
+    / optional-value
+    / array-value
+    / dict-value
+    / composite-value
+    / link-value
+    / path-value
+    / capability-value
     / function-value
     / type-value
 
@@ -781,12 +781,12 @@ composite-value = [+ (field: value)]
 
 link-value = [
     path: path-value,
-	  borrow-type: tstr,
+    borrow-type: tstr,
 ]
 
 path-value = [
-	  domain: path-domain,
-	  identifier: tstr,
+    domain: path-domain,
+    identifier: tstr,
 ]
 
 path-domain = domain-storage / domain-private / domain-public
@@ -796,8 +796,8 @@ domain-private = 2
 domain-public = 3
 
 capability-value = [
-	  address: address-value,
-	  path: path-value
+    address: address-value,
+    path: path-value
 ]
 
 simple-value =
@@ -932,24 +932,24 @@ contract-interface-type-value =
     #6.154(composite-type-value)
 
 composite-type-value = [
-	type: nil / type-value,
-  id: bstr,
-	location-identifier: tstr,
-	fields: [
-    + [
-          name: tstr,
-          type: type-value
-      ]
-  ]
-  initializers: [
-    * [
-        * [
-            label: tstr,
-            identifier: tstr,
+    type: nil / type-value,
+    id: bstr,
+    location-identifier: tstr,
+    fields: [
+        + [
+            name: tstr,
             type: type-value
-          ]
-      ]
-  ]
+        ]
+    ]
+    initializers: [
+        * [
+            * [
+                label: tstr,
+                identifier: tstr,
+                type: type-value
+            ]
+        ]
+    ]
 ]
 
 function-type-value =
