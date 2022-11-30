@@ -3,7 +3,7 @@
 Author: Faye Amacker  
 Status: ABRIDGED DRAFT  
 Date: November 29, 2022  
-Revision: 20221129b  
+Revision: 20221129c  
 
 To simplify initial review of the most important aspects, some verbose content is left out (e.g. list of numeric values representing each built-in Cadence type).  The omitted content will be provided in a less abridged version of this document after the first review is completed.
 
@@ -528,7 +528,25 @@ cbor-tag-resource-type = 138
 cbor-tag-event-type = 139
 cbor-tag-contract-type = 140
 cbor-tag-enum-type = 141
-cbor-tag-capability-type = 148
+cbor-tag-capability-type = 142
+
+; CBOR tag numbers for type value
+cbor-tag-optional-type-value = 143
+cbor-tag-varsized-array-type-value = 144
+cbor-tag-constsized-array-type-value = 145
+cbor-tag-dict-type-value = 146
+cbor-tag-struct-type-value = 147
+cbor-tag-resource-type-value = 148
+cbor-tag-event-type-value = 149
+cbor-tag-contract-type-value = 150
+cbor-tag-enum-type-value = 151
+cbor-tag-struct-interface-type-value = 152
+cbor-tag-resource-interface-type-value = 153
+cbor-tag-contract-interface-type-value = 154
+cbor-tag-function-type-value = 155
+cbor-tag-reference-type-value = 156
+cbor-tag-restricted-type-value = 157
+cbor-tag-capability-type-value = 158
 
 ccf-message = (
     (? ccf-composite-type-message),
@@ -615,7 +633,7 @@ dict-type =
 
 capability-type =
     ; cbor-tag-capability-type
-    #6.148(
+    #6.142(
         ; borrow-type
         inline-type
     )
@@ -749,6 +767,8 @@ value =
 		/ link-value
 		/ path-value
 		/ capability-value
+    / function-value
+    / type-value
 
 optional-value = nil / value
 
@@ -832,6 +852,141 @@ word32-value = uint
 word64-value = uint
 fix64-value = int
 ufix64-value = uint
+
+function-value = function-type-value
+
+type-value =
+    simple-type-value
+    / optional-type-value
+    / varsized-array-type-value
+    / constsized-array-type-value
+    / dict-type-value
+    / struct-type-value
+    / resource-type-value
+    / contract-type-value
+    / event-type-value
+    / enum-type-value
+    / struct-interface-type-value
+    / resource-interface-type-value
+    / contract-interface-type-value
+    / function-type-value
+    / reference-type-value
+    / restricted-type-value
+    / capability-type-value
+    / type-ref
+
+simple-type-value = simple-type
+
+optional-type-value =
+    ; cbor-tag-optional-type-value
+    #6.143(type-value)
+
+varsized-array-type-value =
+    ; cbor-tag-varsized-array-type-value
+    #6.144(type-value)
+
+constsized-array-type-value =
+    ; cbor-tag-constsized-array-type-value
+    #6.145([
+        array-size: uint,
+        element-type: type-value
+    ])
+
+dict-type-value =
+    ; cbor-tag-dict-type-value
+    #6.146([
+        key-type: type-value,
+        element-type: type-value
+    ])
+
+struct-type-value =
+    ; cbor-tag-struct-type-value
+    #6.147(composite-type-value)
+
+resource-type-value =
+    ; cbor-tag-resource-type-value
+    #6.148(composite-type-value)
+
+contract-type-value =
+    ; cbor-tag-contract-type-value
+    #6.150(composite-type-value)
+
+event-type-value =
+    ; cbor-tag-event-type-value
+    #6.149(composite-type-value)
+
+enum-type-value =
+    ; cbor-tag-enum-type-value
+    #6.151(composite-type-value)
+
+struct-interface-type-value =
+    ; cbor-tag-struct-interface-type-value
+    #6.152(composite-type-value)
+
+resource-interface-type-value =
+    ; cbor-tag-resource-interface-type-value
+    #6.153(composite-type-value)
+
+contract-interface-type-value =
+    ; cbor-tag-contract-interface-type-value
+    #6.154(composite-type-value)
+
+composite-type-value = [
+	type: nil / type-value,
+  id: bstr,
+	location-identifier: tstr,
+	fields: [
+    + [
+          name: tstr,
+          type: type-value
+      ]
+  ]
+  initializers: [
+    * [
+        * [
+            label: tstr,
+            identifier: tstr,
+            type: type-value
+          ]
+      ]
+  ]
+]
+
+function-type-value =
+    ; cbor-tag-function-type-value
+    #6.155([
+      id: tstr,
+      parameters: [
+        * [
+            label: tstr,
+            identifier: tstr,
+            type: type-value
+        ]
+      ]
+      return-type: type-value
+    ])
+
+reference-type-value =
+    ; cbor-tag-reference-type-value
+    #6.156([
+      authorized: bool,
+      type: type-value,
+    ])
+
+restricted-type-value =
+    ; cbor-tag-restricted-type-value
+    #6.157([
+      id: tstr,
+      type: type-value,
+      restrictions: [+ type-value]
+    ])
+
+capability-type-value =
+    ; cbor-tag-capability-type-value
+    #6.158(
+      ; borrow-type
+      type-value
+    )
 
 ;CDDL-END
 ```
