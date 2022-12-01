@@ -645,110 +645,60 @@ type-ref =
         bstr
     )
 
-simple-type-id =
-    bool-type-id
-    / string-type-id
-    / character-type-id
-    / address-type-id
-    / int-type-id
-    / int8-type-id
-    / int16-type-id
-    / int32-type-id
-    / int64-type-id
-    / int128-type-id
-    / int256-type-id
-    / uint-type-id
-    / uint8-type-id
-    / uint16-type-id
-    / uint32-type-id
-    / uint64-type-id
-    / uint128-type-id
-    / uint256-type-id
-    / word8-type-id
-    / word16-type-id
-    / word32-type-id
-    / word64-type-id
-    / fix64-type-id
-    / ufix64-type-id
-    / path-type-id
-    / capability-path-type-id
-    / storage-path-type-id
-    / public-path-type-id
-    / private-path-type-id
-    / auth-account-type-id
-    / public-account-type-id
-    / auth-account-keys-type-id
-    / public-account-keys-type-id
-    / auth-account-contracts-type-id
-    / public-account-contracts-type-id
-    / deployed-contract-type-id
-    / account-key-type-id
-    / block-type-id
-    / any-type-id
-    / any-struct-type-id
-    / any-resource-type-id
-    / meta-type-type-id
-    / never-type-id
-    / number-type-id
-    / signed-number-type-id
-    / integer-type-id
-    / signed-integer-type-id
-    / fixed-point-type-id
-    / signed-fixed-point-type-id
-    / bytes-type-id
-    / void-type-id
-
-bool-type-id = 0
-string-type-id = 1
-character-type-id = 2
-address-type-id = 3
-int-type-id = 4
-int8-type-id = 5
-int16-type-id = 6
-int32-type-id = 7
-int64-type-id = 8
-int128-type-id = 9
-int256-type-id = 10
-uint-type-id = 11
-uint8-type-id = 12
-uint16-type-id = 13
-uint32-type-id = 14
-uint64-type-id = 15
-uint128-type-id = 16
-uint256-type-id = 17
-word8-type-id = 18
-word16-type-id = 19
-word32-type-id = 20
-word64-type-id = 21
-fix64-type-id = 22
-ufix64-type-id = 23
-path-type-id = 24
-capability-path-type-id = 25
-storage-path-type-id = 26
-public-path-type-id = 27
-private-path-type-id = 28
-auth-account-type-id = 29
-public-account-type-id = 30
-auth-account-keys-type-id = 31
-public-account-keys-type-id = 32
-auth-account-contracts-type-id = 33
-public-account-contracts-type-id = 34
-deployed-contract-type-id = 35
-account-key-type-id = 36
-block-type-id = 37
-any-type-id = 38
-any-struct-type-id = 39
-any-resource-type-id = 40
-meta-type-type-id = 41
-never-type-id = 42
-number-type-id = 43
-signed-number-type-id = 44
-integer-type-id = 45
-signed-integer-type-id = 46
-fixed-point-type-id = 47
-signed-fixed-point-type-id = 48
-bytes-type-id = 49
-void-type-id = 50
+; simple-type-id is an enumeration.
+simple-type-id = &(
+    bool-type-id: 0,
+    string-type-id: 1,
+    character-type-id: 2,
+    address-type-id: 3,
+    int-type-id: 4,
+    int8-type-id: 5,
+    int16-type-id: 6,
+    int32-type-id: 7,
+    int64-type-id: 8,
+    int128-type-id: 9,
+    int256-type-id: 10,
+    uint-type-id: 11,
+    uint8-type-id: 12,
+    uint16-type-id: 13,
+    uint32-type-id: 14,
+    uint64-type-id: 15,
+    uint128-type-id: 16,
+    uint256-type-id: 17,
+    word8-type-id: 18,
+    word16-type-id: 19,
+    word32-type-id: 20,
+    word64-type-id: 21,
+    fix64-type-id: 22,
+    ufix64-type-id: 23,
+    path-type-id: 24,
+    capability-path-type-id: 25,
+    storage-path-type-id: 26,
+    public-path-type-id: 27,
+    private-path-type-id: 28,
+    auth-account-type-id: 29,
+    public-account-type-id: 30,
+    auth-account-keys-type-id: 31,
+    public-account-keys-type-id: 32,
+    auth-account-contracts-type-id: 33,
+    public-account-contracts-type-id: 34,
+    deployed-contract-type-id: 35,
+    account-key-type-id: 36,
+    block-type-id: 37,
+    any-type-id: 38,
+    any-struct-type-id: 39,
+    any-resource-type-id: 40,
+    meta-type-type-id: 41,
+    never-type-id: 42,
+    number-type-id: 43,
+    signed-number-type-id: 44,
+    integer-type-id: 45,
+    signed-integer-type-id: 46,
+    fixed-point-type-id: 47,
+    signed-fixed-point-type-id: 48,
+    bytes-type-id: 49,
+    void-type-id: 50,
+)
 
 ccf-type-and-value-message =
     ; cbor-tag-type-and-value
@@ -789,11 +739,12 @@ path-value = [
     identifier: tstr,
 ]
 
-path-domain = domain-storage / domain-private / domain-public
-
-domain-storage = 1
-domain-private = 2
-domain-public = 3
+; path-domain is an enumeration
+path-domain = &(
+    domain-storage: 1,
+    domain-private: 2,
+    domain-public: 3,
+)
 
 capability-value = [
     address: address-value,
