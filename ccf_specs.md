@@ -566,9 +566,9 @@ ccf-composite-type-message =
     ])
 
 composite-type = [
-	id: bstr,
-	location-identifier: tstr,
-	fields: [
+    id: bstr,
+    location-identifier: tstr,
+    fields: [
         + [
             field-name: tstr,
             field-type: inline-type
@@ -633,10 +633,11 @@ dict-type =
 
 capability-type =
     ; cbor-tag-capability-type
-    #6.142(
+    ; use an array as an extension point
+    #6.142([
         ; borrow-type
         inline-type
-    )
+    ])
 
 type-ref =
     ; cbor-tag-type-ref
@@ -934,10 +935,11 @@ restricted-type-value =
 
 capability-type-value =
     ; cbor-tag-capability-type-value
-    #6.158(
+    ; use an array as an extension point
+    #6.158([
       ; borrow-type
       type-value
-    )
+    ])
 
 ;CDDL-END
 ```
