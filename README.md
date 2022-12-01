@@ -3,6 +3,8 @@
 
 CCF is defined in [ccf_specs.md](ccf_specs.md).
 
+[Cadence](https://github.com/onflow/cadence) is a resource-oriented programming language that introduces new features to smart contract programming.  It's used by [Flow](https://github.com/onflow/flow-go) blockchain and has a syntax inspired by Swift, Kotlin, and Rust. Its use of resource types maps well to the Move language.
+
 CCF is a data format designed for compact, efficient, and deterministic encoding of Cadence external values.  This format is intended to be an alternative to and eventually replace [JSON-Cadence Data Interchange Format](https://developers.flow.com/cadence/json-cadence-spec).
 
 CCF leverages [Concise Binary Object Representation (CBOR)](https://www.rfc-editor.org/rfc/rfc8949.html), which is an IETF Internet Standard data format with a data model that is a superset of JSON's data model.  CCF uses a subset of CBOR's data model with CBOR Preferred Serialization to deterministically encode values to their smallest form.  CBOR was designed with security considerations in mind, such as malformed data detection.  CCF codecs can inherit detection of malformed data by using an existing CBOR codec.
@@ -11,7 +13,13 @@ CCF separates encoding of Cadence type info and values to avoid unnecessarily re
 
 ## Status
 
-CCF is currently in DRAFT status as of revision 20221129b.
+CCF is currently in DRAFT status as of revision 20221129b.  More content is being added to turn the abridged draft into full draft.
+
+## Timeline
+- Oct 18, 2022 - Resume onboarding of Cadence external value encoding and requirements.
+- Nov 17, 2022 - Share the abridged first draft of CCF with Cadence team and Ramtin for initial sanity check.
+- Nov 22, 2022 - First team meeting about abridged draft of CCF to present and discuss revision [20221122b](https://github.com/fxamacker/ccf_draft/blob/2594c4859e51715bb9e770cc42542eb31278cfc4/README.md).
+- Nov 29, 2022 - Second team meeting about draft of CCF to present and discuss revision [20221129b](https://github.com/fxamacker/ccf_draft/blob/2c9541a90de968413ec34d31dcf2444949dbce1e/ccf_specs.md).
 
 ## Notes
 
