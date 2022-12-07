@@ -2,8 +2,8 @@
 
 Author: Faye Amacker  
 Status: ABRIDGED DRAFT  
-Date: November 29, 2022  
-Revision: 20221129c  
+Date: Dec 07, 2022  
+Revision: 20221207a
 
 To simplify initial review of the most important aspects, some verbose content is left out (e.g. list of numeric values representing each built-in Cadence type).  The omitted content will be provided in a less abridged version of this document after the first review is completed.
 
@@ -511,42 +511,68 @@ Cadence `Address` is encoded as CBOR byte string, and Cadence struct data is enc
 
 ; NOTE: when changing values, also update uses in rules!
 
-; CBOR tag numbers for root objects
+; CBOR tag numbers (128-135) for root objects
 cbor-tag-type = 128
 ; 129 is reserved
 cbor-tag-type-and-value = 130
+; 131-135 are reserved
 
-; CBOR tag numbers for types
-cbor-tag-type-ref = 131
-cbor-tag-simple-type = 132
-cbor-tag-optional-type = 133
-cbor-tag-varsized-array-type = 134
-cbor-tag-constsized-array-type = 135
-cbor-tag-dict-type = 136
-cbor-tag-struct-type = 137
-cbor-tag-resource-type = 138
-cbor-tag-event-type = 139
-cbor-tag-contract-type = 140
-cbor-tag-enum-type = 141
-cbor-tag-capability-type = 142
+; CBOR tag numbers (136-183) for types
 
-; CBOR tag numbers for type value
-cbor-tag-optional-type-value = 143
-cbor-tag-varsized-array-type-value = 144
-cbor-tag-constsized-array-type-value = 145
-cbor-tag-dict-type-value = 146
-cbor-tag-struct-type-value = 147
-cbor-tag-resource-type-value = 148
-cbor-tag-event-type-value = 149
-cbor-tag-contract-type-value = 150
-cbor-tag-enum-type-value = 151
-cbor-tag-struct-interface-type-value = 152
-cbor-tag-resource-interface-type-value = 153
-cbor-tag-contract-interface-type-value = 154
-cbor-tag-function-type-value = 155
-cbor-tag-reference-type-value = 156
-cbor-tag-restricted-type-value = 157
-cbor-tag-capability-type-value = 158
+; inline types
+cbor-tag-type-ref = 136
+cbor-tag-simple-type = 137
+cbor-tag-optional-type = 138
+cbor-tag-varsized-array-type = 139
+cbor-tag-constsized-array-type = 140
+cbor-tag-dict-type = 141
+cbor-tag-reference-type = 142
+cbor-tag-restricted-type = 143
+cbor-tag-capability-type = 144
+; 145-159 are reserved
+
+; composite types
+cbor-tag-struct-type = 160
+cbor-tag-resource-type = 161
+cbor-tag-event-type = 162
+cbor-tag-contract-type = 163
+cbor-tag-enum-type = 164
+; 165-175 are reserved
+
+; interface types
+cbor-tag-struct-interface-type = 176
+cbor-tag-resource-interface-type = 177
+cbor-tag-contract-interface-type = 178
+; 179-183 are reserved
+
+; CBOR tag numbers (184-231) for type value
+
+; non-composite and non-interface type values
+cbor-tag-type-value-ref = 184
+cbor-tag-simple-type-value = 185
+cbor-tag-optional-type-value = 186
+cbor-tag-varsized-array-type-value = 187
+cbor-tag-constsized-array-type-value = 188
+cbor-tag-dict-type-value = 189
+cbor-tag-reference-type-value = 190
+cbor-tag-restricted-type-value = 191
+cbor-tag-capability-type-value = 192
+cbor-tag-function-type-value = 193
+; 194-207 are reserved
+
+; composite type values
+cbor-tag-struct-type-value = 208
+cbor-tag-resource-type-value = 209
+cbor-tag-event-type-value = 210
+cbor-tag-contract-type-value = 211
+cbor-tag-enum-type-value = 212
+; 213-223 are reserved
+
+; interface type values
+cbor-tag-struct-interface-type-value = 224
+cbor-tag-resource-interface-type-value = 225
+cbor-tag-contract-interface-type-value = 226
+; 227-231 are reserved
 
 ccf-message = (
     (? ccf-composite-type-message),
@@ -562,12 +588,19 @@ ccf-composite-type-message =
             / contract-type
             / event-type
             / enum-type
+            / struct-interface-type
+            / resource-interface-type
+            / contract-interface-type
         )
     ])
 
-composite-type = [
+composite-type-id = (
     id: bstr,
     location-identifier: tstr,
+)
+
+composite-type = [
+    composite-type-id
     fields: [
         + [
             field-name: tstr,
@@ -576,25 +609,41 @@ composite-type = [
     ]
 ]
 
+composite-interface-type = [
+    composite-type-id
+]
+
 struct-type =
     ; cbor-tag-struct-type
-    #6.137(composite-type)
+    #6.160(composite-type)
 
 resource-type =
     ; cbor-tag-resource-type
-    #6.138(composite-type)
-
-contract-type =
-    ; cbor-tag-contract-type
-    #6.140(composite-type)
+    #6.161(composite-type)
 
 event-type =
     ; cbor-tag-event-type
-    #6.139(composite-type)
+    #6.162(composite-type)
+
+contract-type =
+    ; cbor-tag-contract-type
+    #6.163(composite-type)
 
 enum-type =
     ; cbor-tag-enum-type
-    #6.141(composite-type)
+    #6.164(composite-type)
+
+struct-interface-type =
+    ; cbor-tag-struct-interface-type
+    #6.176(composite-interface-type)
+
+resource-interface-type =
+    ; cbor-tag-resource-interface-type
+    #6.177(composite-interface-type)
+
+contract-interface-type =
+    ; cbor-tag-contract-interface-type
+    #6.178(composite-interface-type)
 
 inline-type =
     simple-type
@@ -602,46 +651,62 @@ inline-type =
     / varsized-array-type
     / constsized-array-type
     / dict-type
+    / reference-type
+    / restricted-type
     / capability-type
     / type-ref
 
 simple-type =
     ; cbor-tag-simple-type
-    #6.132(simple-type-id)
+    #6.137(simple-type-id)
 
 optional-type =
     ; cbor-tag-optional-type
-    #6.133(inline-type)
+    #6.138(inline-type)
 
 varsized-array-type =
     ; cbor-tag-varsized-array-type
-    #6.134(inline-type)
+    #6.139(inline-type)
 
 constsized-array-type =
     ; cbor-tag-constsized-array-type
-    #6.135([
+    #6.140([
         array-size: uint,
         element-type: inline-type
     ])
 
 dict-type =
     ; cbor-tag-dict-type
-    #6.136([
+    #6.141([
         key-type: inline-type,
         element-type: inline-type
+    ])
+
+reference-type =
+    ; cbor-tag-reference-type
+    #6.142([
+      authorized: bool,
+      type: inline-type,
+    ])
+
+restricted-type =
+    ; cbor-tag-restricted-type
+    #6.143([
+      type: inline-type,
+      restrictions: [+ inline-type]
     ])
 
 capability-type =
     ; cbor-tag-capability-type
     ; use an array as an extension point
-    #6.142([
+    #6.144([
         ; borrow-type
         inline-type
     ])
 
 type-ref =
     ; cbor-tag-type-ref
-    #6.131(
+    #6.136(
         ; composite-type-id
         bstr
     )
@@ -699,6 +764,7 @@ simple-type-id = &(
     signed-fixed-point-type-id: 48,
     bytes-type-id: 49,
     void-type-id: 50,
+    function-type-id: 51,
 )
 
 ccf-type-and-value-message =
@@ -805,7 +871,7 @@ word64-value = uint .le 18446744073709551615
 fix64-value = (int .ge -9223372036854775808) .le 9223372036854775807
 ufix64-value = uint .le 18446744073709551615
 
-function-value = function-type-value
+function-value = function-untagged-type-value
 
 type-value =
     simple-type-value
@@ -825,63 +891,65 @@ type-value =
     / reference-type-value
     / restricted-type-value
     / capability-type-value
-    / type-ref
+    / type-value-ref
 
-simple-type-value = simple-type
+simple-type-value =
+    ; cbor-tag-simple-type-value
+    #6.185(simple-type-id)
 
 optional-type-value =
     ; cbor-tag-optional-type-value
-    #6.143(type-value)
+    #6.186(type-value)
 
 varsized-array-type-value =
     ; cbor-tag-varsized-array-type-value
-    #6.144(type-value)
+    #6.187(type-value)
 
 constsized-array-type-value =
     ; cbor-tag-constsized-array-type-value
-    #6.145([
+    #6.188([
         array-size: uint,
         element-type: type-value
     ])
 
 dict-type-value =
     ; cbor-tag-dict-type-value
-    #6.146([
+    #6.189([
         key-type: type-value,
         element-type: type-value
     ])
 
 struct-type-value =
     ; cbor-tag-struct-type-value
-    #6.147(composite-type-value)
+    #6.208(composite-type-value)
 
 resource-type-value =
     ; cbor-tag-resource-type-value
-    #6.148(composite-type-value)
-
-contract-type-value =
-    ; cbor-tag-contract-type-value
-    #6.150(composite-type-value)
+    #6.209(composite-type-value)
 
 event-type-value =
     ; cbor-tag-event-type-value
-    #6.149(composite-type-value)
+    #6.210(composite-type-value)
+
+contract-type-value =
+    ; cbor-tag-contract-type-value
+    #6.211(composite-type-value)
 
 enum-type-value =
     ; cbor-tag-enum-type-value
-    #6.151(composite-type-value)
+    #6.212(composite-type-value)
 
 struct-interface-type-value =
     ; cbor-tag-struct-interface-type-value
-    #6.152(composite-type-value)
+    #6.224(composite-type-value)
 
 resource-interface-type-value =
     ; cbor-tag-resource-interface-type-value
-    #6.153(composite-type-value)
+    #6.225(composite-type-value)
 
 contract-interface-type-value =
     ; cbor-tag-contract-interface-type-value
-    #6.154(composite-type-value)
+    #6.226(composite-type-value)
 
 composite-type-value = [
     type: nil / type-value,
@@ -906,28 +974,30 @@ composite-type-value = [
 
 function-type-value =
     ; cbor-tag-function-type-value
-    #6.155([
-      id: tstr,
-      parameters: [
+    #6.193(function-untagged-type-value)
+
+function-untagged-type-value = [
+    id: tstr,
+    parameters: [
         * [
             label: tstr,
             identifier: tstr,
             type: type-value
         ]
-      ]
-      return-type: type-value
-    ])
+    ]
+    return-type: type-value
+]
 
 reference-type-value =
     ; cbor-tag-reference-type-value
-    #6.156([
+    #6.190([
       authorized: bool,
       type: type-value,
     ])
 
 restricted-type-value =
     ; cbor-tag-restricted-type-value
-    #6.157([
+    #6.191([
       id: tstr,
       type: type-value,
       restrictions: [+ type-value]
@@ -936,10 +1006,17 @@ restricted-type-value =
 capability-type-value =
     ; cbor-tag-capability-type-value
     ; use an array as an extension point
-    #6.158([
+    #6.192([
       ; borrow-type
       type-value
     ])
+
+type-value-ref =
+    ; cbor-tag-type-value-ref
+    #6.184(
+        ; composite-type-value-id
+        bstr
+    )
 
 ;CDDL-END
 ```
