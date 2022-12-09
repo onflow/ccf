@@ -609,7 +609,7 @@ composite-type = [
     ]
 ]
 
-composite-interface-type = [
+interface-type = [
     type-id
 ]
 
@@ -635,15 +635,15 @@ enum-type =
 
 struct-interface-type =
     ; cbor-tag-struct-interface-type
-    #6.176(composite-interface-type)
+    #6.176(interface-type)
 
 resource-interface-type =
     ; cbor-tag-resource-interface-type
-    #6.177(composite-interface-type)
+    #6.177(interface-type)
 
 contract-interface-type =
     ; cbor-tag-contract-interface-type
-    #6.178(composite-interface-type)
+    #6.178(interface-type)
 
 inline-type =
     simple-type
