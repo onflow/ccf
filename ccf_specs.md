@@ -594,13 +594,16 @@ ccf-composite-type-message =
         )
     ])
 
-type-id = (
-    id: bstr,
-    location-identifier: tstr,
-)
+; id is a unique identifier used by CCF to associate composite/interface type information
+; with value through type-ref and type-value-ref.
+id = bstr
+
+; cadence-type-id is an identifier used by Cadence to identify types.
+cadence-type-id = tstr
 
 composite-type = [
-    type-id
+    id: id,
+    cadence-type-id: cadence-type-id,
     fields: [
         + [
             field-name: tstr,
@@ -610,7 +613,8 @@ composite-type = [
 ]
 
 interface-type = [
-    type-id
+    id: id,
+    cadence-type-id: tstr,
 ]
 
 struct-type =
@@ -706,10 +710,7 @@ capability-type =
 
 type-ref =
     ; cbor-tag-type-ref
-    #6.136(
-        ; type-id
-        bstr
-    )
+    #6.136(id)
 
 ; simple-type-id is an enumeration.
 simple-type-id = &(
@@ -952,9 +953,10 @@ contract-interface-type-value =
     #6.226(composite-type-value)
 
 composite-type-value = [
+    id: id,
+    cadence-type-id: cadence-type-id,
+    ; type is only used by enum type value
     type: nil / type-value,
-    id: bstr,
-    location-identifier: tstr,
     fields: [
         + [
             name: tstr,
@@ -977,7 +979,7 @@ function-type-value =
     #6.193(function-untagged-type-value)
 
 function-untagged-type-value = [
-    id: tstr,
+    cadence-type-id: cadence-type-id,
     parameters: [
         * [
             label: tstr,
@@ -998,7 +1000,7 @@ reference-type-value =
 restricted-type-value =
     ; cbor-tag-restricted-type-value
     #6.191([
-      id: tstr,
+      cadence-type-id: cadence-type-id,
       type: type-value,
       restrictions: [+ type-value]
     ])
@@ -1013,10 +1015,7 @@ capability-type-value =
 
 type-value-ref =
     ; cbor-tag-type-value-ref
-    #6.184(
-        ; composite-type-value-id
-        bstr
-    )
+    #6.184(id)
 
 ;CDDL-END
 ```
