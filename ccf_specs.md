@@ -594,13 +594,13 @@ ccf-composite-type-message =
         )
     ])
 
-composite-type-id = (
+type-id = (
     id: bstr,
     location-identifier: tstr,
 )
 
 composite-type = [
-    composite-type-id
+    type-id
     fields: [
         + [
             field-name: tstr,
@@ -610,7 +610,7 @@ composite-type = [
 ]
 
 composite-interface-type = [
-    composite-type-id
+    type-id
 ]
 
 struct-type =
@@ -707,7 +707,7 @@ capability-type =
 type-ref =
     ; cbor-tag-type-ref
     #6.136(
-        ; composite-type-id
+        ; type-id
         bstr
     )
 
