@@ -9,11 +9,13 @@ To simplify initial review of the most important aspects, some verbose content i
 
 ## Abstract
 
-This document defines the Cadence Compact Format (CCF). CCF is a data format designed for compact, efficient, and deterministic encoding of Cadence external values.  This format is intended to be an alternative to and eventually replace [JSON-Cadence Data Interchange Format](https://developers.flow.com/cadence/json-cadence-spec).
+Cadence Compact Format (CCF) is a data format designed for compact, efficient, and deterministic encoding of [Cadence](https://github.com/onflow/cadence) external values.
 
-[Concise Binary Object Representation (CBOR)](https://www.rfc-editor.org/rfc/rfc8949.html) is an IETF Internet Standard data format with a data model that is a superset of JSON's data model.  CCF uses a subset of CBOR's data model with CBOR Preferred Serialization to deterministically encode values to their smallest form.  CBOR was designed with security considerations in mind, such as malformed data detection.  CCF codecs can inherit detection of malformed data by using an existing CBOR codec.
+Cadence is a resource-oriented programming language that introduces new features to smart contract programming.  It's used by [Flow](https://github.com/onflow/flow-go) blockchain and has a syntax inspired by Swift, Kotlin, and Rust. Its use of resource types maps well to the Move language.
 
-CCF separates encoding of Cadence type info and values to avoid unnecessarily repeating Cadence type info (e.g. for a homogenous array, the same Cadence type info isn't repeatedly encoded).  This separation allows more compact encoded size.  Another distinct advantage is support for more compact communication size.  Detachable Cadence type info (for all composite types) enables protocols using CCF to optionally transmit the Cadence type info just once rather than repeating it for every message matching the same type.
+CCF can be used as a hybrid data format.  CCF-based messages can be fully self-describing or partially self-describing.  Both are more compact than JSON-based messages.  CCF-based protocols can send Cadence metadata just once for all messages of that type.  Malformed data can be detected without Cadence metadata and without creating Cadence objects.
+
+CCF obsoletes [JSON-Cadence Data Interchange Format](https://developers.flow.com/cadence/json-cadence-spec) for use cases that do not require JSON.
 
 ## Introduction
 
