@@ -33,4 +33,4 @@ Draft of CCF was originally in README.md and moved to ccf_specs.md on Nov 29, 20
 
 ## License
 
-CCF is licensed under the terms of the Apache license. See [LICENSE](LICENSE) for more information.
+CCF is licensed under the terms of the Apache License, Version 2.0. See [LICENSE](LICENSE) for more information.

@@ -3,9 +3,7 @@
 Author: Faye Amacker  
 Status: ABRIDGED DRAFT  
 Date: Dec 11, 2022  
-Revision: 20221211a
-
-To simplify initial review of the most important aspects, some verbose content was initially left out.  Omitted content relies on prior revision not changing, so it is being added after each set of prior revisions is reviewed.
+Revision: 20221211b
 
 ## Abstract
 
@@ -17,21 +15,31 @@ CCF can be used as a hybrid data format.  CCF-based messages can be fully self-d
 
 CCF obsoletes [JSON-Cadence Data Interchange Format](https://developers.flow.com/cadence/json-cadence-spec) for use cases that do not require JSON.
 
+## Status of this Document
+
+This document is an ABRIDGED DRAFT.  To simplify initial review of the most important aspects, some verbose content was initially left out.  Omitted content relies on prior revision not changing and is being added after each set of prior revisions is reviewed.
+
+## Copyright Notice
+
+Copyright (c) 2022 Dapper Labs and the persons identified as the document authors.
+
+This document is licensed under the terms of the Apache License, Version 2.0. See [LICENSE](LICENSE) for more information.
+
 ## Introduction
 
 Currently, Cadence external values (e.g. transaction arguments and events) are being encoded using JSON-Cadence Data Interchange format, which is inefficient, verbose, and doesn't define deterministic encoding (canonical form).
 
-A need exists to provide a more compact, efficient, and deterministic encoding of Cadence external values.
+The goal of CCF is to provide more compact, efficient, and deterministic encoding of Cadence external values.
 
-CCF leverages CBOR's data model and Preferred Serialization to deterministically encode values to their smallest form.  This document uses CDDL notation to specify CCF.
+CCF leverages [Internet Standards](https://en.wikipedia.org/wiki/Internet_Standard) from [IETF](https://www.ietf.org) which are designed to be relevant for decades:
 
-- [CDDL (RFC 8610)](https://www.rfc-editor.org/rfc/rfc8610.html) is the Concise Data Definition Language. CDDL is a notation for unambiguously expressing CBOR and JSON data structures.
+- [CBOR (RFC 8949)](https://www.rfc-editor.org/rfc/rfc8949.html) is the Concise Binary Object Representation. CBOR is a stable, efficient, and extensible data format.  CBOR is used by other standards such as W3C WebAuthn, IETF COSE (RFC 9052), and IETF CWT (RFC 8392).
 
-- [EDN (Appendix G of RFC 8610)](https://www.rfc-editor.org/rfc/rfc8610.html#appendix-G) is the Extended Diagnostic Notation.  EDN is used by this document to describe examples of CCF encoding.
+- [CDDL (RFC 8610)](https://www.rfc-editor.org/rfc/rfc8610.html) is the Concise Data Definition Language.  CDDL is a notation for unambiguously expressing CBOR and JSON data structures.
 
-- [CBOR (RFC 8949)](https://www.rfc-editor.org/rfc/rfc8949.html) is an IETF Internet Standard (not just a regular RFC) and is used by other standards, such as W3C WebAuthn, IETF COSE (RFC 9052), and IETF CWT (RFC 8392).  CBOR is extensible without version negotiation and is designed to be relevant for decades.
+- [EDN (Appendix G of RFC 8610)](https://www.rfc-editor.org/rfc/rfc8610.html#appendix-G) is the Extended Diagnostic Notation.  EDN is a "diagnostic notation" used for conversing about encoded CBOR data.
 
-CBOR is a self-describing binary data format that (among other improvements) extends JSON's data model by allowing for binary data.  CBOR's data model is a superset of JSON's data model.  CBOR supports deterministic encoding with Preferred Serialization and Core Deterministic Encoding Requirements as defined in RFC 8949.
+CBOR is used by CCF to deterministically encode values to their smallest form.  CDDL notation is used in this document to define CCF.  EDN is used to describe encoded examples.
 
 ### CCF Design
 
@@ -509,7 +517,8 @@ Cadence `Address` is encoded as CBOR byte string, and Cadence struct data is enc
 ```cddl
 ;CDDL-BEGIN
 
-; CCF uses CBOR tag numbers 128-255, which are unassigned by [IANA](https://www.iana.org/assignments/cbor-tags/cbor-tags.xhtml).
+; CCF uses CBOR tag numbers 128-255, which are unassigned by IANA.
+; https://www.iana.org/assignments/cbor-tags/cbor-tags.xhtml
 
 ; NOTE: when changing values, also update uses in rules!
 
