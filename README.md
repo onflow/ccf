@@ -27,6 +27,37 @@ Additional content includes a section on canonical encoding, additional Cadence 
 - Nov 22, 2022 - First team meeting about abridged draft of CCF to present and discuss revision [20221122b](https://github.com/fxamacker/ccf_draft/blob/2594c4859e51715bb9e770cc42542eb31278cfc4/README.md).
 - Nov 29, 2022 - Second team meeting about draft of CCF to present and discuss revision [20221129b](https://github.com/fxamacker/ccf_draft/blob/2c9541a90de968413ec34d31dcf2444949dbce1e/ccf_specs.md).
 
+## Preliminary Size and Benchmark Comparisons
+
+Preliminary encoded size comparison of new CCF vs current JSON-based format using `FeesDeducted` example downloaded from flowscan.org show:
+- 298 bytes -- JSON
+- 119 bytes -- CCF with Cadence type info attached (fully self-describing)
+- 18 bytes -- CCF without Cadence type info (partially self-describing)
+
+Benchmark Comparison of JSON vs CCF using a `FeesDeducted` event data.
+
+```
+name       old time/op    new time/op    delta
+Encode-48    2.87µs ± 0%    1.44µs ± 0%  -49.88%  (p=0.000 n=20+19)
+
+name       old alloc/op   new alloc/op   delta
+Encode-48    1.12kB ± 0%    1.07kB ± 0%   -5.24%  (p=0.000 n=20+20)
+
+name       old allocs/op  new allocs/op  delta
+Encode-48      23.0 ± 0%      13.0 ± 0%  -43.48%  (p=0.000 n=20+20)
+
+name       old time/op    new time/op    delta
+Decode-48    9.81µs ± 1%    2.31µs ± 0%  -76.46%  (p=0.000 n=20+19)
+
+name       old alloc/op   new alloc/op   delta
+Decode-48    6.37kB ± 0%    1.22kB ± 0%  -80.87%  (p=0.000 n=20+20)
+
+name       old allocs/op  new allocs/op  delta
+Decode-48       130 ± 0%        26 ± 0%  -80.00%  (p=0.000 n=20+20)
+```
+
+These benchmark results are preliminary and subject to change.
+
 ## Notes
 
 Draft of CCF was originally in README.md and moved to ccf_specs.md on Nov 29, 2022. Given this, the initial commit history of the CCF specification is associated with the README.md file rather than ccf_specs.md.
