@@ -2,8 +2,8 @@
 
 Author: Faye Amacker  
 Status: ABRIDGED DRAFT  
-Date: Dec 11, 2022  
-Revision: 20221211c
+Date: Dec 12, 2022  
+Revision: 20221212a
 
 ## Abstract
 
@@ -515,6 +515,16 @@ Cadence data is encoded depending on its type.
 For example, Cadence `UInt8` is encoded as CBOR positive integer, Cadence `String` is encoded as CBOR text string,
 Cadence `Address` is encoded as CBOR byte string, and Cadence struct data is encoded as an array of its raw field data.
 
+### Cadence Type and TypeValue
+
+Cadence types and Cadence `TypeValue` are encoded differently.  They contain different data because they are used differently.
+
+Cadence types are used to decode Cadence data, so they only contain information needed for decoding.  For example, composite type's field info is needed to decode composite value.  However, interface type's field info isn't needed to decode values implementing interface type.
+
+Cadence `TypeValue` is a Cadence value which provides comprehensive information about a type.  For example, composite type value and interface type value contain info about both fields and initializers.
+
+### CCF Specified in CDDL Notation
+
 ```cddl
 ;CDDL-BEGIN
 
@@ -624,6 +634,8 @@ composite-type = [
     ]
 ]
 
+; interface-type doesn't include field info because it's not needed for
+; decoding values implementing interface type.
 interface-type = [
     id: id,
     cadence-type-id: tstr,
