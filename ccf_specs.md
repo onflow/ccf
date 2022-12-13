@@ -521,7 +521,7 @@ Cadence types and Cadence `TypeValue` are encoded differently.  They contain dif
 
 Cadence types are used to decode Cadence data, so they only contain information needed for decoding.  For example, composite type's field info is needed to decode composite value.  However, interface type's field info isn't needed to decode values implementing interface type.
 
-Cadence `TypeValue` is a Cadence value which provides comprehensive information about a type.  For example, composite type value and interface type value contain info about both fields and initializers.
+Cadence type value is a Cadence value which provides comprehensive information about a type.  For example, composite type value and interface type value contain info about both fields and initializers.
 
 ### CCF Specified in CDDL Notation
 
