@@ -517,7 +517,7 @@ Cadence `Address` is encoded as CBOR byte string, and Cadence struct data is enc
 
 ### Cadence Types and Type Values
 
-Cadence types and Cadence `TypeValue` are encoded differently.  They contain different data because they are used differently.
+Cadence types and Cadence type values (run-time types) are encoded differently.  They contain different data because they are used differently.
 
 Cadence types are used to decode Cadence data, so they only contain information needed for decoding.  For example, composite type's field info is needed to decode composite value.  However, interface type's field info isn't needed to decode values implementing interface type.
 
