@@ -515,7 +515,7 @@ Cadence data is encoded depending on its type.
 For example, Cadence `UInt8` is encoded as CBOR positive integer, Cadence `String` is encoded as CBOR text string,
 Cadence `Address` is encoded as CBOR byte string, and Cadence struct data is encoded as an array of its raw field data.
 
-### Cadence Type and TypeValue
+### Cadence Types and Type Values
 
 Cadence types and Cadence `TypeValue` are encoded differently.  They contain different data because they are used differently.
 
