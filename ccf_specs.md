@@ -70,7 +70,7 @@ CCF is designed to support:
 
 - Interoperability and Reuse.  CCF uses the same approach taken by COSE (RFC 9052) leveraging CBOR (RFC 8949).  CCF leverages CBOR, which allows CCF codecs to use CBOR codecs under the hood.
 
-- Translation to JSON.  CCF is defined using CDDL notation.  CBOR's data model is a superset of JSON's data model.  CCF uses a subset of CBOR's data model which allows translation from CCF to JSON-based formats.
+- Translation to JSON.  CCF uses a subset of CBOR data model and RFC 8949 specifies how to convert data between CBOR and JSON.
 
 ## Why CBOR
 
@@ -103,7 +103,7 @@ CBOR was designed with security considerations in mind.  It allows CBOR codecs t
 
 CBOR defines deterministic encoding with Preferred Serialization and Core Deterministic Encoding Requirements.
 
-CBOR is well-suited to replace JSON-based data formats and protocols.  CBOR's data model extends JSON's data model with:
+CBOR is well-suited to replace JSON in data formats and protocols.  Converting data between CBOR and JSON is defined in [section 6 of RFC 8949](https://datatracker.ietf.org/doc/html/rfc8949#name-converting-data-between-cbo).  CBOR's data model extends JSON's data model with:
 - compact binary encodings
 - extension points (CBOR Tags and Simple Values)
 - deterministic encoding as already mentioned
