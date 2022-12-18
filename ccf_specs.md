@@ -134,7 +134,7 @@ CBOR defines data [well-formedness](https://www.rfc-editor.org/rfc/rfc8949.html#
 
 CCF message validation should be done after passing checks for well-formedness.  Invalid CCF messages should be rejected.
 
-CCF decoder should detect and reject malformed or malicious data before creating Cadence objects.  Check for well-formedness can be done on other node types without asking EN for the Cadence type info.
+CCF decoder should detect and reject malformed or malicious data before creating Cadence objects and without requiring Cadence type info.
 
 ## CCF Examples
 
