@@ -3,7 +3,7 @@
 Author: Faye Amacker  
 Status: ABRIDGED DRAFT  
 Date: Jan 30, 2023  
-Revision: 20230130b
+Revision: 20230130c
 
 ## Abstract
 
@@ -720,6 +720,7 @@ reference-type =
 restricted-type =
     ; cbor-tag-restricted-type
     #6.143([
+      cadence-type-id: cadence-type-id,
       type: inline-type,
       restrictions: [+ inline-type]
     ])
