@@ -3,7 +3,7 @@
 Author: Faye Amacker  
 Status: ABRIDGED DRAFT  
 Date: Jan 30, 2023  
-Revision: 20230130a
+Revision: 20230130b
 
 ## Abstract
 
@@ -821,16 +821,9 @@ dict-value = [* (key: value, value: value)]
 composite-value = [+ (field: value)]
 
 path-value = [
-    domain: path-domain,
+    domain: uint,
     identifier: tstr,
 ]
-
-; path-domain is an enumeration
-path-domain = &(
-    domain-storage: 1,
-    domain-private: 2,
-    domain-public: 3,
-)
 
 capability-value = [
     address: address-value,
