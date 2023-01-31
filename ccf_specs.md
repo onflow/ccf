@@ -2,8 +2,8 @@
 
 Author: Faye Amacker  
 Status: ABRIDGED DRAFT  
-Date: Dec 18, 2022  
-Revision: 20221218a
+Date: Jan 30, 2023  
+Revision: 20230130a
 
 ## Abstract
 
@@ -806,7 +806,6 @@ value =
     / array-value
     / dict-value
     / composite-value
-    / link-value
     / path-value
     / capability-value
     / function-value
@@ -820,11 +819,6 @@ dict-value = [* (key: value, value: value)]
 
 ; composite-value is used to encode struct, contract, enum, event, and resource.
 composite-value = [+ (field: value)]
-
-link-value = [
-    path: path-value,
-    borrow-type: tstr,
-]
 
 path-value = [
     domain: path-domain,
