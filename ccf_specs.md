@@ -884,7 +884,17 @@ word64-value = uint .le 18446744073709551615
 fix64-value = (int .ge -9223372036854775808) .le 9223372036854775807
 ufix64-value = uint .le 18446744073709551615
 
-function-value = function-untagged-type-value
+function-value = [
+    cadence-type-id: cadence-type-id,
+    parameters: [
+        * [
+            label: tstr,
+            identifier: tstr,
+            type: type-value
+        ]
+    ]
+    return-type: type-value
+]
 
 type-value =
     nil
@@ -989,19 +999,7 @@ composite-type-value = [
 
 function-type-value =
     ; cbor-tag-function-type-value
-    #6.193(function-untagged-type-value)
-
-function-untagged-type-value = [
-    cadence-type-id: cadence-type-id,
-    parameters: [
-        * [
-            label: tstr,
-            identifier: tstr,
-            type: type-value
-        ]
-    ]
-    return-type: type-value
-]
+    #6.193(function-value)
 
 reference-type-value =
     ; cbor-tag-reference-type-value
