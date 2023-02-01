@@ -2,8 +2,8 @@
 
 Author: Faye Amacker  
 Status: ABRIDGED DRAFT  
-Date: Jan 30, 2023  
-Revision: 20230130c
+Date: Jan 31, 2023  
+Revision: 20230131a
 
 ## Abstract
 
@@ -887,7 +887,8 @@ ufix64-value = uint .le 18446744073709551615
 function-value = function-untagged-type-value
 
 type-value =
-    simple-type-value
+    nil
+    / simple-type-value
     / optional-type-value
     / varsized-array-type-value
     / constsized-array-type-value
