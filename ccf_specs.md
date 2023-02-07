@@ -2,8 +2,8 @@
 
 Author: Faye Amacker  
 Status: ABRIDGED DRAFT  
-Date: Jan 31, 2023  
-Revision: 20230131a
+Date: Feb 06, 2023  
+Revision: 20230206a
 
 ## Abstract
 
@@ -507,13 +507,15 @@ This document uses diagnostic notation as defined in Appendix G of RFC 8610.
 
 ## Specifications
 
-There are 2 top level CCF messages: `ccf-composite-type-message` and `ccf-type-and-value-message`.
+There are 3 top level CCF messages: `ccf-typedef-message`, `ccf-typedef-and-value-message`, and `ccf-type-and-value-message`.
 
-Cadence types are encoded either inlined as `inline-type` or not inlined as `ccf-composite-type-message`.
+- `ccf-typedef-message` is a list of type definitions for Cadence composite types.
+- `ccf-typedef-and-value-message` is a Cadence value preceded by a list of type definitions of referenced Cadence composite types.
+- `ccf-type-and-value-message` is a Cadence value preceded by builtin or known composite Cadence type(s).
 
-Cadence data is encoded depending on its type.
-For example, Cadence `UInt8` is encoded as CBOR positive integer, Cadence `String` is encoded as CBOR text string,
-Cadence `Address` is encoded as CBOR byte string, and Cadence struct data is encoded as an array of its raw field data.
+Cadence types are encoded as `inline-type` (inlined) or as `composite-typedef` (not inlined).
+
+Cadence data is encoded depending on its type. For example, Cadence `UInt8` is encoded as CBOR positive integer, Cadence `String` is encoded as CBOR text string, Cadence `Address` is encoded as CBOR byte string, and Cadence struct data is encoded as an array of its raw field data.
 
 ### Cadence Types and Type Values
 
@@ -534,8 +536,8 @@ Cadence type value is a Cadence value which provides comprehensive information a
 ; NOTE: when changing values, also update uses in rules!
 
 ; CBOR tag numbers (128-135) for root objects
-cbor-tag-type = 128
-; 129 is reserved
+cbor-tag-typedef = 128
+cbor-tag-typedef-and-value = 129
 cbor-tag-type-and-value = 130
 ; 131-135 are reserved
 
@@ -597,24 +599,27 @@ cbor-tag-contract-interface-type-value = 226
 ; 227-231 are reserved
 
 ccf-message = (
-    (? ccf-composite-type-message),
-    ccf-type-and-value-message
+    ccf-typedef-message
+    / ccf-typedef-and-value-message
+    / ccf-type-and-value-message
 )
 
-ccf-composite-type-message =
-    ; cbor-tag-type
-    #6.128([
-        + (
-            struct-type
-            / resource-type
-            / contract-type
-            / event-type
-            / enum-type
-            / struct-interface-type
-            / resource-interface-type
-            / contract-interface-type
-        )
-    ])
+ccf-typedef-message =
+    ; cbor-tag-typedef
+    #6.128(composite-typedef)
+
+composite-typedef = [
+    + (
+        struct-type
+        / resource-type
+        / contract-type
+        / event-type
+        / enum-type
+        / struct-interface-type
+        / resource-interface-type
+        / contract-interface-type
+    )
+]
 
 ; id is a unique identifier used by CCF to associate composite/interface type information
 ; with value through type-ref and type-value-ref.
@@ -793,13 +798,22 @@ simple-type-id = &(
     function-type-id: 51,
 )
 
+ccf-typedef-and-value-message =
+    ; cbor-tag-typedef-and-value
+    #6.129([
+      typedef: composite-typedef,
+      type-and-value: inline-type-and-value 
+    ])
+    
 ccf-type-and-value-message =
     ; cbor-tag-type-and-value
-    #6.130([
-      type: inline-type,
-      value: value
-    ])
+    #6.130(inline-type-and-value)
 
+inline-type-and-value = [
+      type: inline-type,
+      value: value,
+]
+    
 value =
     ccf-type-and-value-message
     / simple-value
