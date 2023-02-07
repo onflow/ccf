@@ -2,8 +2,8 @@
 
 Author: Faye Amacker  
 Status: ABRIDGED DRAFT  
-Date: Feb 06, 2023  
-Revision: 20230206a
+Date: Feb 07, 2023  
+Revision: 20230207a
 
 ## Abstract
 
@@ -877,13 +877,13 @@ bool-value = bool
 character-value = tstr
 string-value = tstr
 address-value = bstr .size 8
-uint-value = bigint
+uint-value = bigint .ge 0
 uint8-value = uint .le 255
 uint16-value = uint .le 65535
 uint32-value = uint .le 4294967295
 uint64-value = uint .le 18446744073709551615
-uint128-value = bigint
-uint256-value = bigint
+uint128-value = bigint .ge 0
+uint256-value = bigint .ge 0
 int-value = bigint
 int8-value = (int .ge -128) .le 127
 int16-value = (int .ge -32768) .le 32767
