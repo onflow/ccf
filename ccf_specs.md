@@ -41,7 +41,7 @@ CCF leverages [Internet Standards](https://en.wikipedia.org/wiki/Internet_Standa
 
 CBOR is used by CCF to deterministically encode values to their smallest form.  CDDL notation is used in this document to define CCF.  EDN is used to describe encoded examples.
 
-## Objectives
+### Objectives
 
 The goal of CCF is to provide compact, efficient, and deterministic encoding of Cadence external values.  To achieve this:
 - CCF leverages CBOR's data model with [Preferred Serialization](https://www.rfc-editor.org/rfc/rfc8949.html#name-preferred-serialization) to deterministically encode values to their smallest form.
@@ -72,7 +72,7 @@ CCF is designed to support:
 
 - Translation to JSON.  CCF uses a subset of CBOR data model and RFC 8949 specifies how to convert data between CBOR and JSON.
 
-## Why CBOR
+### Why CBOR
 
 It's good practice to leverage a standard data format (like CBOR) to define more specific data formats and protocols.
 
@@ -121,6 +121,43 @@ High quality CBOR codecs are available in various programming languages.
 In JavaScript, there are multiple CBOR codecs that are actively maintained. As one example, [hildjj/node-cbor](https://github.com/hildjj/node-cbor) is  maintained by Joe Hildebrand (former VP of Engineering at Mozilla and Distinguished Engineer at Cisco). It's a monorepo with several packages including a "cbor package compiled for use on the web, including all of its non-optional dependencies".
 
 In Go, [fxamacker/cbor](https://github.com/fxamacker/cbor) is a fuzz-tested CBOR codec [already used by Cadence](https://github.com/onflow/cadence/blob/master/runtime/interpreter/encode.go) for internal value encoding.  It's fast, easy to use, and passed multiple security assessments this year without known problems. It is used by Arm Ltd., Chainlink, ConsenSys, Dapper Labs, Duo Labs (cisco), EdgeX Foundry, Microsoft, Mozilla, Oasis Labs, Tailscale, Taurus SA, and many others.  GitHub reports fxamacker/cbor/v2 is used by over 1275 repositories.
+
+### Terminology
+
+The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in BCP 14 [[RFC2119](https://www.rfc-editor.org/info/rfc2119)] [[RFC8174](https://www.rfc-editor.org/info/rfc8174)] when, and only when, they appear in all capitals, as shown here.
+
+This specification makes use of CBOR and CDDL terminology.
+
+#### CBOR
+
+This specification uses these CBOR data items as defined in RFC 8949:
+- nil
+- bool
+- positive integer
+- negative integer
+- byte string
+- text string
+- bignum
+- array
+- tagged data item (tag): comprised of a tag number and tag content
+
+#### CDDL
+
+This specification uses CDDL notation to express CBOR data items:
+- `nil`: CBOR nil
+- `bool`: CBOR bool
+- `uint`: CBOR unsigned integer
+- `nint`: CBOR negative integer
+- `bstr`: CBOR byte string
+- `tstr`: CBOR text string
+- `bigint`: CBOR bignum
+- `? Foo`: Foo is optional
+- `(Foo)`: Foo is a group
+- `Foo / Bar`: either Foo or Bar
+- `Foo Bar`: Foo followed by Bar
+- `[+ Foo]`: one or more Foo in CBOR array
+- `[* Foo]`: zero or more Foo in CBOR array
+- `#6.nnn(type)`: CBOR tag with tag number nnn and content type of "type".
 
 ## Security Considerations
 
@@ -467,39 +504,6 @@ Type data item represents `128([139([h'', "A.f919ee77447b7497.FlowFees.FeesDeduc
 Value data item represents `130([131(h''), [2969, 100000000, 575]])`, where
 - `131(h'')` is type identified by ID `0`.
 - `[2969, 100000000, 575]` is `FeesDeducted` event raw field data.
-
-## Terminology
-
-### CBOR
-
-This document uses these CBOR data items as defined in RFC 8949:
-- nil
-- bool
-- positive integer
-- negative integer
-- byte string
-- text string
-- bignum
-- array
-- tagged data item (tag): comprised of a tag number and tag content
-
-## CDDL
-
-This document uses CDDL notation to express CBOR data items:
-- `nil`: CBOR nil
-- `bool`: CBOR bool
-- `uint`: CBOR unsigned integer
-- `nint`: CBOR negative integer
-- `bstr`: CBOR byte string
-- `tstr`: CBOR text string
-- `bigint`: CBOR bignum
-- `? Foo`: Foo is optional
-- `(Foo)`: Foo is a group
-- `Foo / Bar`: either Foo or Bar
-- `Foo Bar`: Foo followed by Bar
-- `[+ Foo]`: one or more Foo in CBOR array
-- `[* Foo]`: zero or more Foo in CBOR array
-- `#6.nnn(type)`: CBOR tag with tag number nnn and content type of "type".
 
 ## Extended Diagnostic Notation (EDN)
 
