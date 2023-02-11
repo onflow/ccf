@@ -2,8 +2,8 @@
 
 Author: Faye Amacker  
 Status: ABRIDGED DRAFT  
-Date: Feb 07, 2023  
-Revision: 20230207a
+Date: Feb 10, 2023  
+Revision: 20230210a
 
 ## Abstract
 
@@ -124,13 +124,15 @@ In Go, [fxamacker/cbor](https://github.com/fxamacker/cbor) is a fuzz-tested CBOR
 
 ### Terminology
 
+This specification uses requirements terminology, CBOR terminology, and CDDL terminology.
+
+#### Requirements Terminology
+
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in BCP 14 [[RFC2119](https://www.rfc-editor.org/info/rfc2119)] [[RFC8174](https://www.rfc-editor.org/info/rfc8174)] when, and only when, they appear in all capitals, as shown here.
 
-This specification makes use of CBOR and CDDL terminology.
+#### CBOR Terminology
 
-#### CBOR
-
-This specification uses these CBOR data items as defined in RFC 8949:
+This specification uses this subset of CBOR data items as defined in RFC 8949:
 - nil
 - bool
 - positive integer
@@ -141,7 +143,7 @@ This specification uses these CBOR data items as defined in RFC 8949:
 - array
 - tagged data item (tag): comprised of a tag number and tag content
 
-#### CDDL
+#### CDDL Terminology
 
 This specification uses CDDL notation to express CBOR data items:
 - `nil`: CBOR nil
