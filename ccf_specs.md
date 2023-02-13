@@ -1,7 +1,7 @@
 # DRAFT - Cadence Compact Format (CCF)
 
 Author: Faye Amacker  
-Status: ABRIDGED DRAFT  
+Status: DRAFT  
 Date: Feb 13, 2023  
 Revision: 20230213a
 
