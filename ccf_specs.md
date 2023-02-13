@@ -2,8 +2,8 @@
 
 Author: Faye Amacker  
 Status: ABRIDGED DRAFT  
-Date: Feb 10, 2023  
-Revision: 20230210a
+Date: Feb 13, 2023  
+Revision: 20230213a
 
 ## Abstract
 
@@ -17,7 +17,7 @@ CCF obsoletes [JSON-Cadence Data Interchange Format](https://developers.flow.com
 
 ## Status of this Document
 
-This document is an ABRIDGED DRAFT.  To simplify initial review of the most important aspects, some verbose content was initially left out.  Omitted content relies on prior revision not changing and is being added after each set of prior revisions is reviewed.
+This document is a DRAFT.
 
 ## Copyright Notice
 
@@ -160,6 +160,74 @@ This specification uses CDDL notation to express CBOR data items:
 - `[+ Foo]`: one or more Foo in CBOR array
 - `[* Foo]`: zero or more Foo in CBOR array
 - `#6.nnn(type)`: CBOR tag with tag number nnn and content type of "type".
+
+## Serialization Considerations
+
+CCF is a data format that uses a subset of CBOR with additional requirements for validity and deterministic encoding.
+
+### Valid CCF Encoding Requirements
+
+A CCF encoding is valid if it complies with "Valid CCF Encoding Requirements".
+
+Encoders MUST produce valid CCF encodings from valid input items.  Encoders are not required to check for invalid input items (e.g. invalid UTF-8 strings, duplicate dictionary keys, etc.)  Applications MUST NOT provide invalid items to encoders.
+
+Decoders MUST reject CCF encodings that are not valid unless otherwise specified in this section.
+
+A CCF encoding complies with "Valid CCF Encoding Requirements" if it complies with the following restrictions:
+
+- CBOR data items MUST be well-formed and valid as defined in RFC 8949.  E.g. CBOR text strings MUST contain valid UTF-8.  As an exception, RFC 8949 requirements for CBOR maps are not applicable because CCF does not use CBOR maps.
+
+- `composite-type.id` MUST be unique in `ccf-typedef-message` or `ccf-typedef-and-value-message`.
+
+- `composite-type.cadence-type-id` MUST be unique in `ccf-typedef-message` or `ccf-typedef-and-value-message`.
+
+- `type-ref.id` MUST refer to `composite-type.id`.
+
+- `composite-type-value.id` MUST be unique in the same `composite-type-value` data item.
+
+- `type-value-ref.id` MUST refer to `composite-type-value.id` in the same `composite-type-value` data item.
+
+- `name` MUST be unique in `composite-type-value.fields`.
+
+- `identifier` MUST be unique in `composite-type-value.initializers`.
+
+- `restricted-type.restrictions` MUST be unique.
+
+- `field-name` MUST be unique in `composite-type`.
+
+- keys MUST be unique in `dict-value`.  Decoders are not always required to check for duplicate dictionary keys.  In some cases, checking for duplicate dictionary key is not necessary or it may be delegated to the application.
+
+### Deterministic CCF Encoding Requirements
+
+A CCF encoding is deterministic if it satisfies the "Deterministic CCF Encoding Requirements".
+
+Encoders SHOULD emit CCF encodings that are deterministic.  CCF-based protocols MUST specify when encoders are required to emit deterministic CCF encodings.
+
+Decoders SHOULD check CCF encodings to determine whether they are deterministic encodings.  CCF-based protocols MUST specify when decoders are required to check for deterministic encodings and how to handle nondeterministic encodings.
+
+A CCF encoding satisfies the "Deterministic CCF Encoding Requirements" if it satisfies the following restrictions:
+
+- CCF encodings MUST satisfy "Valid CCF Encoding Requirements" defined in this document.
+
+- CCF encodings MUST satisfy "Core Deterministic Encoding Requirements" defined in RFC 8948 Section 4.2.1.  As an exception, RFC 8949 requirements for CBOR maps are not applicable because CCF does not use CBOR maps.
+
+- `composite-type.id` in `ccf-typedef-and-value-message` MUST be identical to its zero-based index in `composite-typedef`.
+
+- `composite-type-value.id` MUST be identical to the zero-based encoding order `type-value`.
+
+- `inline-type-and-value` MUST NOT be used when type can be deduced, for instance:
+  - array elements MUST use `inline-type-and-value` if array type is `[AnyStruct]`.
+  - array elements MUST NOT use `inline-type-and-value` if array type is `[Int]`.
+  - dictionay keys MUST NOT use `inline-type-and-value` while elements must, if dictionary type is `{String: AnyStruct}`.
+  - composite field MUST NOT use `inline-type-and-value` if that field type is `Int`.
+
+- The following data items MUST be sorted using bytewise lexicographic order of their deterministic encodings:
+  - type definitions MUST be sorted by `cadence-type-id` in `composite-typedef`.
+  - `dict-value` key-value pairs MUST be sorted by key.
+  - `composite-type.fields` MUST be sorted by `name`
+  - `composite-type-value.fields` MUST be sorted by `name`.
+  - `composite-type-value.initializers` MUST be sorted by `identifier`.
+  - `restricted-type.restrictions` MUST be sorted.
 
 ## Security Considerations
 
