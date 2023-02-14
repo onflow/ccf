@@ -2,8 +2,8 @@
 
 Author: Faye Amacker  
 Status: DRAFT  
-Date: Feb 13, 2023  
-Revision: 20230213a
+Date: Feb 14, 2023  
+Revision: 20230214a
 
 ## Abstract
 
@@ -165,6 +165,24 @@ This specification uses CDDL notation to express CBOR data items:
 
 CCF is a data format that uses a subset of CBOR with additional requirements for validity and deterministic encoding.
 
+### Cadence Types and Values Encoding
+
+[Cadence values have types](https://developers.flow.com/cadence/language/values-and-types).  For example:
+- `true` has the type `Bool` 
+- `"hello"` has the type `String` 
+- `let aos: [String] = ["hello", "world"]` declares `aos` of type `[String]`. 
+- `let aoa: [AnyStruct] = ["hello", true]` declares `aoa` of type `[AnyStruct]`.
+
+CCF encoding decouples value encoding from type encoding.  For example:  
+- Cadence booleans is encoded as a tuple of type and value: the `Bool` type and its value.  
+- Cadence strings is encoded as a tuple of type and value: the `String` type and its value.
+
+For compactness, CCF encoding skips type encoding when type can be inferred.
+
+As one example, the type of each element in `[String]` can be inferred to have type `String`.  Given this, CCF encodings of `[String]` can skip encoding each element's type of `String`.  Instead, CCF encodes `[String]` as a tuple like this: `[String]` type and a value representing a list of element values.  This avoids redundantly encoding each element's type.
+
+If type cannot be inferred, it must be encoded as part of a tuple representing a type and its value.  For example, the type of each element in `[AnyStruct]` cannot be inferred.  The type `AnyStruct` is the top type of all non-resource types and array elements can be of heterogenous types. In this case, `[AnyStruct]` is encoded as a tuple like this: `[AnyStruct]` type and a value being a list of tuples representing each element's type and value.
+
 ### Valid CCF Encoding Requirements
 
 A CCF encoding is valid if it complies with "Valid CCF Encoding Requirements".
@@ -215,11 +233,7 @@ A CCF encoding satisfies the "Deterministic CCF Encoding Requirements" if it sat
 
 - `composite-type-value.id` MUST be identical to the zero-based encoding order `type-value`.
 
-- `inline-type-and-value` MUST NOT be used when type can be deduced, for instance:
-  - array elements MUST use `inline-type-and-value` if array type is `[AnyStruct]`.
-  - array elements MUST NOT use `inline-type-and-value` if array type is `[Int]`.
-  - dictionay keys MUST NOT use `inline-type-and-value` while elements must, if dictionary type is `{String: AnyStruct}`.
-  - composite field MUST NOT use `inline-type-and-value` if that field type is `Int`.
+- `inline-type-and-value` MUST NOT be used when type can be inferred.
 
 - The following data items MUST be sorted using bytewise lexicographic order of their deterministic encodings:
   - type definitions MUST be sorted by `cadence-type-id` in `composite-typedef`.
