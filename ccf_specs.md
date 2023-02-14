@@ -211,7 +211,7 @@ A CCF encoding complies with "Valid CCF Encoding Requirements" if it complies wi
   - `name` MUST be unique in `composite-type-value.fields`. 
   - `identifier` MUST be unique in `composite-type-value.initializers`.
 
-- `restricted-type.restrictions` MUST be unique.
+- Elements of `restricted-type.restrictions` MUST be unique.
 
 - `field-name` MUST be unique in `composite-type`.
 
