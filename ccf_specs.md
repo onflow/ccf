@@ -201,6 +201,8 @@ A CCF encoding complies with "Valid CCF Encoding Requirements" if it complies wi
 
 - `composite-type.cadence-type-id` MUST be unique in `ccf-typedef-message` or `ccf-typedef-and-value-message`.
 
+- `field-name` MUST be unique in `composite-type`.
+
 - `type-ref.id` MUST refer to `composite-type.id`.
 
 - `composite-type-value.id` MUST be unique in the same `composite-type-value` data item.
@@ -211,9 +213,7 @@ A CCF encoding complies with "Valid CCF Encoding Requirements" if it complies wi
   - `name` MUST be unique in `composite-type-value.fields`. 
   - `identifier` MUST be unique in `composite-type-value.initializers`.
 
-- Elements of `restricted-type.restrictions` MUST be unique.
-
-- `field-name` MUST be unique in `composite-type`.
+- elements MUST be unique in `restricted-type` or `restricted-type-value`.
 
 - keys MUST be unique in `dict-value`.  Decoders are not always required to check for duplicate dictionary keys.  In some cases, checking for duplicate dictionary key is not necessary or it may be delegated to the application.
 
