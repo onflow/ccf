@@ -195,6 +195,8 @@ A CCF encoding complies with "Valid CCF Encoding Requirements" if it complies wi
 
 - CBOR data items MUST be well-formed and valid as defined in RFC 8949.  E.g. CBOR text strings MUST contain valid UTF-8.  As an exception, RFC 8949 requirements for CBOR maps are not applicable because CCF does not use CBOR maps.
 
+- CCF encodings must comply with specifications in "CCF Specified in CDDL Notation" section of this document.
+
 - `composite-type.id` MUST be unique in `ccf-typedef-message` or `ccf-typedef-and-value-message`.
 
 - `composite-type.cadence-type-id` MUST be unique in `ccf-typedef-message` or `ccf-typedef-and-value-message`.
