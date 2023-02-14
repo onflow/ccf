@@ -207,9 +207,9 @@ A CCF encoding complies with "Valid CCF Encoding Requirements" if it complies wi
 
 - `type-value-ref.id` MUST refer to `composite-type-value.id` in the same `composite-type-value` data item.
 
-- `name` MUST be unique in `composite-type-value.fields`.
-
-- `identifier` MUST be unique in `composite-type-value.initializers`.
+- all parameter lists MUST be unique in `composite-type-value`.
+  - `name` MUST be unique in `composite-type-value.fields`. 
+  - `identifier` MUST be unique in `composite-type-value.initializers`.
 
 - `restricted-type.restrictions` MUST be unique.
 
