@@ -215,9 +215,9 @@ A CCF encoding complies with "Valid CCF Encoding Requirements" if it complies wi
   - `composite-type-value.initializers`
   - `function-value.parameters`
 
-- elements MUST be unique in `restricted-type` or `restricted-type-value`.
+- Elements MUST be unique in `restricted-type` or `restricted-type-value`.
 
-- keys MUST be unique in `dict-value`.  Decoders are not always required to check for duplicate dictionary keys.  In some cases, checking for duplicate dictionary key is not necessary or it may be delegated to the application.
+- Keys MUST be unique in `dict-value`.  Decoders are not always required to check for duplicate dictionary keys.  In some cases, checking for duplicate dictionary key is not necessary or it may be delegated to the application.
 
 ### Deterministic CCF Encoding Requirements
 
@@ -240,7 +240,7 @@ A CCF encoding satisfies the "Deterministic CCF Encoding Requirements" if it sat
 - `inline-type-and-value` MUST NOT be used when type can be inferred.
 
 - The following data items MUST be sorted using bytewise lexicographic order of their deterministic encodings:
-  - type definitions MUST be sorted by `cadence-type-id` in `composite-typedef`.
+  - Type definitions MUST be sorted by `cadence-type-id` in `composite-typedef`.
   - `dict-value` key-value pairs MUST be sorted by key.
   - `composite-type.fields` MUST be sorted by `name`
   - `composite-type-value.fields` MUST be sorted by `name`.
