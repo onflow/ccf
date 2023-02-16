@@ -177,6 +177,8 @@ CCF encoding decouples value encoding from type encoding.  For example:
 - Cadence booleans is encoded as a tuple of type and value: the `Bool` type and its value.  
 - Cadence strings is encoded as a tuple of type and value: the `String` type and its value.
 
+For compactness, encoders can omit encodings of Cadence type when Cadence optional value is nil, provided that the type information is encoded in the outer container.
+
 For compactness, CCF encoding skips type encoding when type can be inferred.
 
 As one example, the type of each element in `[String]` can be inferred to have type `String`.  Given this, CCF encodings of `[String]` can skip encoding each element's type of `String`.  Instead, CCF encodes `[String]` as a tuple like this: `[String]` type and a value representing a list of element values.  This avoids redundantly encoding each element's type.
@@ -239,7 +241,7 @@ A CCF encoding satisfies the "Deterministic CCF Encoding Requirements" if it sat
 
 - `composite-type-value.id` MUST be identical to the zero-based encoding order `type-value`.
 
-- `inline-type-and-value` MUST NOT be used when type can be inferred.
+- `inline-type-and-value` MUST NOT be used when type can be omitted as described in "Cadence Types and Values Encoding".
 
 - The following data items MUST be sorted using bytewise lexicographic order of their deterministic encodings:
   - Type definitions MUST be sorted by `cadence-type-id` in `composite-typedef`.
