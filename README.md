@@ -17,14 +17,17 @@ RFC 8949 and RFC 8610 are [Internet Standards](https://en.wikipedia.org/wiki/Int
 
 ## Status
 
-- CCF specification is currently an ABRIDGED DRAFT with work underway to specify canonical encoding.
-- CCF codec currently implements CCF specs revision [20221212a](https://github.com/fxamacker/ccf_draft/blob/aaca94b2478b821b92db155cbce32ff2554f4f95/ccf_specs.md). The CCF codec will be submitted as a PR to onflow/cadence once it's ready for review.
+- CCF specification is currently a DRAFT with cleanup underway to remove DRAFT status.
+- CCF codec currently implements nearly 100% of CCF specs revision [20230216a](https://github.com/fxamacker/ccf_draft/blob/699decd58c82a7566781267a25be4b4019adb464/ccf_specs.md). The CCF codec is being updated locally by @fxamacker and all tests are passing, including JSON-Cadence tests ported and modified to CCF.  Unit tests (including comments) currently total around 7,000 lines.
 
 ### Next steps
 
-More content is being added to turn the abridged draft into full draft.  For example, a section on canonical encoding, additional Cadence type(s), and more CCF examples.  Some changes to Cadence may be required, such as https://github.com/onflow/cadence/issues/2167 to add static type for `cadence.PathLink` (aka `cadence.Link` in old docs).
+There are no known codec-impacting changes remaining but some might be discovered during PR review of CCF codec, codec integration, and maybe during fuzz testing.
 
-:point_right:  CCF codec passing JSON-Cadence tests ported and modified to CCF was an important milestone.  However, more CCF tests are needed because CCF has more features and encodes more information than JSON-Cadence Data Interchange Format.  Additionally, the CCF codec will need to be fuzz tested by the Cadence team before it is used in production.
+- CCF specification will be cleaned up and DRAFT status will be replaced by RC1 around Feb 16, 2023.
+- CCF codec will be updated and opened as a PR in onflow/cadence as soon as it's ready for review.
+- More unit tests will be added after the PR for codec is opened or merged in onflow/cadence.
+- Fuzz tests will be created and run by the Cadence team before it is used in production.
 
 ## Timeline
 - Oct 18, 2022 - Resume onboarding of Cadence external value encoding and requirements.
@@ -33,6 +36,7 @@ More content is being added to turn the abridged draft into full draft.  For exa
 - Nov 29, 2022 - Second team meeting about draft of CCF to present and discuss revision [20221129b](https://github.com/fxamacker/ccf_draft/blob/2c9541a90de968413ec34d31dcf2444949dbce1e/ccf_specs.md).
 - Dec 9, 2022 - Merged [PR 35](https://github.com/fxamacker/ccf_draft/pull/35) to add more Cadence types and reassign CBOR tag values. The only Cadence type that is known to be missing from CCF specs is `cadence.PathLink` (blocked by https://github.com/onflow/cadence/issues/2167).
 - Dec 15, 2022 - Updated CCF codec (WIP) to incorporate latest CCF specs.  For example, updates to CCF specs from PRs [30](https://github.com/fxamacker/ccf_draft/pull/30), [31](https://github.com/fxamacker/ccf_draft/pull/31), [32](https://github.com/fxamacker/ccf_draft/pull/32), and [35](https://github.com/fxamacker/ccf_draft/pull/35).  All existing CCF codec tests pass (e.g. JSON-Cadence tests ported and modified to CCF).
+- Feb 14, 2023 - ABRIDGED DRAFT -> DRAFT.  Third team meeting about draft of CCF to present and discuss unmerged revision [20230214a](https://github.com/fxamacker/ccf_draft/blob/2d6dcb84fba079ebb995a6e55296ca081332a6a4/ccf_specs.md).
 
 ## Preliminary Size and Benchmark Comparisons
 
