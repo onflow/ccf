@@ -177,13 +177,13 @@ CCF encoding decouples value encoding from type encoding.  For example:
 - Cadence booleans is encoded as a tuple of type and value: the `Bool` type and its value.  
 - Cadence strings is encoded as a tuple of type and value: the `String` type and its value.
 
-For compactness, encoders can omit encodings of Cadence type when Cadence optional value is nil, provided that the type information is encoded in the outer container.
+For compactness, encoders can omit encodings of Cadence type when:
+- Optional value is nil, provided that the optional type information is encoded in the outer container.
+- Element's type matches the outer container's element type.
 
-For compactness, CCF encoding skips type encoding when type can be inferred.
-
-As one example, the type of each element in `[String]` can be inferred to have type `String`.  Given this, CCF encodings of `[String]` can skip encoding each element's type of `String`.  Instead, CCF encodes `[String]` as a tuple like this: `[String]` type and a value representing a list of element values.  This avoids redundantly encoding each element's type.
-
-If type cannot be inferred, it must be encoded as part of a tuple representing a type and its value.  For example, the type of each element in `[AnyStruct]` cannot be inferred.  The type `AnyStruct` is the top type of all non-resource types and array elements can be of heterogenous types. In this case, `[AnyStruct]` is encoded as a tuple like this: `[AnyStruct]` type and a value being a list of tuples representing each element's type and value.
+For example, when encoding a Cadence container such as `Array`:
+- `[String]`: each element's type matches the outer container's element type, so encoders can omit encoding each element's type.
+- `[AnyStruct]`: each element's type cannot match the outer container's element type, so encoders must encode the type for each element.
 
 ### Valid CCF Encoding Requirements
 
