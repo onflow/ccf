@@ -223,7 +223,9 @@ A CCF encoding complies with "Valid CCF Encoding Requirements" if it complies wi
 
 A CCF encoding is deterministic if it satisfies the "Deterministic CCF Encoding Requirements".
 
-Encoders SHOULD emit CCF encodings that are deterministic.  CCF-based protocols MUST specify when encoders are required to emit deterministic CCF encodings.
+Encoders SHOULD emit CCF encodings that are deterministic.  CCF-based protocols MUST specify when encoders are required to emit deterministic CCF encodings.  For example:
+- a CCF-based protocol for encoding transaction arguments might want to specify that encoders MUST produce deterministic encodings of the values.
+- a CCF-based protocol for encoding script results might want to specify that encoders are not required to produce deterministic encodings of the values (if results are sent to clients that don't care about the values being deterministically encoded). 
 
 Decoders SHOULD check CCF encodings to determine whether they are deterministic encodings.  CCF-based protocols MUST specify when decoders are required to check for deterministic encodings and how to handle nondeterministic encodings.
 
