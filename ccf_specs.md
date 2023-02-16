@@ -1,9 +1,9 @@
 # DRAFT - Cadence Compact Format (CCF)
 
 Author: Faye Amacker  
-Status: ABRIDGED DRAFT  
-Date: Feb 10, 2023  
-Revision: 20230210a
+Status: DRAFT  
+Date: Feb 16, 2023  
+Revision: 20230216a
 
 ## Abstract
 
@@ -17,7 +17,7 @@ CCF obsoletes [JSON-Cadence Data Interchange Format](https://developers.flow.com
 
 ## Status of this Document
 
-This document is an ABRIDGED DRAFT.  To simplify initial review of the most important aspects, some verbose content was initially left out.  Omitted content relies on prior revision not changing and is being added after each set of prior revisions is reviewed.
+This document is a DRAFT.
 
 ## Copyright Notice
 
@@ -160,6 +160,97 @@ This specification uses CDDL notation to express CBOR data items:
 - `[+ Foo]`: one or more Foo in CBOR array
 - `[* Foo]`: zero or more Foo in CBOR array
 - `#6.nnn(type)`: CBOR tag with tag number nnn and content type of "type".
+
+## Serialization Considerations
+
+CCF is a data format that uses a subset of CBOR with additional requirements for validity and deterministic encoding.
+
+### Cadence Types and Values Encoding
+
+[Cadence values have types](https://developers.flow.com/cadence/language/values-and-types).  For example:
+- `true` has the type `Bool` 
+- `"hello"` has the type `String` 
+- `let aos: [String] = ["hello", "world"]` declares `aos` of type `[String]`. 
+- `let aoa: [AnyStruct] = ["hello", true]` declares `aoa` of type `[AnyStruct]`.
+
+CCF encoding decouples value encoding from type encoding.  For example:  
+- Cadence booleans is encoded as a tuple of type and value: the `Bool` type and its value.  
+- Cadence strings is encoded as a tuple of type and value: the `String` type and its value.
+
+For compactness, encoders can omit encodings of Cadence type when:
+- Optional value is nil, provided that the optional type information is encoded in the outer container.
+- Element's type matches the outer container's element type.
+
+For example, when encoding a Cadence container such as `Array`:
+- `[String]`: each element's type matches the outer container's element type, so encoders can omit encoding each element's type.
+- `[AnyStruct]`: each element's type cannot match the outer container's element type, so encoders must encode the type for each element.
+
+### Valid CCF Encoding Requirements
+
+A CCF encoding is valid if it complies with "Valid CCF Encoding Requirements".
+
+Encoders MUST produce valid CCF encodings from valid input items.  Encoders are not required to check for invalid input items (e.g. invalid UTF-8 strings, duplicate dictionary keys, etc.)  Applications MUST NOT provide invalid items to encoders.
+
+Decoders MUST reject CCF encodings that are not valid unless otherwise specified in this section.
+
+A CCF encoding complies with "Valid CCF Encoding Requirements" if it complies with the following restrictions:
+
+- CBOR data items MUST be well-formed and valid as defined in RFC 8949.  E.g. CBOR text strings MUST contain valid UTF-8.  As an exception, RFC 8949 requirements for CBOR maps are not applicable because CCF does not use CBOR maps.
+
+- CCF encodings must comply with specifications in "CCF Specified in CDDL Notation" section of this document.
+
+- `composite-type.id` MUST be unique in `ccf-typedef-message` or `ccf-typedef-and-value-message`.
+
+- `composite-type.cadence-type-id` MUST be unique in `ccf-typedef-message` or `ccf-typedef-and-value-message`.
+
+- `field-name` MUST be unique in `composite-type`.
+
+- `type-ref.id` MUST refer to `composite-type.id`.
+
+- `composite-type-value.id` MUST be unique in the same `composite-type-value` data item.
+
+- `type-value-ref.id` MUST refer to `composite-type-value.id` in the same `composite-type-value` data item.
+
+- `name` MUST be unique in `composite-type-value.fields`. 
+  
+- All parameter lists MUST have unique `identifier`. For example, `indentifier` MUST be unique in
+  - `composite-type-value.initializers`
+  - `function-value.parameters`
+
+- Elements MUST be unique in `restricted-type` or `restricted-type-value`.
+
+- Keys MUST be unique in `dict-value`.  Decoders are not always required to check for duplicate dictionary keys.  In some cases, checking for duplicate dictionary key is not necessary or it may be delegated to the application.
+
+### Deterministic CCF Encoding Requirements
+
+A CCF encoding is deterministic if it satisfies the "Deterministic CCF Encoding Requirements".
+
+Encoders SHOULD emit CCF encodings that are deterministic.  CCF-based protocols MUST specify when encoders are required to emit deterministic CCF encodings.  For example:
+- a CCF-based protocol for encoding transaction arguments might want to specify that encoders MUST produce deterministic encodings of the values.
+- a CCF-based protocol for encoding script results might want to specify that encoders are not required to produce deterministic encodings of the values (if results are sent to clients that don't care about the values being deterministically encoded). 
+
+Decoders SHOULD check CCF encodings to determine whether they are deterministic encodings.  CCF-based protocols MUST specify when decoders are required to check for deterministic encodings and how to handle nondeterministic encodings.
+
+A CCF encoding satisfies the "Deterministic CCF Encoding Requirements" if it satisfies the following restrictions:
+
+- CCF encodings MUST satisfy "Valid CCF Encoding Requirements" defined in this document.
+
+- CCF encodings MUST satisfy "Core Deterministic Encoding Requirements" defined in RFC 8948 Section 4.2.1.  As an exception, RFC 8949 requirements for CBOR maps are not applicable because CCF does not use CBOR maps.
+
+- `composite-type.id` in `ccf-typedef-and-value-message` MUST be identical to its zero-based index in `composite-typedef`.
+
+- `composite-type-value.id` MUST be identical to the zero-based encoding order `type-value`.
+
+- `inline-type-and-value` MUST NOT be used when type can be omitted as described in "Cadence Types and Values Encoding".
+
+- The following data items MUST be sorted using bytewise lexicographic order of their deterministic encodings:
+  - Type definitions MUST be sorted by `cadence-type-id` in `composite-typedef`.
+  - `dict-value` key-value pairs MUST be sorted by key.
+  - `composite-type.fields` MUST be sorted by `name`
+  - `composite-type-value.fields` MUST be sorted by `name`.
+  - `composite-type-value.initializers` MUST be sorted by `identifier`.
+  - `restricted-type.restrictions` MUST be sorted by restriction's `cadence-type-id`.
+  - `restricted-type-value.restrictions` MUST be sorted by restriction's `cadence-type-id`.
 
 ## Security Considerations
 
