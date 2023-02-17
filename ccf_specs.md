@@ -1141,3 +1141,13 @@ type-value-ref =
 
 ;CDDL-END
 ```
+
+## Acknowledgements
+
+This document would not exist without Ramtin M. Seraj and Bastian Müller.
+
+Ramtin and Bastian's contributions on this effort is hard to list exhaustively because they inspire individuals and teams to produce impactful results.
+
+Ramtin M. Seraj led the effort to require a deterministic and more compact alternative to JSON-Cadence Data Interchange Format.  This document's "Objectives" section includes and adds to the initial objectives Ramtin listed (in a notion) for a binary format for Cadence external values.  
+
+Bastian Müller helped the author understand details related to Cadence types and values, which made writing this document possible.  Bastian also led the PR reviews of this document, contributed changes, asked great questions during CCF meetings, and identified sections that needed clarification (in both the CDDL notation and English text).
