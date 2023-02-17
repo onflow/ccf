@@ -17,14 +17,14 @@ RFC 8949 and RFC 8610 are [Internet Standards](https://en.wikipedia.org/wiki/Int
 
 ## Status
 
-- CCF specification is currently a DRAFT with cleanup underway to remove DRAFT status.
+- CCF specification is currently a release candidate (RC1) with cleanup underway.
 - CCF codec currently implements nearly 100% of CCF specs revision [20230216a](https://github.com/fxamacker/ccf_draft/blob/699decd58c82a7566781267a25be4b4019adb464/ccf_specs.md). The CCF codec is being updated locally by @fxamacker and all tests are passing, including JSON-Cadence tests ported and modified to CCF.  Unit tests (including comments) currently total around 7,000 lines.
 
 ### Next steps
 
 There are no known codec-impacting changes remaining but some might be discovered during PR review of CCF codec, codec integration, and maybe during fuzz testing.
 
-- CCF specification will be cleaned up and DRAFT status will be replaced by RC1 around Feb 16, 2023.
+- CCF specification will be cleaned up and RC1 status will be replaced by RC2 (as a parallel task).
 - CCF codec will be updated and opened as a PR in onflow/cadence as soon as it's ready for review.
 - More unit tests will be added after the PR for codec is opened or merged in onflow/cadence.
 - Fuzz tests will be created and run by the Cadence team before it is used in production.
@@ -37,6 +37,8 @@ There are no known codec-impacting changes remaining but some might be discovere
 - Dec 9, 2022 - Merged [PR 35](https://github.com/fxamacker/ccf_draft/pull/35) to add more Cadence types and reassign CBOR tag values. The only Cadence type that is known to be missing from CCF specs is `cadence.PathLink` (blocked by https://github.com/onflow/cadence/issues/2167).
 - Dec 15, 2022 - Updated CCF codec (WIP) to incorporate latest CCF specs.  For example, updates to CCF specs from PRs [30](https://github.com/fxamacker/ccf_draft/pull/30), [31](https://github.com/fxamacker/ccf_draft/pull/31), [32](https://github.com/fxamacker/ccf_draft/pull/32), and [35](https://github.com/fxamacker/ccf_draft/pull/35).  All existing CCF codec tests pass (e.g. JSON-Cadence tests ported and modified to CCF).
 - Feb 14, 2023 - ABRIDGED DRAFT -> DRAFT.  Third team meeting about draft of CCF to present and discuss unmerged revision [20230214a](https://github.com/fxamacker/ccf_draft/blob/2d6dcb84fba079ebb995a6e55296ca081332a6a4/ccf_specs.md).
+- Feb 17, 2023 - DRAFT -> RC1 with revision [20230217a](https://github.com/fxamacker/ccf_draft/blob/4e8f42db29925bd15481301729eca1b52852dcb4/ccf_specs.md)
+
 
 ## Preliminary Size and Benchmark Comparisons
 
