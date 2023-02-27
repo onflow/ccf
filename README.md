@@ -42,32 +42,61 @@ There are no known codec-impacting changes remaining but some might be discovere
 
 ## Preliminary Size and Benchmark Comparisons
 
-Preliminary encoded size comparison of new CCF vs current JSON-based format using `FeesDeducted` example downloaded from flowscan.org show:
-- 298 bytes -- JSON
-- 119 bytes -- CCF with Cadence type info attached (fully self-describing)
-- 18 bytes -- CCF without Cadence type info (partially self-describing)
 
-Benchmark Comparison of JSON vs CCF using a `FeesDeducted` event data.
+We are not comparing apples to apples.  Prior formats (CBF and JSON-Cadence Data Interchange) didn't specify requirements for validity, sorting, etc.
+
+- CCF encoder sorts events data for deterministic encoding.
+- CCF decoder verifies that events data are well-formed and sorted.
+
+At this time, CCF decoder doesn't include the option to check for "Preferred Serialization" (encoding to smallest size).
+
+#### Size Comparisons
+
+| Encoding | Event Count | Encoded size | Comments | 
+| --- | --- | --- | --- |
+| JSON | 48,309 |13,858,836 | JSON-Cadence Data Interchange Format |
+| CCF | 48,309 |  6,159,931 | CCF in fully self-describing and deterministic mode |
+
+CCF's partially self-describing mode would be even smaller (roughly 1/4 the size of JSON) in some use cases.
+
+#### Speed and Memory Comparisons
 
 ```
-name       old time/op    new time/op    delta
-Encode-48    2.87µs ± 0%    1.44µs ± 0%  -49.88%  (p=0.000 n=20+19)
+                     │ 48k_events_encode_json.log │     48k_events_encode_ccf.log       │
+                     │           sec/op           │   sec/op     vs base                │
+EncodeBatchEvents-20                 89.84m ± 17%   69.28m ± 3%  -22.88% (p=0.000 n=10)
 
-name       old alloc/op   new alloc/op   delta
-Encode-48    1.12kB ± 0%    1.07kB ± 0%   -5.24%  (p=0.000 n=20+20)
+                     │ 48k_events_encode_json.log │      48k_events_encode_ccf.log       │
+                     │            B/op            │     B/op      vs base                │
+EncodeBatchEvents-20                 32.45Mi ± 0%   25.82Mi ± 0%  -20.45% (p=0.000 n=10)
 
-name       old allocs/op  new allocs/op  delta
-Encode-48      23.0 ± 0%      13.0 ± 0%  -43.48%  (p=0.000 n=20+20)
-
-name       old time/op    new time/op    delta
-Decode-48    9.81µs ± 1%    2.31µs ± 0%  -76.46%  (p=0.000 n=20+19)
-
-name       old alloc/op   new alloc/op   delta
-Decode-48    6.37kB ± 0%    1.22kB ± 0%  -80.87%  (p=0.000 n=20+20)
-
-name       old allocs/op  new allocs/op  delta
-Decode-48       130 ± 0%        26 ± 0%  -80.00%  (p=0.000 n=20+20)
+                     │ 48k_events_encode_json.log │     48k_events_encode_ccf.log       │
+                     │         allocs/op          │  allocs/op   vs base                │
+EncodeBatchEvents-20                  756.6k ± 0%   370.4k ± 0%  -51.05% (p=0.000 n=10)
 ```
+
+```
+                     │ 48k_events_decode_json.log │     48k_events_decode_ccf.log       │
+                     │           sec/op           │   sec/op     vs base                │
+DecodeBatchEvents-20                  646.2m ± 8%   158.3m ± 5%  -75.50% (p=0.000 n=10)
+
+                     │ 48k_events_decode_json.log │      48k_events_decode_ccf.log       │
+                     │            B/op            │     B/op      vs base                │
+DecodeBatchEvents-20                234.97Mi ± 0%   56.16Mi ± 0%  -76.10% (p=0.000 n=10)
+
+                     │ 48k_events_decode_json.log │     48k_events_decode_ccf.log       │
+                     │         allocs/op          │  allocs/op   vs base                │
+DecodeBatchEvents-20                  4.746M ± 0%   1.288M ± 0%  -72.86% (p=0.000 n=10)
+
+```
+
+### Event Data Details
+
+The 48,309 events used in comparisons are from a transaction on mainnet with unusually high number of events.
+
+There were 9 event types.  These 3 event types had over 15,000 events each: `FlowToken.TokensDeposited`,  `FlowToken.TokensWithdrawn`,  `FlowIDTableStaking.DelegatorRewardsPaid`
+
+To simplify benchmark code (it's Sunday night), all event values for each event type are the same (i.e. the values are from the first event of that type).
 
 These benchmark results are preliminary and subject to change.
 
