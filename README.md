@@ -39,9 +39,7 @@ There are no known codec-impacting changes remaining but some might be discovere
 - Feb 14, 2023 - ABRIDGED DRAFT -> DRAFT.  Third team meeting about draft of CCF to present and discuss unmerged revision [20230214a](https://github.com/fxamacker/ccf_draft/blob/2d6dcb84fba079ebb995a6e55296ca081332a6a4/ccf_specs.md).
 - Feb 17, 2023 - DRAFT -> RC1 with revision [20230217a](https://github.com/fxamacker/ccf_draft/blob/4e8f42db29925bd15481301729eca1b52852dcb4/ccf_specs.md)
 
-
 ## Preliminary Size and Benchmark Comparisons
-
 
 We are not comparing apples to apples.  Prior formats (CBF and JSON-Cadence Data Interchange) didn't specify requirements for validity, sorting, etc.
 
@@ -61,40 +59,38 @@ CCF's partially self-describing mode would be even smaller (roughly 1/4 the size
 
 #### Speed and Memory Comparisons
 
-```
-                     │ 48k_events_encode_json.log │     48k_events_encode_ccf.log       │
-                     │           sec/op           │   sec/op     vs base                │
-EncodeBatchEvents-20                 89.84m ± 17%   69.28m ± 3%  -22.88% (p=0.000 n=10)
-
-                     │ 48k_events_encode_json.log │      48k_events_encode_ccf.log       │
-                     │            B/op            │     B/op      vs base                │
-EncodeBatchEvents-20                 32.45Mi ± 0%   25.82Mi ± 0%  -20.45% (p=0.000 n=10)
-
-                     │ 48k_events_encode_json.log │     48k_events_encode_ccf.log       │
-                     │         allocs/op          │  allocs/op   vs base                │
-EncodeBatchEvents-20                  756.6k ± 0%   370.4k ± 0%  -51.05% (p=0.000 n=10)
-```
+These informal and preliminary benchmarks used commit f911063 in https://github.com/onflow/cadence/pull/2364.
 
 ```
-                     │ 48k_events_decode_json.log │     48k_events_decode_ccf.log       │
-                     │           sec/op           │   sec/op     vs base                │
-DecodeBatchEvents-20                  646.2m ± 8%   158.3m ± 5%  -75.50% (p=0.000 n=10)
+$ benchstat bench_json_events_48k.log bench_ccf_events_48k.log 
+goos: linux
+goarch: amd64
+pkg: github.com/onflow/cadence/encoding/ccf
+cpu: 13th Gen Intel(R) Core(TM) i5-13600K
+                     │ bench_json_events_48k.log │      bench_ccf_events_48k.log       │
+                     │          sec/op           │   sec/op     vs base                │
+EncodeBatchEvents-20                 96.61m ± 4%   70.73m ± 3%  -26.79% (p=0.000 n=10)
+DecodeBatchEvents-20                 647.7m ± 3%   157.5m ± 3%  -75.68% (p=0.000 n=10)
+geomean                              250.1m        105.5m       -57.81%
 
-                     │ 48k_events_decode_json.log │      48k_events_decode_ccf.log       │
-                     │            B/op            │     B/op      vs base                │
-DecodeBatchEvents-20                234.97Mi ± 0%   56.16Mi ± 0%  -76.10% (p=0.000 n=10)
+                     │ bench_json_events_48k.log │       bench_ccf_events_48k.log       │
+                     │           B/op            │     B/op      vs base                │
+EncodeBatchEvents-20                32.45Mi ± 0%   25.82Mi ± 0%  -20.45% (p=0.000 n=10)
+DecodeBatchEvents-20               234.97Mi ± 0%   56.16Mi ± 0%  -76.10% (p=0.000 n=10)
+geomean                             87.32Mi        38.08Mi       -56.39%
 
-                     │ 48k_events_decode_json.log │     48k_events_decode_ccf.log       │
-                     │         allocs/op          │  allocs/op   vs base                │
-DecodeBatchEvents-20                  4.746M ± 0%   1.288M ± 0%  -72.86% (p=0.000 n=10)
-
+                     │ bench_json_events_48k.log │      bench_ccf_events_48k.log       │
+                     │         allocs/op         │  allocs/op   vs base                │
+EncodeBatchEvents-20                 756.6k ± 0%   370.4k ± 0%  -51.05% (p=0.000 n=10)
+DecodeBatchEvents-20                 4.746M ± 0%   1.288M ± 0%  -72.86% (p=0.000 n=10)
+geomean                              1.895M        690.7k       -63.55%
 ```
 
 ### Event Data Details
 
 The 48,309 events used in comparisons are from a transaction on mainnet with unusually high number of events.
 
-There were 9 event types.  These 3 event types had over 15,000 events each: `FlowToken.TokensDeposited`,  `FlowToken.TokensWithdrawn`,  `FlowIDTableStaking.DelegatorRewardsPaid`
+There were 9 event types.  These 3 event types had over 15,000 events each: `FlowToken.TokensDeposited`,  `FlowToken.TokensWithdrawn`,  `FlowIDTableStaking.DelegatorRewardsPaid`.
 
 To simplify benchmark code (it's Sunday night), all event values for each event type are the same (i.e. the values are from the first event of that type).
 
