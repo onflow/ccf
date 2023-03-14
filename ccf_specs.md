@@ -2,8 +2,8 @@
 
 Author: Faye Amacker  
 Status: RC1  
-Date: Feb 17, 2023  
-Revision: 20230217a
+Date: March 14, 2023  
+Revision: 20230314a
 
 ## Abstract
 
@@ -729,7 +729,7 @@ composite-type = [
     id: id,
     cadence-type-id: cadence-type-id,
     fields: [
-        + [
+        * [
             field-name: tstr,
             field-type: inline-type
         ]
@@ -1124,7 +1124,7 @@ restricted-type-value =
     #6.191([
       cadence-type-id: cadence-type-id,
       type: type-value,
-      restrictions: [+ type-value]
+      restrictions: [* type-value]
     ])
 
 capability-type-value =
