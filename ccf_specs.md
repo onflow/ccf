@@ -824,7 +824,7 @@ restricted-type =
     #6.143([
       cadence-type-id: cadence-type-id,
       type: inline-type,
-      restrictions: [+ inline-type]
+      restrictions: [* inline-type]
     ])
 
 capability-type =
@@ -930,7 +930,7 @@ array-value = [* value]
 dict-value = [* (key: value, value: value)]
 
 ; composite-value is used to encode struct, contract, enum, event, and resource.
-composite-value = [+ (field: value)]
+composite-value = [* (field: value)]
 
 path-value = [
     domain: uint,
@@ -1092,7 +1092,7 @@ composite-type-value = [
     ; type is only used by enum type value
     type: nil / type-value,
     fields: [
-        + [
+        * [
             name: tstr,
             type: type-value
         ]
