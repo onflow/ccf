@@ -822,7 +822,6 @@ reference-type =
 restricted-type =
     ; cbor-tag-restricted-type
     #6.143([
-      cadence-type-id: cadence-type-id,
       type: inline-type,
       restrictions: [* inline-type]
     ])
@@ -996,7 +995,6 @@ fix64-value = (int .ge -9223372036854775808) .le 9223372036854775807
 ufix64-value = uint .le 18446744073709551615
 
 function-value = [
-    cadence-type-id: cadence-type-id,
     parameters: [
         * [
             label: tstr,
@@ -1122,7 +1120,6 @@ reference-type-value =
 restricted-type-value =
     ; cbor-tag-restricted-type-value
     #6.191([
-      cadence-type-id: cadence-type-id,
       type: type-value,
       restrictions: [* type-value]
     ])
