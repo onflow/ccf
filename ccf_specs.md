@@ -248,7 +248,6 @@ A CCF encoding satisfies the "Deterministic CCF Encoding Requirements" if it sat
   - `dict-value` key-value pairs MUST be sorted by key.
   - `composite-type.fields` MUST be sorted by `name`
   - `composite-type-value.fields` MUST be sorted by `name`.
-  - `composite-type-value.initializers` MUST be sorted by `identifier`.
   - `restricted-type.restrictions` MUST be sorted by restriction's `cadence-type-id`.
   - `restricted-type-value.restrictions` MUST be sorted by restriction's `cadence-type-id`.
 
@@ -1102,7 +1101,7 @@ composite-type-value = [
         ]
     ]
     initializers: [
-        * [
+        ? [
             * [
                 label: tstr,
                 identifier: tstr,
