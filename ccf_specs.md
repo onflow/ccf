@@ -995,6 +995,12 @@ fix64-value = (int .ge -9223372036854775808) .le 9223372036854775807
 ufix64-value = uint .le 18446744073709551615
 
 function-value = [
+    type-parameters: [
+        * [
+           name: tstr,
+           type-bound: type-value 
+        ]
+    ]
     parameters: [
         * [
             label: tstr,
