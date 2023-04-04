@@ -2,8 +2,8 @@
 
 Author: Faye Amacker  
 Status: RC1  
-Date: April 3, 2023  
-Revision: 20230403a
+Date: April 4, 2023  
+Revision: 20230404a
 
 ## Abstract
 
@@ -823,7 +823,7 @@ reference-type =
 restricted-type =
     ; cbor-tag-restricted-type
     #6.143([
-      type: inline-type,
+      type: inline-type / nil,
       restrictions: [* inline-type]
     ])
 
@@ -832,7 +832,7 @@ capability-type =
     ; use an array as an extension point
     #6.144([
         ; borrow-type
-        inline-type
+        inline-type / nil
     ])
 
 type-ref =
