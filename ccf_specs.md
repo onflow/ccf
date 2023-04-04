@@ -2,8 +2,8 @@
 
 Author: Faye Amacker  
 Status: RC1  
-Date: March 14, 2023  
-Revision: 20230314a
+Date: April 3, 2023  
+Revision: 20230403a
 
 ## Abstract
 
@@ -213,6 +213,8 @@ A CCF encoding complies with "Valid CCF Encoding Requirements" if it complies wi
 
 - `name` MUST be unique in `composite-type-value.fields`. 
   
+- `name` MUST be unique in `function-value.type-parameters`. 
+
 - All parameter lists MUST have unique `identifier`. For example, `indentifier` MUST be unique in
   - `composite-type-value.initializers`
   - `function-value.parameters`
@@ -1010,9 +1012,7 @@ function-value = [
     return-type: type-value
 ]
 
-type-value =
-    nil
-    / simple-type-value
+type-value = simple-type-value
     / optional-type-value
     / varsized-array-type-value
     / constsized-array-type-value
@@ -1125,7 +1125,7 @@ reference-type-value =
 restricted-type-value =
     ; cbor-tag-restricted-type-value
     #6.191([
-      type: type-value,
+      type: type-value / nil,
       restrictions: [* type-value]
     ])
 
@@ -1134,7 +1134,7 @@ capability-type-value =
     ; use an array as an extension point
     #6.192([
       ; borrow-type
-      type-value
+      type-value / nil
     ])
 
 type-value-ref =
