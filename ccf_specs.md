@@ -707,6 +707,9 @@ ccf-typedef-message =
     #6.128(composite-typedef)
 
 composite-typedef = [
+    ; one-or-more instead of zero-or-more because:
+    ; - when encoding a primitive type, such as boolean or string, `ccf-type-and-value-message` is used (no `composite-typedef` at all)
+    ; - when encoding a composite type, such as event, `ccf-typedef-and-value-message` is used, which encodes at least one `composite-typedef`
     + (
         struct-type
         / resource-type
