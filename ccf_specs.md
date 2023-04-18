@@ -291,11 +291,11 @@ Cadence `Int` type with value `42` encoded to JSON is 27 bytes when minified.
 CCF encoding is 9 bytes:
 
 ```
-d88282d88404c2412a
+d88282d88904c2412a
 ```
 
-It represents `130([132(4), 42])`, where
-- `132(4)` is Cadence `Int`.
+It represents `130([137(4), 42])`, where:
+- `137(4)` is Cadence `Int`.
 - `42` is raw value.
 
 ### Cadence Homogenous Array with Simple Type Elements
@@ -325,11 +325,11 @@ Cadence `[Int]` type of value `[1, 2, 3]` encoded to JSON is 107 bytes when mini
 CCF encoding is 18 bytes:
 
 ```
-d88282d886d8840483c24101c24102c24103
+d88282d88bd8890483c24101c24102c24103
 ```
 
-It represents `130([134(132(4)), [1, 2, 3]])`, where
-- `134(132(4))` is Cadence array of `Int`.
+It represents `130([139(137(4)), [1, 2, 3]])`, where:
+- `139(137(4))` is Cadence array of `Int`.
 - `[1, 2, 3]` is raw value.
 
 ### Cadence Heterogenous Array with Simple Type Elements
@@ -359,18 +359,20 @@ Cadence `[AnyStruct]` type of value `[1, "a", true]` encoded to JSON is 112 byte
 CCF encoding is 34 bytes:
 
 ```
-d88282d886d884182783d88282d88404c24101d88282d884016161d88282d88400f5
+d88282d88bd889182783d88282d88904c24101d88282d889016161d88282d88900f5
 ```
 
-It represents `130([134(132(39)), [130([132(4), 1]), 130([132(1), "a"]), 130([132(0), true])]])`, where
-- `134(132(39))` is Cadence array of `AnyStruct`.
-- `130([132(4), 1])` is first element (`132(4)` is Cadence `Int`, `1` is raw value)
-- `130([132(1), "a"])` is second element (`132(1)` is Cadence `String`, `"a"` is raw value)
-- `130([132(0), true])` is third element (`132(0)` is Cadence `Boolean`, `true` is raw value)
+It represents `130([139(137(39)), [130([137(4), 1]), 130([137(1), "a"]), 130([137(0), true])]])`, where:
+- `139(137(39))` is Cadence array of `AnyStruct`.
+- `130([137(4), 1])` is first element (`137(4)` is Cadence `Int`, `1` is raw value).
+- `130([137(1), "a"])` is second element (`137(1)` is Cadence `String`, `"a"` is raw value).
+- `130([137(0), true]` is third element (`137(0)` is Cadence `Boolean`, `true` is raw value).
 
 ### Cadence Homogenous Array with Composite Type Elements
 
-Cadence composite types, such as struct, resource, and event, are encoded as detachable (not inlined) type info.  Each encoded composite type info has an unique ID which is used to bind with Cadence value.
+This example is for CCF in fully self-describing mode (partially self-describing mode encodes smaller messages).
+
+Cadence composite types, such as struct, resource, and event, are not inlined as type info.  Each encoded composite type info has a unique ID which is used to bind with Cadence value.
 
 Cadence `[Foo]` type encoded to JSON is 353 bytes when minified:
 
@@ -427,24 +429,26 @@ Cadence `[Foo]` type encoded to JSON is 353 bytes when minified:
 }
 ```
 
-CCF encoding is 48 bytes (first 27 bytes for type and next 21 bytes for raw value):
+CCF encoding is 47 bytes (in fully self-describing mode):
 
 ```
-d88081d88a83406a532e746573742e466f6f818263626172d88404d88282d886d883408381c2410181c2410281c24103
+d8818281d8a183406a532e746573742e466f6f818263626172d8890482d88bd888408381c2410181c2410281c24103
 ```
 
-It contains two data items: type and value.
+It represents `129([[161([h'', "S.test.Foo", [["bar", 137(4)]]])], [139(136(h'')), [[1], [2], [3]]]])`, which contains type and value.
 
-Type data item represents `128([138([h'', "S.test.Foo", [["bar", 132(4)]]])])` , where
-- `h''` is unique ID `0`.  This ID is used inside value data item to bind type with raw value.
-- `S.test.Foo` is location and identifier.
-- `[["bar", 132(4)]]` is field definition of one field: `"bar"` field of Cadence `Int`.
+Type data item represents `161([h'', "S.test.Foo", [["bar", 137(4)]]])` , which defines a resource type:
+- `h''` is CCF type ID `0`.  This ID is used inside value data item to bind type with raw value.
+- `"S.test.Foo"` is Cadence type ID.
+- `[["bar", 137(4)]]` is field definition of one field: `"bar"` field of Cadence `Int`.
 
-Value data item represents `130([134(131(h'')), [[1], [2], [3]]])`, where
-- `134(131(h''))` is Cadence array of type identified by ID `0`.
-- `[[1], [2], [3]]]` is array of `Foo` resouce raw field data.
+Value data item represents `[139(136(h'')), [[1], [2], [3]]]]`, where:
+- `139(136(h''))` is Cadence array of type identified by ID `0`.
+- `[[1], [2], [3]]]` is array of `Foo` resource raw field data.
 
 ### Cadence Homogenous Array with Composite Type Elements (One Field Type Is Abstract)
+
+This example is for CCF in fully self-describing mode (partially self-describing mode encodes smaller messages).
 
 Composite field `baz` is abstract type.
 
@@ -524,29 +528,29 @@ Cadence `[Foo]` type encoded to JSON is 508 bytes when minified:
 }
 ```
 
-CCF encoding is 81 bytes (first 36 bytes for type and next 45 bytes for raw value):
+CCF encoding is 80 bytes (in fully self-describing mode):
 
 ```
-d88081d88a83406a532e746573742e466f6f828263626172d88404826362617ad8841827d88282d886d883408382c24101d88282d88404c2410182c24102d88282d88401616182c24103d88282d88400f5
+d8818281d8a183406a532e746573742e466f6f828263626172d88904826362617ad889182782d88bd888408382c24101d88282d88904c2410182c24102d88282d88901616182c24103d88282d88900f5
 ```
 
-It contains two data items: type and value.
+It represents `129([[161([h'', "S.test.Foo", [["bar", 137(4)], ["baz", 137(39)]]])], [139(136(h'')), [[1, 130([137(4), 1])], [2, 130([137(1), "a"])], [3, 130([137(0), true])]]]])`, which contains type and value.
 
-Type data item represents `128([138([h'', "S.test.Foo", [["bar", 132(4)], ["baz", 132(39)]]])])`, where
-- `h''` is unique ID `0`.  This ID is used inside value data item to bind type with raw value.
-- `S.test.Foo` is location and identifier.
-- `["bar", 132(4)]` is first field definition: `"bar"` field of Cadence `Int`.
-- `["baz", 132(39)]` is second field definition: `"baz"` field of Cadence `AnyStruct`.
+Type data item represents `161([h'', "S.test.Foo", [["bar", 137(4)], ["baz", 137(39)]]])` , which defines a resource type:
+- `h''` is CCF type ID `0`.  This ID is used inside value data item to bind type with raw value.
+- `"S.test.Foo"` is Cadence type ID.
+- `["bar", 137(4)]` is first field definition: `"bar"` field of Cadence `Int`.
+- `["baz", 137(39)]` is second field definition: `"baz"` field of Cadence `AnyStruct`.
 
-Value data item represents `130([134(131(h'')), [[1, 130([132(4), 1])], [2, 130([132(1), "a"])], [3, 130([132(0), true])]]])`, where
-- `134(131(h''))` is Cadence array of type identified by ID `0`.
-- `[1, 130([132(4), 1])]` is first resource raw field data.
-- `[2, 130([132(1), "a"])]` is second resource raw field data.
-- `[3, 130([132(0), true])]` is third resource raw field data.
+Value data item represents `[139(136(h'')), [[1, 130([137(4), 1])], [2, 130([137(1), "a"])], [3, 130([137(0), true])]]]`, where:
+- `139(136(h''))` is Cadence array of type identified by ID `0`.
+- `[1, 130([137(4), 1])]` is first resource raw field data.
+- `[2, 130([137(1), "a"])]` is second resource raw field data.
+- `[3, 130([137(0), true])]` is third resource raw field data.
 
 ### `FeesDeducted` Event
 
-`FeesDeducted` event is encoded as detachable (not inlined) type info.
+This example is for CCF in fully self-describing mode (partially self-describing mode encodes smaller messages).
 
 This example of `FeesDeducted` event encoded to JSON is 298 bytes when minified:
 
@@ -582,26 +586,22 @@ This example of `FeesDeducted` event encoded to JSON is 298 bytes when minified:
 }
 ```
 
-CCF encoding is 119 bytes (first 101 bytes for type and next 18 bytes for raw value):
+CCF encoding is 118 bytes (in fully self-describing mode):
 
 ```
-d88081d88b83407828412e663931396565373734343762373439372e466c6f77466565732e466565734465647563746564838266616d6f756e74d88417826f696e636c7573696f6e4566666f7274d88417826f657865637574696f6e4566666f7274d88417d88282d8834083190b991a05f5e10019023f
+d8818281d8a283407828412e663931396565373734343762373439372e466c6f77466565732e466565734465647563746564838266616d6f756e74d88917826f657865637574696f6e4566666f7274d88917826f696e636c7573696f6e4566666f7274d8891782d8884083190b9919023f1a05f5e100
 ```
 
-It contains two data items: type and value.
+It represents `129([[162([h'', "A.f919ee77447b7497.FlowFees.FeesDeducted", [["amount", 137(23)], ["executionEffort", 137(23)], ["inclusionEffort", 137(23)]]])], [136(h''), [2969, 575, 100000000]]])`, which contains type and value.
 
-Type data item represents `128([139([h'', "A.f919ee77447b7497.FlowFees.FeesDeducted", [["amount", 132(23)], ["inclusionEffort", 132(23)], ["executionEffort", 132(23)]]])])` , where
-- `h''` is unique ID `0`.  This ID is used inside value data item to bind type with raw value.
-- `"A.f919ee77447b7497.FlowFees.FeesDeducted"` is location and identifier.
-- `[["amount", 132(23)], ["inclusionEffort", 132(23)], ["executionEffort", 132(23)]]` is field definition with 3 fields: `"amount"` field of Cadence `UFix64`, `"inclusionEffort"` field of Cadence `UFix64`, and `"executionEffort"` field of Cadence `UFix64`.
+Type data item represents `162([h'', "A.f919ee77447b7497.FlowFees.FeesDeducted", [["amount", 137(23)], ["executionEffort", 137(23)], ["inclusionEffort", 137(23)]]])` , which defines an event type:
+- `h''` is CCF type ID `0`.  This ID is used inside value data item to bind type with raw value.
+- `"A.f919ee77447b7497.FlowFees.FeesDeducted"` is Cadence type ID.
+- `[["amount", 137(23)], ["executionEffort", 137(23)], ["inclusionEffort", 137(23)]]` is field definition with 3 fields: `"amount"` field of Cadence `UFix64`, `"inclusionEffort"` field of Cadence `UFix64`, and `"executionEffort"` field of Cadence `UFix64`.  Fields are sorted by field name.
 
-Value data item represents `130([131(h''), [2969, 100000000, 575]])`, where
-- `131(h'')` is type identified by ID `0`.
-- `[2969, 100000000, 575]` is `FeesDeducted` event raw field data.
-
-## Extended Diagnostic Notation (EDN)
-
-This document uses diagnostic notation as defined in Appendix G of RFC 8610.
+Value data item represents `[136(h''), [2969, 575, 100000000]]`, where:
+- `136(h'')` is type identified by ID `0`.
+- `[2969, 575, 100000000]` is `FeesDeducted` event raw field data.
 
 ## Specifications
 
