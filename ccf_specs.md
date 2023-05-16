@@ -2,8 +2,8 @@
 
 Author: Faye Amacker  
 Status: RC1  
-Date: April 20, 2023  
-Revision: 20230420a
+Date: May 16, 2023  
+Revision: 20230516a
 
 ## Abstract
 
@@ -119,10 +119,14 @@ Widely used CBOR codecs are available in various programming languages.
 
 In JavaScript, there are multiple widely used CBOR codecs. As one example, [hildjj/node-cbor](https://github.com/hildjj/node-cbor) is  maintained by Joe Hildebrand (former VP of Engineering at Mozilla and Distinguished Engineer at Cisco). It's a monorepo with several packages including a "cbor package compiled for use on the web, including all of its non-optional dependencies".
 
+In C, Intel maintains [TinyCBOR](https://github.com/intel/tinycbor), a CBOR codec optimized for very fast operation with very small footprint.
+
+For .NET languages, Microsoft maintains [System.Formats.Cbor namespace](https://learn.microsoft.com/en-us/dotnet/api/system.formats.cbor), which is the CBOR codec in .Net Platform Extensions.
+
 In Go, [fxamacker/cbor](https://github.com/fxamacker/cbor) is used by Cadence in its [CCF codec](https://github.com/onflow/cadence/tree/master/encoding/ccf):
   - fxamacker/cbor was [already used by Cadence](https://github.com/onflow/cadence/blob/master/runtime/interpreter/encode.go) for internal value encoding.
   - fxamacker/cbor was designed with security in mind and passed multiple security assessments in 2022.  A [nonconfidential security assessment](https://github.com/veraison/go-cose/blob/v1.0.0-rc.1/reports/NCC_Microsoft-go-cose-Report_2022-05-26_v1.0.pdf) produced by NCC Group for Microsoft Corporation includes parts of fxamacker/cbor.
-  - fxamacker/cbor is used by Arm Ltd., Chainlink, ConsenSys, Dapper Labs, Duo Labs (Cisco), EdgeX Foundry, F5, Fraunhofer AISEC, Microsoft, Mozilla, Oasis Labs, Tailscale, Taurus SA, TIBCO, and others.  As of April 2023, GitHub reports fxamacker/cbor is used by over 2,000 repositories (1,900+ using v2 and 195+ using v1).
+  - fxamacker/cbor is used by Arm Ltd., Chainlink, ConsenSys, Dapper Labs, Duo Labs (Cisco), EdgeX Foundry, F5, Fraunhofer AISEC, Microsoft, Mozilla, Oasis Labs, Tailscale, Taurus SA, TIBCO, and others.  As of May 2023, GitHub reports fxamacker/cbor is used by over 2,000 repositories (2,000+ using v2 and 195+ using v1).
 
 ### Terminology
 
@@ -257,17 +261,32 @@ A CCF encoding satisfies the "Deterministic CCF Encoding Requirements" if it sat
 
 ## Security Considerations
 
-CBOR security considerations are described in [Section 10 of RFC 8949 (CBOR)](https://www.rfc-editor.org/rfc/rfc8949.html#name-security-considerations).
+CBOR security considerations in [Section 10 of RFC 8949 (CBOR)](https://www.rfc-editor.org/rfc/rfc8949.html#name-security-considerations) apply to CCF.
 
-There are two types of data validation:
-- Is the data well-formed?
-- Is the data valid?
+There are two types of checks for acceptable data:
+- Checks for well-formedness
+- Checks for validity
 
 CBOR defines data [well-formedness](https://www.rfc-editor.org/rfc/rfc8949.html#name-well-formedness-errors-and-) and a CBOR decoder MUST detect and reject malformed data before checking for validity.
 
-CCF message validation should be done after passing checks for well-formedness.  Invalid CCF messages should be rejected.
+CCF decoders MUST detect and reject malformed data before checking for validity.
 
-CCF decoder should detect and reject malformed or malicious data before creating Cadence objects and without requiring Cadence type info.
+CCF decoders SHOULD detect and reject malformed data before creating Cadence objects and without requiring Cadence type information.
+
+CCF decoders can handle invalid CCF messages as required by each CCF-based protocol.  In some cases, it may be more practical for the application to check if the decoded data is acceptable.
+
+CCF decoders SHOULD allow CBOR limits to be specified and enforced, such as:
+- Max number of array elements
+- Max number of map pairs
+- Max nested levels
+
+For example, max number of array elements would forbid any single array in a CCF message from exceeding that many elements.
+
+The main tradeoff for decoder limits:
+- limits set too high can allow memory exhaustion and other attacks to succeed.
+- limits set too low creates the possibility of being unable to decode non-malicious messages that exceeds limits.
+
+Encoders usually don't enforce limits because it's simpler and more efficient for applications to enforce limits before providing the data to encoders.
 
 ## CCF Examples
 
