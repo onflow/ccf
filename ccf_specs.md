@@ -1,9 +1,9 @@
 # Cadence Compact Format (CCF)
 
 Author: Faye Amacker  
-Status: RC1  
-Date: May 16, 2023  
-Revision: 20230516a
+Status: RC1   
+Date: July 2, 2023  
+Revision: 20230702a
 
 ## Abstract
 
@@ -83,7 +83,11 @@ CCF is designed to support:
 
 ### Why CBOR
 
-CBOR is a data format that is more extensible and compact than JSON.  CBOR supports deterministic encoding that is the same for CBOR codecs implemented in different programming languages.  CBOR allows separate detection of malformed data and invalid data.
+CBOR is a modern alternative to earlier data formats such as JSON, GOB, MessagePack, etc.  These comparisons between CBOR and other binary formats were published by IETF:
+- Appendix C of RFC 8618 Compacted-DNS: [Comparison of Binary Formats](https://www.rfc-editor.org/rfc/rfc8618#appendix-C)
+- Appendix E of RFC 8949 CBOR: [Comparison of Other Binary Formats to CBOR's Design Objectives](https://www.rfc-editor.org/rfc/rfc8949.html#name-comparison-of-other-binary-)
+
+CBOR is more extensible and compact than JSON.  CBOR supports deterministic encodings that is the same for CBOR codecs implemented in different programming languages.  CBOR allows separate detection of malformed data and invalid data.  This allows CCF decoders to reject malformed inputs without creating Cadence objects.
 
 Although using a 100% custom data format can sometimes produce smaller encodings than CBOR, that alone doesn't outweigh the combination of other qualities and considerations such as security, maintainability, risks, etc.
 
