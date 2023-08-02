@@ -1,9 +1,9 @@
 # Cadence Compact Format (CCF)
 
 Author: Faye Amacker  
-Status: RC1   
-Date: July 2, 2023  
-Revision: 20230702a
+Status: RC2 DRAFT  
+Date: August 1, 2023  
+Revision: 20230801a
 
 ## Abstract
 
@@ -15,7 +15,7 @@ CCF messages can be fully self-describing or partially self-describing.  Both ar
 
 CCF defines all requirements for deterministic encoding to allow CCF codecs implemented in different programming languages to produce the same deterministic encodings.
 
-CCF obsoletes [JSON-Cadence Data Interchange Format](https://developers.flow.com/cadence/json-cadence-spec) for use cases that do not require JSON.
+CCF obsoletes [JSON-Cadence Data Interchange Format](https://developers.flow.com/cadence/json-cadence-spec) (JSON-CDC) for use cases that do not require JSON.
 
 ## Status of this Document
 
@@ -29,16 +29,18 @@ This document is licensed under the terms of the Apache License, Version 2.0. Se
 
 ## Introduction
 
-Cadence external values (e.g. transaction arguments and events) have been encoded using JSON-Cadence Data Interchange format, which is inefficient, verbose, and doesn't define deterministic encoding.
+Cadence external values (e.g. events, transaction arguments, etc.) have been encoded using JSON-CDC, which is inefficient, verbose, and doesn't define deterministic encoding.
 
 CCF is a data format that allows more compact, efficient, and deterministic encoding of Cadence external values.
 
-The CCF codec in Cadence is faster, uses less memory, encodes deterministically, and produces smaller messages than the JSON-CDC codec.  A real `FeesDeducted` event taken from mainnet can encode to:
+A `FeesDeducted` event on the Flow blockchain can encode to:
 - 298 bytes in JSON-CDC (minified).
 - 118 bytes in CCF (fully self-describing mode).
 - ~20 bytes in CCF (partially self-describing mode).
 
 CCF defines all requirements for deterministic encoding (sort orders, smallest encoded forms, and Cadence-specific requirements) to allow CCF codecs implemented in different programming languages to produce the same deterministic encodings.
+
+Some requirements (such as "Deterministic CCF Encoding") are defined as optional.  Each CCF-based protocol can have a specification which states how each CCF option is used.  It is outside the scope of this specification to define individual CCF-based protocols.
 
 CCF leverages [Internet Standards](https://en.wikipedia.org/wiki/Internet_Standard) from [IETF](https://www.ietf.org) which are designed to be relevant for decades:
 
@@ -83,7 +85,7 @@ CCF is designed to support:
 
 ### Why CBOR
 
-CBOR is a modern alternative to earlier data formats such as JSON, GOB, MessagePack, etc.  These comparisons between CBOR and other binary formats were published by IETF:
+CBOR is a trusted alternative to earlier data formats such as JSON, MessagePack, and others.  These comparisons between CBOR and other binary formats were published by IETF:
 - Appendix C of RFC 8618 Compacted-DNS: [Comparison of Binary Formats](https://www.rfc-editor.org/rfc/rfc8618#appendix-C)
 - Appendix E of RFC 8949 CBOR: [Comparison of Other Binary Formats to CBOR's Design Objectives](https://www.rfc-editor.org/rfc/rfc8949.html#name-comparison-of-other-binary-)
 
