@@ -2,8 +2,8 @@
 
 Author: Faye Amacker  
 Status: RC2 DRAFT  
-Date: August 1, 2023  
-Revision: 20230801a
+Date: August 3, 2023  
+Revision: 20230803a
 
 ## Abstract
 
@@ -13,13 +13,13 @@ Cadence is a resource-oriented programming language that introduces new features
 
 CCF messages can be fully self-describing or partially self-describing.  Both are more compact than JSON-based messages.  CCF-based protocols can send Cadence metadata just once for all messages of that type.  Malformed data can be detected without Cadence metadata and without creating Cadence objects.
 
-CCF defines all requirements for deterministic encoding to allow CCF codecs implemented in different programming languages to produce the same deterministic encodings.
+CCF defines "Deterministic CCF Encoding Requirements" and makes it optional.  It allows CCF codecs implemented in different programming languages to produce the same deterministic encodings.  CCF-based formats and protocols can balance tradeoffs by specifying how they use CCF options.
 
 CCF obsoletes [JSON-Cadence Data Interchange Format](https://developers.flow.com/cadence/json-cadence-spec) (JSON-CDC) for use cases that do not require JSON.
 
 ## Status of this Document
 
-This document is a release candidate (RC1).  There will be at least one more release candidate.
+This document is a release candidate (RC2 DRAFT).
 
 ## Copyright Notice
 
@@ -27,20 +27,26 @@ Copyright (c) 2022-2023 Dapper Labs, Inc. and the persons identified as the docu
 
 This document is licensed under the terms of the Apache License, Version 2.0. See [LICENSE](LICENSE) for more information.
 
+## Scope
+
+This document specifies Cadence Compact Format.
+
+It is outside the scope of this document to specify individual CCF-based formats or protocols (e.g. events).
+
 ## Introduction
+
+CCF is a data format that allows compact, efficient, and deterministic encoding of Cadence external values.
 
 Cadence external values (e.g. events, transaction arguments, etc.) have been encoded using JSON-CDC, which is inefficient, verbose, and doesn't define deterministic encoding.
 
-CCF is a data format that allows more compact, efficient, and deterministic encoding of Cadence external values.
-
-A `FeesDeducted` event on the Flow blockchain can encode to:
+The same `FeesDeducted` event on the Flow blockchain can encode to:
 - 298 bytes in JSON-CDC (minified).
 - 118 bytes in CCF (fully self-describing mode).
-- ~20 bytes in CCF (partially self-describing mode).
+-  20 bytes in CCF (partially self-describing mode).
 
 CCF defines all requirements for deterministic encoding (sort orders, smallest encoded forms, and Cadence-specific requirements) to allow CCF codecs implemented in different programming languages to produce the same deterministic encodings.
 
-Some requirements (such as "Deterministic CCF Encoding") are defined as optional.  Each CCF-based protocol can have a specification which states how each CCF option is used.  It is outside the scope of this specification to define individual CCF-based protocols.
+Some requirements (such as "Deterministic CCF Encoding Requirements") are defined as optional.  Each CCF-based format or protocol can have its specification state how CCF options are used.  This allows each protocol to balance tradeoffs such as compatibility, determinism, speed, encoded data size, etc.
 
 CCF leverages [Internet Standards](https://en.wikipedia.org/wiki/Internet_Standard) from [IETF](https://www.ietf.org) which are designed to be relevant for decades:
 
