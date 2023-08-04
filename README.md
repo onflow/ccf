@@ -28,10 +28,6 @@ CCF uses CBOR and is designed to allow efficient detection and rejection of malf
 
 CBOR is an [Internet Standard](https://www.ietf.org/rfc/std-index.txt) defined by [IETF&nbsp;STD&nbsp;94](https://www.rfc-editor.org/info/std94).  CBOR is designed to be relevant for decades and is used by data formats and protocols such as [W3C&nbsp;WebAuthn](https://www.w3.org/TR/webauthn-2/), C-DNS&nbsp;([IETF&nbsp;RFC&nbsp;8618](https://www.rfc-editor.org/rfc/rfc8618.html)), COSE&nbsp;([IETF&nbsp;STD&nbsp;96](https://www.rfc-editor.org/info/std96)), CWT&nbsp;([IETF&nbsp;RFC&nbsp;8392](https://www.rfc-editor.org/info/rfc8392)), etc.
 
-## Contributing
-
-If you would like to contribute to CCF, have a look at the [contributing guide](https://github.com/onflow/ccf/blob/main/CONTRIBUTING.md).
-
 ## License
 
 CCF is licensed under the terms of the Apache License, Version 2.0. See [LICENSE](LICENSE) for more information.
