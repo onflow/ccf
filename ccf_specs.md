@@ -920,6 +920,10 @@ simple-type-id = &(
     bytes-type-id: 49,
     void-type-id: 50,
     function-type-id: 51,
+    word128-type-id: 52,
+    word256-type-id: 53,
+    any-struct-attachment-type-id: 54,
+    any-resource-attachment-type-id: 55,
 )
 
 ccf-typedef-and-value-message =
@@ -964,9 +968,18 @@ path-value = [
     identifier: tstr,
 ]
 
-capability-value = [
+capability-value = 
+    path-capability-value
+    / id-capability-value
+
+path-capability-value = [
     address: address-value,
     path: path-value
+]
+
+id-capability-value = [
+    address: address-value,
+    id: uint64-value
 ]
 
 simple-value =
@@ -993,6 +1006,8 @@ simple-value =
     / word16-value
     / word32-value
     / word64-value
+    / word128-value
+    / word256-value
     / fix64-value
     / ufix64-value
 
@@ -1019,6 +1034,8 @@ word8-value = uint .le 255
 word16-value = uint .le 65535
 word32-value = uint .le 4294967295
 word64-value = uint .le 18446744073709551615
+word128-value = bigint .ge 0
+word256-value = bigint .ge 0
 fix64-value = (int .ge -9223372036854775808) .le 9223372036854775807
 ufix64-value = uint .le 18446744073709551615
 
