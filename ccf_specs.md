@@ -83,15 +83,7 @@ CCF is designed to support:
 
 ### Why CBOR
 
-CBOR is a trusted alternative to earlier data formats such as JSON, MessagePack, and others.  These comparisons between CBOR and other binary formats were published by IETF:
-- Appendix C of RFC 8618 Compacted-DNS: [Comparison of Binary Formats](https://www.rfc-editor.org/rfc/rfc8618#appendix-C)
-- Appendix E of RFC 8949 CBOR: [Comparison of Other Binary Formats to CBOR's Design Objectives](https://www.rfc-editor.org/rfc/rfc8949.html#name-comparison-of-other-binary-)
-
-CBOR is more extensible and compact than JSON.  CBOR supports deterministic encodings that is the same for CBOR codecs implemented in different programming languages.  CBOR allows separate detection of malformed data and invalid data.  This allows CCF decoders to reject malformed inputs without creating Cadence objects.
-
-Although using a 100% custom data format can sometimes produce smaller encodings than CBOR, that alone doesn't outweigh the combination of other qualities and considerations such as security, maintainability, risks, etc.
-
-Concise Binary Object Representation (CBOR) is a data format defined in IETF [RFC 8949](https://www.rfc-editor.org/rfc/rfc8949.html):
+CBOR is an [Internet Standard](https://www.ietf.org/rfc/std-index.txt) defined by [IETF&nbsp;STD&nbsp;94 (RFC 8949)](https://www.rfc-editor.org/info/std94):
 
 > The Concise Binary Object Representation (CBOR) is a data format
    whose design goals include the possibility of extremely small code
@@ -99,23 +91,26 @@ Concise Binary Object Representation (CBOR) is a data format defined in IETF [RF
    for version negotiation.  These design goals make it different from
    earlier binary serializations such as ASN.1 and MessagePack.
 
-As an [Internet Standard](https://en.wikipedia.org/wiki/Internet_Standard) (not just a common RFC), CBOR is designed to be relevant for decades and is used to define other data formats and protocols such as:
-- W3C [WebAuthn](https://www.w3.org/TR/webauthn-2/) - Web Authentication
-- IETF [RFC 9052](https://www.rfc-editor.org/rfc/rfc9052.html) - CBOR Object Signing and Encryption (COSE): Structures and Process
-- IETF [RFC 8392](https://www.rfc-editor.org/rfc/rfc8392.html) - CBOR Web Tokens (CWT)
-
-This approach enables a COSE codec to use a CBOR codec under the hood.  COSE codecs can focus on providing COSE-specific features rather than reinventing the wheel, which reduces complexity, cost of development, and risks.
+In addition to the aspects listed in CBOR's design goals, CBOR-based formats can support:
+- Deterministic encodings across programming languages. Encoders implemented in different languages can produce identical deterministic encodings.
+- Separate detection of malformed data and invalid data. Decoders can efficiently reject malformed inputs without creating Cadence objects.
 
 CBOR is well-suited to replace JSON in data formats and protocols. CBOR's data model extends JSON's data model with:
 - compact binary encodings
 - extension points (CBOR Tags and Simple Values)
 - deterministic encoding (Core Deterministic Encoding Requirements)
 
-As one example, CBOR Web Tokens is a modern binary alternative to the text-based JSON Web Tokens (JWT).  Like CBOR Web Tokens, CCF is a modern binary alternative to an existing JSON-based data format.
+Published comparisons between CBOR and other binary data formats such as Protocol Buffers, etc. include:
+- Appendix C of RFC 8618 Compacted-DNS: [Comparison of Binary Formats](https://www.rfc-editor.org/rfc/rfc8618#appendix-C)
+- Appendix E of RFC 8949 (STD 94) CBOR: [Comparison of Other Binary Formats to CBOR's Design Objectives](https://www.rfc-editor.org/rfc/rfc8949.html#name-comparison-of-other-binary-)
 
-Additional considerations for using CBOR include availability and quality of CBOR codecs in various programming languages.
+CBOR is used in data formats and protocols such as [W3C&nbsp;WebAuthn](https://www.w3.org/TR/webauthn-2/), Compacted-DNS&nbsp;([IETF&nbsp;RFC&nbsp;8618](https://www.rfc-editor.org/rfc/rfc8618.html)), COSE&nbsp;([IETF&nbsp;STD&nbsp;96](https://www.rfc-editor.org/info/std96)), CWT&nbsp;([IETF&nbsp;RFC&nbsp;8392](https://www.rfc-editor.org/info/rfc8392)), etc.
 
-Cadence is [already using CBOR](https://github.com/onflow/cadence/blob/master/runtime/interpreter/encode.go) to encode internal values.  Using CBOR to also encode external values is a good fit for multiple reasons.
+Although using a 100% custom data format can sometimes produce smaller encodings than CBOR, that alone doesn't outweigh the combination of other qualities and considerations such as security, maintainability, risks, etc.
+
+Lastly, Cadence is [already using CBOR](https://github.com/onflow/cadence/blob/master/runtime/interpreter/encode.go) to encode internal values, so using CBOR to encode external values added to the list of stronger reasons making CBOR a good fit.
+
+Other considerations for using CBOR include availability and quality of CBOR codecs in various programming languages.
 
 ### Interoperability and Reuse of CBOR Codecs
 
@@ -130,7 +125,7 @@ For .NET languages, Microsoft maintains [System.Formats.Cbor namespace](https://
 In Go, [fxamacker/cbor](https://github.com/fxamacker/cbor) is used by Cadence in its [CCF codec](https://github.com/onflow/cadence/tree/master/encoding/ccf):
   - fxamacker/cbor was [already used by Cadence](https://github.com/onflow/cadence/blob/master/runtime/interpreter/encode.go) for internal value encoding.
   - fxamacker/cbor was designed with security in mind and passed multiple security assessments in 2022.  A [nonconfidential security assessment](https://github.com/veraison/go-cose/blob/v1.0.0-rc.1/reports/NCC_Microsoft-go-cose-Report_2022-05-26_v1.0.pdf) produced by NCC Group for Microsoft Corporation includes parts of fxamacker/cbor.
-  - fxamacker/cbor is used by Arm Ltd., Chainlink, ConsenSys, Dapper Labs, Duo Labs (Cisco), EdgeX Foundry, F5, Fraunhofer AISEC, Microsoft, Mozilla, Oasis Labs, Tailscale, Taurus SA, TIBCO, and others.  As of May 2023, GitHub reports fxamacker/cbor is used by over 2,000 repositories (2,000+ using v2 and 195+ using v1).
+  - fxamacker/cbor is used by Arm Ltd., Chainlink, Cisco, ConsenSys, Dapper Labs, EdgeX Foundry, F5, Fraunhofer-AISEC, Microsoft, Mozilla, Oasis Labs, Tailscale, Taurus SA, Teleport, TIBCO, and others.  GitHub reports fxamacker/cbor is used by over 2,000 repositories (2,000+ using v2 and 195+ using v1).
 
 ### Terminology
 
