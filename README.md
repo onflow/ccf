@@ -11,20 +11,22 @@ CCF obsoletes [JSON-Cadence Data Interchange Format](https://developers.flow.com
 
 ### Introduction
 
-Cadence external values (e.g. transaction arguments, events, etc.) have been encoded using JSON-Cadence Data Interchange format, which is human-readable, verbose, and doesn't define deterministic encoding.
+CCF is a data format that allows compact, efficient, and deterministic encoding of Cadence external values.
 
-CCF is a binary data format that allows more compact, efficient, and deterministic encoding of Cadence external values.  Consequently, the CCF codec in Cadence is faster, uses less memory, encodes deterministically, and produces smaller messages than the JSON-CDC codec.
+Cadence external values (e.g. events, transaction arguments, etc.) have been encoded using JSON-CDC, which is inefficient, verbose, and doesn't define deterministic encoding.
 
-A real `FeesDeducted` event can encode to:
+The same `FeesDeducted` event on the Flow blockchain can encode to:
 - 298 bytes in JSON-CDC (minified).
 - 118 bytes in CCF (fully self-describing mode).
-- ~20 bytes in CCF (partially self-describing mode) with 12 bytes for data and ~8 bytes for type id (counter, hash, etc.)
+- &nbsp;20 bytes in CCF (partially self-describing mode).
 
-Unlike prior formats, CCF defines all requirements for deterministic encoding (sort orders, smallest encoded forms, and Cadence-specific requirements) to allow CCF codecs implemented in different programming languages to deterministically produce identical messages.
+CCF defines all requirements for deterministic encoding (sort orders, smallest encoded forms, and Cadence-specific requirements) to allow CCF codecs implemented in different programming languages to produce the same deterministic encodings.
 
-For security, CCF was designed to allow efficient detection and rejection of malformed messages without creating Cadence objects.  This allows more costly checks (e.g. validity) to be performed only on well-formed messages.
+Some requirements (such as "Deterministic CCF Encoding Requirements") are defined as optional.  Each CCF-based format or protocol can have its specification state how CCF options are used.  This allows each protocol to balance tradeoffs such as compatibility, determinism, speed, encoded data size, etc.
 
-CCF leverages vendor-neutral Internet Standards such as CBOR (RFC 8949), which is designed to be relevant for decades.
+CCF uses CBOR and is designed to allow efficient detection and rejection of malformed messages without creating Cadence objects. This allows more costly checks for validity, etc. to be performed only on well-formed messages.
+
+CBOR is an [Internet Standard](https://www.ietf.org/rfc/std-index.txt) defined by [IETF&nbsp;STD&nbsp;94](https://www.rfc-editor.org/info/std94).  CBOR is designed to be relevant for decades and is used by data formats and protocols such as [W3C&nbsp;WebAuthn](https://www.w3.org/TR/webauthn-2/), C-DNS&nbsp;([IETF&nbsp;RFC&nbsp;8618](https://www.rfc-editor.org/rfc/rfc8618.html)), COSE&nbsp;([IETF&nbsp;STD&nbsp;96](https://www.rfc-editor.org/info/std96)), CWT&nbsp;([IETF&nbsp;RFC&nbsp;8392](https://www.rfc-editor.org/info/rfc8392)), etc.
 
 ## Internet Standards
 
@@ -57,7 +59,13 @@ RFC 8949 and RFC 8610 are [Internet Standards](https://en.wikipedia.org/wiki/Int
 - Mar 2023 - Paused in order to work on Atree v0.6: https://github.com/onflow/atree/pull/295
 - Mar-Apr 2023 - Updated PR 2364 to match new changes to Cadence that affect external values, incorporate review feedback, and add more tests.
 - Apr 5, 2023 - As requested, reduce hours spent on CCF to begin work on Atree register inlining.  https://github.com/onflow/atree/issues/292
-- Apr 13, 2023 - Merged PR 2364 to add CCF codec (+20,857 lines, `go test -cover` reported 83%, fuzz tested many billions of executions).
+- Apr 13, 2023 - Paused after merging PR 2364 to add CCF codec (+20,857 lines, `go test -cover` reported 83%, fuzz tested many billions of executions).  https://github.com/onflow/cadence/pull/2364
+- May 26, 2023 - Resumed as requested with June 7 deadline, to use CCF codec for events encoding for deployment to testnet by June 7.
+                 - Paused work on Atree register inlining https://github.com/onflow/atree/issues/292.
+- June 9, 2023 - Fix backward compatibility with programs relying on JSON-CDC sort order because they were accessing event fields by index rather than field name.
+                 - Add options to CCF codec and make events encoding opt-out of "Deterministic CCF Encoding Requirements"
+- June 13, 2023 - Paused as requested ("CCF showed enough impact" in fully self-describing mode) and switch back to Atree register inlining https://github.com/onflow/atree/issues/292.  Postpone work on CCF Specs and CCF Codec (e.g. partially self describing mode which would reduce events encoding size by 14x instead of 2x)
+- August 1-4, 2023 - Resume updating CCF specs part-time after inquiry about moving it to onflow/ccf. https://github.com/fxamacker/ccf_draft/issues/92.
 
 ## Preliminary Size and Benchmark Comparisons
 
@@ -74,12 +82,15 @@ At this time, CCF decoder doesn't include the option to check for "Preferred Ser
 | --- | --- | --- | --- |
 | JSON | 48,309 |13,858,836 | JSON-Cadence Data Interchange Format |
 | CCF | 48,309 |  6,159,931 | CCF in fully self-describing and deterministic mode |
+| CCF | 48,309 | TBD | Est. 1/14 size of JSON-CDC with CCF in partially self-describing mode |
 
 CCF's partially self-describing mode would be even smaller (roughly 1/14 the size of JSON) in some use cases.
 
-#### Speed and Memory Comparisons
+#### Preliminary Speed and Memory Comparisons (obsolete)
 
 These informal and preliminary benchmarks used commit f911063 in https://github.com/onflow/cadence/pull/2364.
+
+This is obsolete because we opt-out of "Deterministic CCF Encoding Requirements" for events encoding. Not using that mode makes CCF faster and more memory efficient than shown here.
 
 ```
 $ benchstat bench_json_events_48k.log bench_ccf_events_48k.log 
