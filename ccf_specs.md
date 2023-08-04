@@ -1,9 +1,9 @@
 # Cadence Compact Format (CCF)
 
 Author: Faye Amacker  
-Status: RC2 DRAFT  
-Date: August 3, 2023  
-Revision: 20230803b
+Status: RC2  
+Date: August 4, 2023  
+Revision: 20230804a
 
 ## Abstract
 
@@ -19,7 +19,7 @@ CCF obsoletes [JSON-Cadence Data Interchange Format](https://developers.flow.com
 
 ## Status of this Document
 
-This document is a release candidate (RC2 DRAFT).
+This document is a release candidate (RC2).
 
 ## Copyright Notice
 
