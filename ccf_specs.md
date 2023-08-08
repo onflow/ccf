@@ -2,8 +2,8 @@
 
 Author: Faye Amacker  
 Status: RC2  
-Date: August 4, 2023  
-Revision: 20230804a
+Date: August 7, 2023  
+Revision: 20230807a
 
 ## Abstract
 
@@ -116,18 +116,28 @@ Other considerations for using CBOR include availability and quality of CBOR cod
 
 ### Interoperability and Reuse of CBOR Codecs
 
-Widely used CBOR codecs are available in various programming languages.  CCF codecs can reuse existing CBOR codecs to reduce risks.
+CBOR data can be exchanged between standards compliant CBOR codecs implemented in any programming language.
 
-In JavaScript, there are multiple widely used CBOR codecs. As one example, [hildjj/node-cbor](https://github.com/hildjj/node-cbor) is  maintained by Joe Hildebrand (former VP of Engineering at Mozilla and Distinguished Engineer at Cisco). It's a monorepo with several packages including a "cbor package compiled for use on the web, including all of its non-optional dependencies".
+Existing CBOR codecs can be used by codecs for CBOR-based formats and protocols.  CBOR codecs are available in various programming languages.  Projects implementing a CCF codec should evaluate more than one CBOR codec for standards compliance, security, and other factors.
 
-In C, Intel maintains [TinyCBOR](https://github.com/intel/tinycbor), a CBOR codec optimized for very fast operation with very small footprint.
+#### .NET Languages
 
-For .NET languages, Microsoft maintains [System.Formats.Cbor namespace](https://learn.microsoft.com/en-us/dotnet/api/system.formats.cbor), which is the CBOR codec in .Net Platform Extensions.
+Microsoft maintains [System.Formats.Cbor namespace](https://learn.microsoft.com/en-us/dotnet/api/system.formats.cbor), which is the CBOR codec in .Net Platform Extensions.
 
-In Go, [fxamacker/cbor](https://github.com/fxamacker/cbor) is used by Cadence in its [CCF codec](https://github.com/onflow/cadence/tree/master/encoding/ccf):
+#### C
+
+Intel maintains [TinyCBOR](https://github.com/intel/tinycbor), a CBOR codec optimized for very fast operation with very small footprint.
+
+#### Go
+
+[fxamacker/cbor](https://github.com/fxamacker/cbor) is used by Cadence in its [CCF codec](https://github.com/onflow/cadence/tree/master/encoding/ccf):
   - `fxamacker/cbor` was designed with security in mind and passed multiple security assessments in 2022.  A [nonconfidential security assessment](https://github.com/veraison/go-cose/blob/v1.0.0-rc.1/reports/NCC_Microsoft-go-cose-Report_2022-05-26_v1.0.pdf) produced by NCC Group for Microsoft Corporation includes parts of fxamacker/cbor.
   - `fxamacker/cbor` is used in projects by Arm Ltd., Cisco, Dapper Labs, EdgeX&nbsp;Foundry, Fraunhofer&#8209;AISEC, Linux&nbsp;Foundation, Microsoft, Mozilla, Tailscale, Teleport, [and&nbsp;others](https://github.com/fxamacker/cbor#who-uses-fxamackercbor).  Notably, it was already [used by Cadence](https://github.com/onflow/cadence/blob/master/runtime/interpreter/encode.go) for internal value encoding.
-  - `fxamacker/cbor` is maintained by the author of this document.  
+  - `fxamacker/cbor` is maintained by the author of this document.
+
+#### JavaScript
+
+[hildjj/node-cbor](https://github.com/hildjj/node-cbor) and its potential successor [hildji/cbor2](https://github.com/hildjj/cbor2) are maintained by Joe Hildebrand (former VP of Engineering at Mozilla).
 
 ### Terminology
 
