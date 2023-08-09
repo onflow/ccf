@@ -2,8 +2,8 @@
 
 Author: Faye Amacker  
 Status: RC2  
-Date: August 7, 2023  
-Revision: 20230807a
+Date: August 9, 2023  
+Revision: 20230809a
 
 ## Abstract
 
@@ -143,7 +143,7 @@ Intel maintains [TinyCBOR](https://github.com/intel/tinycbor), a CBOR codec opti
 
 This specification uses requirements terminology, CBOR terminology, and CDDL terminology.
 
-This specification uses the following notations to specify or describe CCF:
+This specification also uses the following notations:
 - Concise Data Definition Language (CDDL) defined by [RFC 8610](https://www.rfc-editor.org/rfc/rfc8610.html).  CDDL is a notation for unambiguously expressing CBOR and JSON data structures.
 - Extended Diagnostic Notation (EDN) defined by [Appendix G of RFC 8610](https://www.rfc-editor.org/rfc/rfc8610.html#appendix-G).  EDN is a "diagnostic notation" used for conversing about encoded CBOR data items.
 
@@ -334,7 +334,7 @@ It represents `130([137(4), 42])`, where:
 - `137(4)` is Cadence `Int`.
 - `42` is raw value.
 
-### Cadence Homogenous Array with Simple Type Elements
+### Cadence Homogeneous Array with Simple Type Elements
 
 Cadence `[Int]` type of value `[1, 2, 3]` encoded to JSON is 107 bytes when minified:
 
@@ -368,7 +368,7 @@ It represents `130([139(137(4)), [1, 2, 3]])`, where:
 - `139(137(4))` is Cadence array of `Int`.
 - `[1, 2, 3]` is raw value.
 
-### Cadence Heterogenous Array with Simple Type Elements
+### Cadence Heterogeneous Array with Simple Type Elements
 
 Cadence `[AnyStruct]` type of value `[1, "a", true]` encoded to JSON is 112 bytes when minified:
 
@@ -404,7 +404,7 @@ It represents `130([139(137(39)), [130([137(4), 1]), 130([137(1), "a"]), 130([13
 - `130([137(1), "a"])` is second element (`137(1)` is Cadence `String`, `"a"` is raw value).
 - `130([137(0), true]` is third element (`137(0)` is Cadence `Boolean`, `true` is raw value).
 
-### Cadence Homogenous Array with Composite Type Elements
+### Cadence Homogeneous Array with Composite Type Elements
 
 This example is for CCF in fully self-describing mode (partially self-describing mode encodes smaller messages).
 
@@ -482,7 +482,7 @@ Value data item represents `[139(136(h'')), [[1], [2], [3]]]]`, where:
 - `139(136(h''))` is Cadence array of type identified by ID `0`.
 - `[[1], [2], [3]]]` is array of `Foo` resource raw field data.
 
-### Cadence Homogenous Array with Composite Type Elements (One Field Type Is Abstract)
+### Cadence Homogeneous Array with Composite Type Elements (One Field Type Is Abstract)
 
 This example is for CCF in fully self-describing mode (partially self-describing mode encodes smaller messages).
 
