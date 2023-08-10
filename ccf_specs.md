@@ -2,8 +2,8 @@
 
 Author: Faye Amacker  
 Status: RC2  
-Date: August 9, 2023  
-Revision: 20230809a
+Date: August 10, 2023  
+Revision: 20230810a
 
 ## Abstract
 
@@ -13,7 +13,7 @@ Cadence is a resource-oriented programming language that introduces new features
 
 CCF messages can be fully self-describing or partially self-describing.  Both are more compact than JSON-based messages.  CCF-based protocols can send Cadence metadata just once for all messages of that type.  Malformed data can be detected without Cadence metadata and without creating Cadence objects.
 
-CCF defines "Deterministic CCF Encoding Requirements" and makes it optional.  It allows CCF codecs implemented in different programming languages to produce the same deterministic encodings.  CCF-based formats and protocols can balance tradeoffs by specifying how they use CCF options.
+CCF defines "Deterministic CCF Encoding Requirements" and makes it optional.  It allows CCF codecs implemented in different programming languages to produce the same deterministic encodings.  CCF-based formats and protocols can balance trade-offs by specifying how they use CCF options.
 
 CCF obsoletes [JSON-Cadence Data Interchange Format](https://developers.flow.com/cadence/json-cadence-spec) (JSON-CDC) for use cases that do not require JSON.
 
@@ -46,7 +46,7 @@ The same `FeesDeducted` event on the Flow blockchain can encode to:
 
 CCF defines all requirements for deterministic encoding (sort orders, smallest encoded forms, and Cadence-specific requirements) to allow CCF codecs implemented in different programming languages to produce the same deterministic encodings.
 
-Some requirements (such as "Deterministic CCF Encoding Requirements") are defined as optional.  Each CCF-based format or protocol can have its specification state how CCF options are used.  This allows each protocol to balance tradeoffs such as compatibility, determinism, speed, encoded data size, etc.
+Some requirements (such as "Deterministic CCF Encoding Requirements") are defined as optional.  Each CCF-based format or protocol can have its specification state how CCF options are used.  This allows each protocol to balance trade-offs such as compatibility, determinism, speed, encoded data size, etc.
 
 CCF uses CBOR and is designed to allow efficient detection and rejection of malformed messages without creating Cadence objects. This allows more costly checks for validity, etc. to be performed only on well-formed messages.
 
@@ -69,11 +69,11 @@ CCF is designed to support:
 
 - Compact encoding.  Smaller encoded size is produced by:
   - CBOR's data model with CBOR Preferred Serialization, which produces more compact encoding than JSON.
-  - Separate encoding of Cadence types and values to avoid repeatedly encoding the same Cadence type info unecessarily.
+  - Separate encoding of Cadence types and values to avoid repeatedly encoding the same Cadence type info unnecessarily.
 
 - Compact communications.  Detachable Cadence type info allows CCF-based protocols to optionally avoid resending the same Cadence type info for all messages matching that type.  CCF-based protocols can cache and uniquely identify a Cadence type so it can be matched to Cadence value (such as an event) during decoding.
 
-- Deterministic encoding.  CCF uses CBOR's Preferred Serialization to achieve deterministic encoding.  Other parts of CBOR's Core Determinisitic Encoding Requirements are not needed by this specification.
+- Deterministic encoding.  CCF uses CBOR's Preferred Serialization to achieve deterministic encoding.  Other parts of CBOR's Core Deterministic Encoding Requirements are not needed by this specification.
 
 - Early detection of malformed data.  CCF decoders can detect and reject malformed data without creating Cadence objects.  CCF decoders can detect malformed data without having Cadence type info.  If data is not malformed, then CCF decoders can proceed to detect and reject invalid CCF data as described in this document.
 
@@ -297,7 +297,7 @@ CCF decoders SHOULD allow CBOR limits to be specified and enforced, such as:
 
 For example, max number of array elements would forbid any single array in a CCF message from exceeding that many elements.
 
-The main tradeoff for decoder limits:
+The main trade-off for decoder limits:
 - limits set too high can allow memory exhaustion and other attacks to succeed.
 - limits set too low creates the possibility of being unable to decode non-malicious messages that exceeds limits.
 
@@ -1200,7 +1200,7 @@ type-value-ref =
 ;CDDL-END
 ```
 
-## Acknowledgements
+## Acknowledgments
 
 This document would not exist without Ramtin M. Seraj and Bastian Müller.
 
