@@ -1,25 +1,23 @@
 # Cadence Compact Format (CCF)
 
 Author: Faye Amacker  
-Status: RC2  
-Date: August 10, 2023  
-Revision: 20230810a
+Status: RC3  
+Date: September 4, 2023  
+Revision: 20230904a
 
 ## Abstract
 
-Cadence Compact Format (CCF) is a data format designed for compact, efficient, and deterministic encoding of [Cadence](https://github.com/onflow/cadence) external values.
-
-Cadence is a resource-oriented programming language that introduces new features to smart contract programming.  It's used by [Flow](https://github.com/onflow/flow-go) blockchain and has a syntax inspired by Swift, Kotlin, and Rust. Its use of resource types maps well to the Move language.
+Cadence Compact Format (CCF) is a data format designed for compact, efficient, and deterministic encoding of [Cadence](https://github.com/onflow/cadence) external values.  Cadence is a modern resource-oriented programming language used by [Flow](https://github.com/onflow/flow-go) blockchain.
 
 CCF messages can be fully self-describing or partially self-describing.  Both are more compact than JSON-based messages.  CCF-based protocols can send Cadence metadata just once for all messages of that type.  Malformed data can be detected without Cadence metadata and without creating Cadence objects.
 
-CCF defines "Deterministic CCF Encoding Requirements" and makes it optional.  It allows CCF codecs implemented in different programming languages to produce the same deterministic encodings.  CCF-based formats and protocols can balance trade-offs by specifying how they use CCF options.
+CCF defines "Deterministic CCF Encoding Requirements" and makes it optional.  CCF codecs implemented in different programming languages can produce the same deterministic encodings.  CCF-based formats and protocols can balance trade-offs by specifying how they use CCF options.
 
 CCF obsoletes [JSON-Cadence Data Interchange Format](https://developers.flow.com/cadence/json-cadence-spec) (JSON-CDC) for use cases that do not require JSON.
 
 ## Status of this Document
 
-This document is a release candidate (RC2).
+This document is a release candidate (RC3).
 
 ## Copyright Notice
 
@@ -55,7 +53,7 @@ CBOR is an [Internet Standard](https://www.ietf.org/rfc/std-index.txt) defined b
 ### Objectives
 
 The goal of CCF is to provide compact, efficient, and deterministic encoding of Cadence external values.  To achieve this:
-- CCF leverages CBOR's data model with [Preferred Serialization](https://www.rfc-editor.org/rfc/rfc8949.html#name-preferred-serialization) to deterministically encode values to their smallest form.
+- CCF uses CBOR's data model with [Preferred Serialization](https://www.rfc-editor.org/rfc/rfc8949.html#name-preferred-serialization) to deterministically encode values to their smallest form.
 
 - CCF separates Cadence type encoding from Cadence value encoding. This has two distinct advantages:
 
@@ -118,26 +116,18 @@ Other considerations for using CBOR include availability and quality of CBOR cod
 
 CBOR data can be exchanged between standards compliant CBOR codecs implemented in any programming language.
 
-Existing CBOR codecs can be used by codecs for CBOR-based formats and protocols.  CBOR codecs are available in various programming languages.  Projects implementing a CCF codec should evaluate more than one CBOR codec for standards compliance, security, and other factors.
-
-#### .NET Languages
-
-Microsoft maintains [System.Formats.Cbor namespace](https://learn.microsoft.com/en-us/dotnet/api/system.formats.cbor), which is the CBOR codec in .Net Platform Extensions.
-
-#### C
-
-Intel maintains [TinyCBOR](https://github.com/intel/tinycbor), a CBOR codec optimized for very fast operation with very small footprint.
-
-#### Go
-
-[fxamacker/cbor](https://github.com/fxamacker/cbor) is used by Cadence in its [CCF codec](https://github.com/onflow/cadence/tree/master/encoding/ccf):
+CBOR-based formats and protocols can use existing CBOR codecs.  For example, [CCF codec](https://github.com/onflow/cadence/tree/master/encoding/ccf) in Cadence uses [fxamacker/cbor](https://github.com/fxamacker/cbor):
   - `fxamacker/cbor` was designed with security in mind and passed multiple security assessments in 2022.  A [nonconfidential security assessment](https://github.com/veraison/go-cose/blob/v1.0.0-rc.1/reports/NCC_Microsoft-go-cose-Report_2022-05-26_v1.0.pdf) produced by NCC Group for Microsoft Corporation includes parts of fxamacker/cbor.
   - `fxamacker/cbor` is used in projects by Arm Ltd., Cisco, Dapper Labs, EdgeX&nbsp;Foundry, Fraunhofer&#8209;AISEC, Linux&nbsp;Foundation, Microsoft, Mozilla, Tailscale, Teleport, [and&nbsp;others](https://github.com/fxamacker/cbor#who-uses-fxamackercbor).  Notably, it was already [used by Cadence](https://github.com/onflow/cadence/blob/master/runtime/interpreter/encode.go) for internal value encoding.
   - `fxamacker/cbor` is maintained by the author of this document.
 
-#### JavaScript
+CBOR codecs are available in various programming languages.  Examples include:
 
-[hildjj/node-cbor](https://github.com/hildjj/node-cbor) and its potential successor [hildji/cbor2](https://github.com/hildjj/cbor2) are maintained by Joe Hildebrand (former VP of Engineering at Mozilla).
+- __.NET Languages__: Microsoft maintains [System.Formats.Cbor namespace](https://learn.microsoft.com/en-us/dotnet/api/system.formats.cbor), which is the CBOR codec in .Net Platform Extensions.
+- __C/C++__: Intel maintains [TinyCBOR](https://github.com/intel/tinycbor), a CBOR codec optimized for very fast operation with very small footprint.
+- __Javascript__:  [hildjj/node-cbor](https://github.com/hildjj/node-cbor) and its successor [hildji/cbor2](https://github.com/hildjj/cbor2) are maintained by Joe Hildebrand (former VP of Engineering at Mozilla).
+
+Projects implementing a CCF codec should evaluate more than one CBOR codec for standards compliance, security, and other factors.
 
 ### Terminology
 
