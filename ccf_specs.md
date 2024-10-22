@@ -1,9 +1,8 @@
 # Cadence Compact Format (CCF)
 
 Author: Faye Amacker  
-Status: RC3  
-Date: September 4, 2023  
-Revision: 20230904a
+Version: 1.0.0  
+Date: October 22, 2024  
 
 ## Abstract
 
@@ -15,13 +14,9 @@ CCF defines "Deterministic CCF Encoding Requirements" and makes it optional. CCF
 
 CCF obsoletes [JSON-Cadence Data Interchange Format](https://developers.flow.com/cadence/json-cadence-spec) (JSON-CDC) for use cases that do not require JSON.
 
-## Status of this Document
-
-This document is a release candidate (RC3).
-
 ## Copyright Notice
 
-Copyright (c) 2022-2023 Dapper Labs, Inc. and the persons identified as the document authors.
+Copyright © 2022-2024 Flow Foundation and the persons identified as the document authors.
 
 This document is licensed under the terms of the Apache License, Version 2.0. See [LICENSE](LICENSE) for more information.
 
@@ -29,7 +24,9 @@ This document is licensed under the terms of the Apache License, Version 2.0. Se
 
 This document specifies Cadence Compact Format.
 
-It is outside the scope of this document to specify individual CCF-based formats or protocols (e.g. events).
+Some requirements defined in this document are explicitly specified as optional.  
+
+It is outside the scope of this document to specify individual CCF-based formats or protocols (e.g. events).  For example, CCF-based formats or protocols MUST specify when encoders are required to emit CCF encodings that satisfy "Deterministic CCF Encoding Requirements".
 
 ## Introduction
 
