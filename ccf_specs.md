@@ -682,7 +682,8 @@ cbor-tag-resource-type = 161
 cbor-tag-event-type = 162
 cbor-tag-contract-type = 163
 cbor-tag-enum-type = 164
-; 165-175 are reserved
+cbor-tag-attachment-type = 165
+; 166-175 are reserved
 
 ; interface types
 cbor-tag-struct-interface-type = 176
@@ -711,7 +712,8 @@ cbor-tag-resource-type-value = 209
 cbor-tag-event-type-value = 210
 cbor-tag-contract-type-value = 211
 cbor-tag-enum-type-value = 212
-; 213-223 are reserved
+cbor-tag-attachment-type-value = 213
+; 214-223 are reserved
 
 ; interface type values
 cbor-tag-struct-interface-type-value = 224
@@ -739,6 +741,7 @@ composite-typedef = [
         / contract-type
         / event-type
         / enum-type
+        / attachment-type
         / struct-interface-type
         / resource-interface-type
         / contract-interface-type
@@ -789,6 +792,10 @@ contract-type =
 enum-type =
     ; cbor-tag-enum-type
     #6.164(composite-type)
+
+attachment-type =
+    ; cbor-tag-attachment-type
+    #6.165(composite-type)
 
 struct-interface-type =
     ; cbor-tag-struct-interface-type
@@ -1066,6 +1073,7 @@ type-value = simple-type-value
     / contract-type-value
     / event-type-value
     / enum-type-value
+    / attachment-type-value
     / struct-interface-type-value
     / resource-interface-type-value
     / contract-interface-type-value
@@ -1120,6 +1128,10 @@ contract-type-value =
 enum-type-value =
     ; cbor-tag-enum-type-value
     #6.212(composite-type-value)
+
+attachment-type-value =
+    ; cbor-tag-attachment-type-value
+    #6.213(composite-type-value)
 
 struct-interface-type-value =
     ; cbor-tag-struct-interface-type-value
