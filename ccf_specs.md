@@ -1053,6 +1053,7 @@ function-value = [
         ]
     ]
     return-type: type-value
+    purity: int
 ]
 
 type-value = simple-type-value
