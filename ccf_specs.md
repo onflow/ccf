@@ -227,7 +227,7 @@ A CCF encoding complies with "Valid CCF Encoding Requirements" if it complies wi
   - `composite-type-value.initializers`
   - `function-value.parameters`
 
-- Elements MUST be unique in `restricted-type` or `restricted-type-value`.
+- Elements MUST be unique in `intersection-type` or `intersection-type-value`.
 
 - Keys MUST be unique in `dict-value`. Decoders are not always required to check for duplicate dictionary keys. In some cases, checking for duplicate dictionary key is not necessary or it may be delegated to the application.
 
@@ -258,8 +258,8 @@ A CCF encoding satisfies the "Deterministic CCF Encoding Requirements" if it sat
   - `dict-value` key-value pairs MUST be sorted by key.
   - `composite-type.fields` MUST be sorted by `name`
   - `composite-type-value.fields` MUST be sorted by `name`.
-  - `restricted-type.restrictions` MUST be sorted by restriction's `cadence-type-id`.
-  - `restricted-type-value.restrictions` MUST be sorted by restriction's `cadence-type-id`.
+  - `intersection-type.types` MUST be sorted by restriction's `cadence-type-id`.
+  - `intersection-type-value.types` MUST be sorted by restriction's `cadence-type-id`.
 
 ## Security Considerations
 
@@ -672,7 +672,7 @@ cbor-tag-varsized-array-type = 139
 cbor-tag-constsized-array-type = 140
 cbor-tag-dict-type = 141
 cbor-tag-reference-type = 142
-cbor-tag-restricted-type = 143
+cbor-tag-intersection-type = 143
 cbor-tag-capability-type = 144
 ; 145-159 are reserved
 
@@ -701,7 +701,7 @@ cbor-tag-varsized-array-type-value = 187
 cbor-tag-constsized-array-type-value = 188
 cbor-tag-dict-type-value = 189
 cbor-tag-reference-type-value = 190
-cbor-tag-restricted-type-value = 191
+cbor-tag-intersection-type-value = 191
 cbor-tag-capability-type-value = 192
 cbor-tag-function-type-value = 193
 ; 194-207 are reserved
@@ -816,7 +816,7 @@ inline-type =
     / constsized-array-type
     / dict-type
     / reference-type
-    / restricted-type
+    / intersection-type
     / capability-type
     / type-ref
 
@@ -853,11 +853,10 @@ reference-type =
       type: inline-type,
     ])
 
-restricted-type =
-    ; cbor-tag-restricted-type
+intersection-type =
+    ; cbor-tag-intersection-type
     #6.143([
-      type: inline-type / nil,
-      restrictions: [* inline-type]
+      types: [+ inline-type]
     ])
 
 capability-type =
@@ -1079,7 +1078,7 @@ type-value = simple-type-value
     / contract-interface-type-value
     / function-type-value
     / reference-type-value
-    / restricted-type-value
+    / intersection-type-value
     / capability-type-value
     / type-value-ref
 
@@ -1178,11 +1177,10 @@ reference-type-value =
       type: type-value,
     ])
 
-restricted-type-value =
-    ; cbor-tag-restricted-type-value
+intersection-type-value =
+    ; cbor-tag-intersection-type-value
     #6.191([
-      type: type-value / nil,
-      restrictions: [* type-value]
+      types: [+ type-value]
     ])
 
 capability-type-value =
