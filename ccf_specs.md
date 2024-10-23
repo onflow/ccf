@@ -674,7 +674,8 @@ cbor-tag-dict-type = 141
 cbor-tag-reference-type = 142
 cbor-tag-intersection-type = 143
 cbor-tag-capability-type = 144
-; 145-159 are reserved
+cbor-tag-inclusiverange-type = 145
+; 146-159 are reserved
 
 ; composite types
 cbor-tag-struct-type = 160
@@ -704,7 +705,8 @@ cbor-tag-reference-type-value = 190
 cbor-tag-intersection-type-value = 191
 cbor-tag-capability-type-value = 192
 cbor-tag-function-type-value = 193
-; 194-207 are reserved
+cbor-tag-inclusiverange-type-value = 194
+; 195-207 are reserved
 
 ; composite type values
 cbor-tag-struct-type-value = 208
@@ -818,6 +820,7 @@ inline-type =
     / reference-type
     / intersection-type
     / capability-type
+    / inclusiverange-type
     / type-ref
 
 simple-type =
@@ -866,6 +869,10 @@ capability-type =
         ; borrow-type
         inline-type / nil
     ])
+
+inclusiverange-type =
+    ; cbor-tag-inclusiverange-type
+    #6.145(inline-type)
 
 type-ref =
     ; cbor-tag-type-ref
@@ -956,6 +963,7 @@ value =
     / composite-value
     / path-value
     / capability-value
+    / inclusiverange-value
     / function-value
     / type-value
 
@@ -985,6 +993,12 @@ path-capability-value = [
 id-capability-value = [
     address: address-value,
     id: uint64-value
+]
+
+inclusiverange-value = [
+    start: value,
+    end: value,
+    step: value,
 ]
 
 simple-value =
@@ -1080,6 +1094,7 @@ type-value = simple-type-value
     / reference-type-value
     / intersection-type-value
     / capability-type-value
+    / inclusiverange-type-value
     / type-value-ref
 
 simple-type-value =
@@ -1190,6 +1205,10 @@ capability-type-value =
       ; borrow-type
       type-value / nil
     ])
+
+inclusiverange-type-value =
+    ; cbor-tag-inclusiverange-type-value
+    #6.194(type-value)
 
 type-value-ref =
     ; cbor-tag-type-value-ref
