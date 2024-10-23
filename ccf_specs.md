@@ -892,13 +892,13 @@ unauthorized-type = nil
 entitlement-set-authorization-type =
 	; cbor-tag-entitlement-set-authorization-type
 	#6.146([
-	    kind: uint8,
-	    entitlements: [+ string]
+	    kind: uint,
+	    entitlements: [+ tstr]
 	])
 
 entitlement-map-authorization-type =
 	; cbor-tag-entitlement-map-authorization-type
-	#6.147(entitlement: string)
+	#6.147(tstr)
 
 type-ref =
     ; cbor-tag-type-ref
@@ -1246,13 +1246,13 @@ unauthorized-type-value = nil
 entitlement-set-authorization-type-value =
 	; cbor-tag-entitlement-set-authorization-type-value
 	#6.195([
-	    kind: uint8,
-	    entitlements: [+ string],
+	    kind: uint,
+	    entitlements: [+ tstr],
 	])
 
-entitlement-map-authorization-type =
+entitlement-map-authorization-type-value =
 	; cbor-tag-entitlement-map-authorization-type-value
-	#6.196(entitlement: string)
+	#6.196(tstr)
 
 type-value-ref =
     ; cbor-tag-type-value-ref
