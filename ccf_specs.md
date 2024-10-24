@@ -867,7 +867,7 @@ reference-type =
 intersection-type =
     ; cbor-tag-intersection-type
     #6.143([
-      types: [+ inline-type]
+      types: [+ inline-type],
     ])
 
 capability-type =
@@ -875,7 +875,7 @@ capability-type =
     ; use an array as an extension point
     #6.144([
         ; borrow-type
-        inline-type / nil
+        inline-type / nil,
     ])
 
 inclusiverange-type =
@@ -893,7 +893,7 @@ entitlement-set-authorization-type =
 	; cbor-tag-entitlement-set-authorization-type
 	#6.146([
 	    kind: uint,
-	    entitlements: [+ tstr]
+	    entitlements: [+ tstr],
 	])
 
 entitlement-map-authorization-type =
@@ -935,14 +935,7 @@ simple-type-id = &(
     storage-path-type-id: 26,
     public-path-type-id: 27,
     private-path-type-id: 28,
-    auth-account-type-id: 29,
-    public-account-type-id: 30,
-    auth-account-keys-type-id: 31,
-    public-account-keys-type-id: 32,
-    auth-account-contracts-type-id: 33,
-    public-account-contracts-type-id: 34,
     deployed-contract-type-id: 35,
-    account-key-type-id: 36,
     block-type-id: 37,
     any-type-id: 38,
     any-struct-type-id: 39,
@@ -962,6 +955,49 @@ simple-type-id = &(
     word256-type-id: 53,
     any-struct-attachment-type-id: 54,
     any-resource-attachment-type-id: 55,
+    storage-capability-controller-type-id: 56,
+    account-capability-controller-type-id: 57,
+    account-type-id: 58,
+    account-contracts-type-id: 59,
+    account-keys-type-id: 60,
+    account-inbox-type-id: 61,
+    account-storage-capabilities-type-id: 62,
+    account-account-capabilities-type-id: 63,
+    account-capabilities-type-id: 64,
+    account-storage-type-id: 65,
+    mutate-type-id: 66,
+    insert-type-id: 67,
+    remove-type-id: 68,
+    identity-type-id: 69,
+    storage-type-id: 70,
+    save-value-type-id: 71,
+    load-value-type-id: 72,
+    copy-value-type-id: 73,
+    borrow-value-type-id: 74,
+    contracts-type-id: 75,
+    add-contract-type-id: 76,
+    update-contract-type-id: 77,
+    remove-contract-type-id: 78,
+    keys-type-id: 79,
+    add-key-type-id: 80,
+    revoke-key-type-id: 81,
+    inbox-type-id: 82,
+    publish-inbox-capability-type-id: 83,
+    unpublish-inbox-capability-type-id: 84,
+    claim-inbox-capability-type-id: 85,
+    capabilities-type-id: 86,
+    storage-capabilities-type-id: 87,
+    account-capabilities-type-id: 88,
+    publish-capability-type-id: 89,
+    unpublish-capability-type-id: 90,
+    get-storage-capability-controller-type-id: 91,
+    issue-storage-capability-controller-type-id: 92,
+    get-account-capability-controller-type-id: 93,
+    issue-account-capability-controller-type-id: 94,
+    capabilities-mapping-type-id: 95,
+    account-mapping-type-id: 96,
+    hashable-struct-type-id: 97,
+    fixedSize-unsigned-integer-type-id: 98,
 )
 
 ccf-typedef-and-value-message =
