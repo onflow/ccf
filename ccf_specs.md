@@ -931,7 +931,7 @@ simple-type-id = &(
     fix64-type-id: 22,
     ufix64-type-id: 23,
     path-type-id: 24,
-    capability-path-type-id: 25,
+    capability-type-id: 25,
     storage-path-type-id: 26,
     public-path-type-id: 27,
     private-path-type-id: 28,
@@ -1043,16 +1043,7 @@ path-value = [
     identifier: tstr,
 ]
 
-capability-value = 
-    path-capability-value
-    / id-capability-value
-
-path-capability-value = [
-    address: address-value,
-    path: path-value,
-]
-
-id-capability-value = [
+capability-value = [
     address: address-value,
     id: uint64-value,
 ]
