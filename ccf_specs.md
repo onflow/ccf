@@ -1,9 +1,8 @@
 # Cadence Compact Format (CCF)
 
 Author: Faye Amacker  
-Status: RC3  
-Date: September 4, 2023  
-Revision: 20230904a
+Version: 1.0.0  
+Date: October 22, 2024  
 
 ## Abstract
 
@@ -15,13 +14,9 @@ CCF defines "Deterministic CCF Encoding Requirements" and makes it optional. CCF
 
 CCF obsoletes [JSON-Cadence Data Interchange Format](https://developers.flow.com/cadence/json-cadence-spec) (JSON-CDC) for use cases that do not require JSON.
 
-## Status of this Document
-
-This document is a release candidate (RC3).
-
 ## Copyright Notice
 
-Copyright (c) 2022-2023 Dapper Labs, Inc. and the persons identified as the document authors.
+Copyright © 2022-2024 Flow Foundation and the persons identified as the document authors.
 
 This document is licensed under the terms of the Apache License, Version 2.0. See [LICENSE](LICENSE) for more information.
 
@@ -29,7 +24,9 @@ This document is licensed under the terms of the Apache License, Version 2.0. Se
 
 This document specifies Cadence Compact Format.
 
-It is outside the scope of this document to specify individual CCF-based formats or protocols (e.g. events).
+Some requirements defined in this document are explicitly specified as optional.  
+
+It is outside the scope of this document to specify individual CCF-based formats or protocols (e.g. events).  For example, CCF-based formats or protocols MUST specify when encoders are required to emit CCF encodings that satisfy "Deterministic CCF Encoding Requirements".
 
 ## Introduction
 
@@ -230,8 +227,10 @@ A CCF encoding complies with "Valid CCF Encoding Requirements" if it complies wi
   - `composite-type-value.initializers`
   - `function-value.parameters`
 
-- Elements MUST be unique in `restricted-type` or `restricted-type-value`.
+- Elements MUST be unique in `intersection-type` or `intersection-type-value`.
 
+- Elements MUST be unique in `entitlement-set-authorization-type.entitlements` or `entitlement-set-authorization-type-value.entitlements`.
+ 
 - Keys MUST be unique in `dict-value`. Decoders are not always required to check for duplicate dictionary keys. In some cases, checking for duplicate dictionary key is not necessary or it may be delegated to the application.
 
 ### Deterministic CCF Encoding Requirements
@@ -261,8 +260,10 @@ A CCF encoding satisfies the "Deterministic CCF Encoding Requirements" if it sat
   - `dict-value` key-value pairs MUST be sorted by key.
   - `composite-type.fields` MUST be sorted by `name`
   - `composite-type-value.fields` MUST be sorted by `name`.
-  - `restricted-type.restrictions` MUST be sorted by restriction's `cadence-type-id`.
-  - `restricted-type-value.restrictions` MUST be sorted by restriction's `cadence-type-id`.
+  - `intersection-type.types` MUST be sorted by restriction's `cadence-type-id`.
+  - `intersection-type-value.types` MUST be sorted by restriction's `cadence-type-id`.
+  - `entitlement-set-authorization-type.entitlements` MUST be sorted.
+  - `entitlement-set-authorization-type-value.entitlements` MUST be sorted.
 
 ## Security Considerations
 
@@ -675,9 +676,12 @@ cbor-tag-varsized-array-type = 139
 cbor-tag-constsized-array-type = 140
 cbor-tag-dict-type = 141
 cbor-tag-reference-type = 142
-cbor-tag-restricted-type = 143
+cbor-tag-intersection-type = 143
 cbor-tag-capability-type = 144
-; 145-159 are reserved
+cbor-tag-inclusiverange-type = 145
+cbor-tag-entitlement-set-authorization-type = 146
+cbor-tag-entitlement-map-authorization-type = 147
+; 148-159 are reserved
 
 ; composite types
 cbor-tag-struct-type = 160
@@ -685,7 +689,8 @@ cbor-tag-resource-type = 161
 cbor-tag-event-type = 162
 cbor-tag-contract-type = 163
 cbor-tag-enum-type = 164
-; 165-175 are reserved
+cbor-tag-attachment-type = 165
+; 166-175 are reserved
 
 ; interface types
 cbor-tag-struct-interface-type = 176
@@ -703,10 +708,13 @@ cbor-tag-varsized-array-type-value = 187
 cbor-tag-constsized-array-type-value = 188
 cbor-tag-dict-type-value = 189
 cbor-tag-reference-type-value = 190
-cbor-tag-restricted-type-value = 191
+cbor-tag-intersection-type-value = 191
 cbor-tag-capability-type-value = 192
 cbor-tag-function-type-value = 193
-; 194-207 are reserved
+cbor-tag-inclusiverange-type-value = 194
+cbor-tag-entitlement-set-authorization-type-value = 195
+cbor-tag-entitlement-map-authorization-type-value = 196
+; 197-207 are reserved
 
 ; composite type values
 cbor-tag-struct-type-value = 208
@@ -714,7 +722,8 @@ cbor-tag-resource-type-value = 209
 cbor-tag-event-type-value = 210
 cbor-tag-contract-type-value = 211
 cbor-tag-enum-type-value = 212
-; 213-223 are reserved
+cbor-tag-attachment-type-value = 213
+; 214-223 are reserved
 
 ; interface type values
 cbor-tag-struct-interface-type-value = 224
@@ -742,6 +751,7 @@ composite-typedef = [
         / contract-type
         / event-type
         / enum-type
+        / attachment-type
         / struct-interface-type
         / resource-interface-type
         / contract-interface-type
@@ -761,7 +771,7 @@ composite-type = [
     fields: [
         * [
             field-name: tstr,
-            field-type: inline-type
+            field-type: inline-type,
         ]
     ]
 ]
@@ -793,6 +803,10 @@ enum-type =
     ; cbor-tag-enum-type
     #6.164(composite-type)
 
+attachment-type =
+    ; cbor-tag-attachment-type
+    #6.165(composite-type)
+
 struct-interface-type =
     ; cbor-tag-struct-interface-type
     #6.176(interface-type)
@@ -812,8 +826,9 @@ inline-type =
     / constsized-array-type
     / dict-type
     / reference-type
-    / restricted-type
+    / intersection-type
     / capability-type
+    / inclusiverange-type
     / type-ref
 
 simple-type =
@@ -832,28 +847,27 @@ constsized-array-type =
     ; cbor-tag-constsized-array-type
     #6.140([
         array-size: uint,
-        element-type: inline-type
+        element-type: inline-type,
     ])
 
 dict-type =
     ; cbor-tag-dict-type
     #6.141([
         key-type: inline-type,
-        element-type: inline-type
+        element-type: inline-type,
     ])
 
 reference-type =
     ; cbor-tag-reference-type
     #6.142([
-      authorized: bool,
+      authorized: authorization-type,
       type: inline-type,
     ])
 
-restricted-type =
-    ; cbor-tag-restricted-type
+intersection-type =
+    ; cbor-tag-intersection-type
     #6.143([
-      type: inline-type / nil,
-      restrictions: [* inline-type]
+      types: [+ inline-type],
     ])
 
 capability-type =
@@ -861,8 +875,30 @@ capability-type =
     ; use an array as an extension point
     #6.144([
         ; borrow-type
-        inline-type / nil
+        inline-type / nil,
     ])
+
+inclusiverange-type =
+    ; cbor-tag-inclusiverange-type
+    #6.145(inline-type)
+
+authorization-type =
+    unauthorized-type
+    / entitlement-set-authorization-type
+    / entitlement-map-authorization-type
+
+unauthorized-type = nil
+
+entitlement-set-authorization-type =
+	; cbor-tag-entitlement-set-authorization-type
+	#6.146([
+	    kind: uint,
+	    entitlements: [+ tstr],
+	])
+
+entitlement-map-authorization-type =
+	; cbor-tag-entitlement-map-authorization-type
+	#6.147(tstr)
 
 type-ref =
     ; cbor-tag-type-ref
@@ -895,18 +931,11 @@ simple-type-id = &(
     fix64-type-id: 22,
     ufix64-type-id: 23,
     path-type-id: 24,
-    capability-path-type-id: 25,
+    capability-type-id: 25,
     storage-path-type-id: 26,
     public-path-type-id: 27,
     private-path-type-id: 28,
-    auth-account-type-id: 29,
-    public-account-type-id: 30,
-    auth-account-keys-type-id: 31,
-    public-account-keys-type-id: 32,
-    auth-account-contracts-type-id: 33,
-    public-account-contracts-type-id: 34,
     deployed-contract-type-id: 35,
-    account-key-type-id: 36,
     block-type-id: 37,
     any-type-id: 38,
     any-struct-type-id: 39,
@@ -926,13 +955,56 @@ simple-type-id = &(
     word256-type-id: 53,
     any-struct-attachment-type-id: 54,
     any-resource-attachment-type-id: 55,
+    storage-capability-controller-type-id: 56,
+    account-capability-controller-type-id: 57,
+    account-type-id: 58,
+    account-contracts-type-id: 59,
+    account-keys-type-id: 60,
+    account-inbox-type-id: 61,
+    account-storage-capabilities-type-id: 62,
+    account-account-capabilities-type-id: 63,
+    account-capabilities-type-id: 64,
+    account-storage-type-id: 65,
+    mutate-type-id: 66,
+    insert-type-id: 67,
+    remove-type-id: 68,
+    identity-type-id: 69,
+    storage-type-id: 70,
+    save-value-type-id: 71,
+    load-value-type-id: 72,
+    copy-value-type-id: 73,
+    borrow-value-type-id: 74,
+    contracts-type-id: 75,
+    add-contract-type-id: 76,
+    update-contract-type-id: 77,
+    remove-contract-type-id: 78,
+    keys-type-id: 79,
+    add-key-type-id: 80,
+    revoke-key-type-id: 81,
+    inbox-type-id: 82,
+    publish-inbox-capability-type-id: 83,
+    unpublish-inbox-capability-type-id: 84,
+    claim-inbox-capability-type-id: 85,
+    capabilities-type-id: 86,
+    storage-capabilities-type-id: 87,
+    account-capabilities-type-id: 88,
+    publish-capability-type-id: 89,
+    unpublish-capability-type-id: 90,
+    get-storage-capability-controller-type-id: 91,
+    issue-storage-capability-controller-type-id: 92,
+    get-account-capability-controller-type-id: 93,
+    issue-account-capability-controller-type-id: 94,
+    capabilities-mapping-type-id: 95,
+    account-mapping-type-id: 96,
+    hashable-struct-type-id: 97,
+    fixedSize-unsigned-integer-type-id: 98,
 )
 
 ccf-typedef-and-value-message =
     ; cbor-tag-typedef-and-value
     #6.129([
       typedef: composite-typedef,
-      type-and-value: inline-type-and-value 
+      type-and-value: inline-type-and-value,
     ])
     
 ccf-type-and-value-message =
@@ -953,6 +1025,7 @@ value =
     / composite-value
     / path-value
     / capability-value
+    / inclusiverange-value
     / function-value
     / type-value
 
@@ -962,7 +1035,7 @@ array-value = [* value]
 
 dict-value = [* (key: value, value: value)]
 
-; composite-value is used to encode struct, contract, enum, event, and resource.
+; composite-value is used to encode struct, contract, enum, event, resource, and attachment.
 composite-value = [* (field: value)]
 
 path-value = [
@@ -970,18 +1043,15 @@ path-value = [
     identifier: tstr,
 ]
 
-capability-value = 
-    path-capability-value
-    / id-capability-value
-
-path-capability-value = [
+capability-value = [
     address: address-value,
-    path: path-value
+    id: uint64-value,
 ]
 
-id-capability-value = [
-    address: address-value,
-    id: uint64-value
+inclusiverange-value = [
+    start: value,
+    end: value,
+    step: value,
 ]
 
 simple-value =
@@ -1045,17 +1115,18 @@ function-value = [
     type-parameters: [
         * [
            name: tstr,
-           type-bound: type-value / nil
+           type-bound: type-value / nil,
         ]
-    ]
+    ],
     parameters: [
         * [
             label: tstr,
             identifier: tstr,
-            type: type-value
+            type: type-value,
         ]
-    ]
-    return-type: type-value
+    ],
+    return-type: type-value,
+    purity: int,
 ]
 
 type-value = simple-type-value
@@ -1068,13 +1139,15 @@ type-value = simple-type-value
     / contract-type-value
     / event-type-value
     / enum-type-value
+    / attachment-type-value
     / struct-interface-type-value
     / resource-interface-type-value
     / contract-interface-type-value
     / function-type-value
     / reference-type-value
-    / restricted-type-value
+    / intersection-type-value
     / capability-type-value
+    / inclusiverange-type-value
     / type-value-ref
 
 simple-type-value =
@@ -1093,14 +1166,14 @@ constsized-array-type-value =
     ; cbor-tag-constsized-array-type-value
     #6.188([
         array-size: uint,
-        element-type: type-value
+        element-type: type-value,
     ])
 
 dict-type-value =
     ; cbor-tag-dict-type-value
     #6.189([
         key-type: type-value,
-        element-type: type-value
+        element-type: type-value,
     ])
 
 struct-type-value =
@@ -1123,6 +1196,10 @@ enum-type-value =
     ; cbor-tag-enum-type-value
     #6.212(composite-type-value)
 
+attachment-type-value =
+    ; cbor-tag-attachment-type-value
+    #6.213(composite-type-value)
+
 struct-interface-type-value =
     ; cbor-tag-struct-interface-type-value
     #6.224(composite-type-value)
@@ -1143,18 +1220,18 @@ composite-type-value = [
     fields: [
         * [
             name: tstr,
-            type: type-value
+            type: type-value,
         ]
-    ]
+    ],
     initializers: [
         ? [
             * [
                 label: tstr,
                 identifier: tstr,
-                type: type-value
+                type: type-value,
             ]
         ]
-    ]
+    ],
 ]
 
 function-type-value =
@@ -1164,15 +1241,14 @@ function-type-value =
 reference-type-value =
     ; cbor-tag-reference-type-value
     #6.190([
-      authorized: bool,
+      authorized: authorization-type-value,
       type: type-value,
     ])
 
-restricted-type-value =
-    ; cbor-tag-restricted-type-value
+intersection-type-value =
+    ; cbor-tag-intersection-type-value
     #6.191([
-      type: type-value / nil,
-      restrictions: [* type-value]
+      types: [+ type-value]
     ])
 
 capability-type-value =
@@ -1182,6 +1258,28 @@ capability-type-value =
       ; borrow-type
       type-value / nil
     ])
+
+inclusiverange-type-value =
+    ; cbor-tag-inclusiverange-type-value
+    #6.194(type-value)
+
+authorization-type-value =
+    unauthorized-type-value
+    / entitlement-set-authorization-type-value
+    / entitlement-map-authorization-type-value
+
+unauthorized-type-value = nil
+
+entitlement-set-authorization-type-value =
+	; cbor-tag-entitlement-set-authorization-type-value
+	#6.195([
+	    kind: uint,
+	    entitlements: [+ tstr],
+	])
+
+entitlement-map-authorization-type-value =
+	; cbor-tag-entitlement-map-authorization-type-value
+	#6.196(tstr)
 
 type-value-ref =
     ; cbor-tag-type-value-ref
