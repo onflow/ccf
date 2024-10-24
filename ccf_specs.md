@@ -1035,7 +1035,7 @@ array-value = [* value]
 
 dict-value = [* (key: value, value: value)]
 
-; composite-value is used to encode struct, contract, enum, event, and resource.
+; composite-value is used to encode struct, contract, enum, event, resource, and attachment.
 composite-value = [* (field: value)]
 
 path-value = [
