@@ -2,7 +2,7 @@
 
 Author: Faye Amacker  
 Version: 1.0.0  
-Date: October 22, 2024  
+Date: January 26, 2025  
 
 ## Abstract
 
@@ -16,7 +16,7 @@ CCF obsoletes [JSON-Cadence Data Interchange Format](https://developers.flow.com
 
 ## Copyright Notice
 
-Copyright © 2022-2024 Flow Foundation and the persons identified as the document authors.
+Copyright © 2022-2025 Flow Foundation and the persons identified as the document authors.
 
 This document is licensed under the terms of the Apache License, Version 2.0. See [LICENSE](LICENSE) for more information.
 
@@ -115,14 +115,14 @@ CBOR data can be exchanged between standards compliant CBOR codecs implemented i
 
 CBOR-based formats and protocols can use existing CBOR codecs. For example, [CCF codec](https://github.com/onflow/cadence/tree/master/encoding/ccf) in Cadence uses [fxamacker/cbor](https://github.com/fxamacker/cbor):
   - `fxamacker/cbor` was designed with security in mind and passed multiple security assessments in 2022. A [nonconfidential security assessment](https://github.com/veraison/go-cose/blob/v1.0.0-rc.1/reports/NCC_Microsoft-go-cose-Report_2022-05-26_v1.0.pdf) produced by NCC Group for Microsoft Corporation includes parts of fxamacker/cbor.
-  - `fxamacker/cbor` is used in projects by Arm Ltd., Cisco, Dapper Labs, EdgeX&nbsp;Foundry, Fraunhofer&#8209;AISEC, Linux&nbsp;Foundation, Microsoft, Mozilla, Tailscale, Teleport, [and&nbsp;others](https://github.com/fxamacker/cbor#who-uses-fxamackercbor). Notably, it was already [used by Cadence](https://github.com/onflow/cadence/blob/master/runtime/interpreter/encode.go) for internal value encoding.
+  - `fxamacker/cbor` is used in projects by Arm Ltd., Cisco, EdgeX&nbsp;Foundry, Flow Foundation, Fraunhofer&#8209;AISEC, IBM, Kubernetes, Linux&nbsp;Foundation, Microsoft, Mozilla, Tailscale, Teleport, [and&nbsp;others](https://github.com/fxamacker/cbor#who-uses-fxamackercbor). Notably, it was already [used by Cadence](https://github.com/onflow/cadence/blob/master/runtime/interpreter/encode.go) for internal value encoding.
   - `fxamacker/cbor` is maintained by the author of this document.
 
 CBOR codecs are available in various programming languages. Examples include:
 
-- __.NET Languages__: Microsoft maintains [System.Formats.Cbor namespace](https://learn.microsoft.com/en-us/dotnet/api/system.formats.cbor), which is the CBOR codec in .Net Platform Extensions.
+- __.NET Languages__: Microsoft maintains [System.Formats.Cbor](https://learn.microsoft.com/en-us/dotnet/api/system.formats.cbor), the CBOR codec in .Net Platform Extensions.
 - __C/C++__: Intel maintains [TinyCBOR](https://github.com/intel/tinycbor), a CBOR codec optimized for very fast operation with very small footprint.
-- __Javascript__: [hildjj/node-cbor](https://github.com/hildjj/node-cbor) and its successor [hildji/cbor2](https://github.com/hildjj/cbor2) are maintained by Joe Hildebrand (former VP of Engineering at Mozilla).
+- __Javascript__: Joe Hildebrand (former VP of Engineering at Mozilla) maintains [hildji/cbor2](https://github.com/hildjj/cbor2).
 
 Projects implementing a CCF codec should evaluate more than one CBOR codec for standards compliance, security, and other factors.
 
@@ -239,7 +239,7 @@ A CCF encoding is deterministic if it satisfies the "Deterministic CCF Encoding 
 
 Encoders SHOULD emit CCF encodings that are deterministic. CCF-based protocols MUST specify when encoders are required to emit deterministic CCF encodings. For example:
 - a CCF-based protocol for encoding transaction arguments might want to specify that encoders MUST produce deterministic encodings of the values.
-- a CCF-based protocol for encoding script results might want to specify that encoders are not required to produce deterministic encodings of the values (if results are sent to clients that don't care about the values being deterministically encoded). 
+- a CCF-based protocol for encoding unsorted fields might want to specify that encoders are not required to produce deterministic encodings of the values (if compatibility with legacy systems is higher priority than "Deterministic CCF Encoding Requirements"). 
 
 Decoders SHOULD check CCF encodings to determine whether they are deterministic encodings. CCF-based protocols MUST specify when decoders are required to check for deterministic encodings and how to handle nondeterministic encodings.
 
