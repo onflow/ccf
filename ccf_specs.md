@@ -2,7 +2,7 @@
 
 Author: Faye Amacker  
 Version: 1.0.0  
-Date: January 26, 2025  
+Date: May 19, 2025
 
 ## Abstract
 
@@ -143,7 +143,7 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 This specification uses this subset of CBOR data items as defined in RFC 8949:
 - nil
 - bool
-- positive integer
+- unsigned integer
 - negative integer
 - byte string
 - text string
@@ -640,7 +640,7 @@ There are 3 top level CCF messages: `ccf-typedef-message`, `ccf-typedef-and-valu
 
 Cadence types are encoded as `inline-type` (inlined) or as `composite-typedef` (not inlined).
 
-Cadence data is encoded depending on its type. For example, Cadence `UInt8` is encoded as CBOR positive integer, Cadence `String` is encoded as CBOR text string, Cadence `Address` is encoded as CBOR byte string, and Cadence struct data is encoded as an array of its raw field data.
+Cadence data is encoded depending on its type. For example, Cadence `UInt8` is encoded as CBOR unsigned integer, Cadence `String` is encoded as CBOR text string, Cadence `Address` is encoded as CBOR byte string, and Cadence struct data is encoded as an array of its raw field data.
 
 ### Cadence Types and Type Values
 
