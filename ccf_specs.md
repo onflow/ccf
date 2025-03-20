@@ -28,6 +28,8 @@ Some requirements defined in this document are explicitly specified as optional.
 
 It is outside the scope of this document to specify individual CCF-based formats or protocols (e.g. events).  For example, CCF-based formats or protocols MUST specify when encoders are required to emit CCF encodings that satisfy "Deterministic CCF Encoding Requirements".
 
+It is outside the scope of this document to specify encoding of version numbers for CCF itself, CCF-based formats, or CCF-based protocols.  For example, CCF-based formats and protocols are free to specify an encoding that uses SemVer, sequence-based versioning, other versioning, or no versioning.  Some CCF-based formats or protocols may want to specify using CBOR Sequences ([IETF RFC 8742](https://www.rfc-editor.org/rfc/rfc8742.html)) to provide a version number in the first CBOR data item, followed by CBOR data item(s) encoded in CCF.
+
 ## Introduction
 
 CCF is a data format that allows compact, efficient, and deterministic encoding of Cadence external values.
