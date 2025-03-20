@@ -109,8 +109,6 @@ Published comparisons between CBOR and other binary data formats such as Protoco
 
 Although using a 100% custom data format can sometimes produce smaller encodings than CBOR, that alone doesn't outweigh the combination of other qualities and considerations such as maturity of specification, security, maintainability, risks, etc.
 
-Lastly, Cadence is [already using CBOR](https://github.com/onflow/cadence/blob/master/runtime/interpreter/encode.go) to encode internal values, so using CBOR to encode external values added to the list of stronger reasons making CBOR a good fit.
-
 Other considerations for using CBOR include availability and quality of CBOR codecs in various programming languages.
 
 ### Interoperability and Reuse of CBOR Codecs
