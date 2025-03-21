@@ -129,7 +129,7 @@ This specification also uses the following notations:
 
 #### Requirements Terminology
 
-The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in BCP 14 [[RFC2119](https://www.rfc-editor.org/info/rfc2119)] [[RFC8174](https://www.rfc-editor.org/info/rfc8174)] when, and only when, they appear in all capitals, as shown here.
+The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in [BCP 14](https://www.rfc-editor.org/info/bcp14) [[RFC2119](https://www.rfc-editor.org/info/rfc2119)] [[RFC8174](https://www.rfc-editor.org/info/rfc8174)] when, and only when, they appear in all capitals, as shown here.
 
 #### CBOR Terminology
 
@@ -198,7 +198,7 @@ A CCF encoding complies with "Valid CCF Encoding Requirements" if it complies wi
 
 - CBOR data items MUST be well-formed and valid as defined in RFC 8949. For example, CBOR text strings MUST contain valid UTF-8. As an exception, RFC 8949 requirements for CBOR maps are not applicable because CCF does not use CBOR maps.
 
-- CCF encodings must comply with specifications in "CCF Specified in CDDL Notation" section of this document.
+- CCF encodings MUST comply with specifications in "CCF Specified in CDDL Notation" section of this document.
 
 - `composite-type.id` MUST be unique in `ccf-typedef-message` or `ccf-typedef-and-value-message`.
 
