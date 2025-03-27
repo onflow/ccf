@@ -2,7 +2,7 @@
 
 Author: Faye Amacker  
 Version: 1.0.0  
-Date: May 20, 2025
+Date: March 27, 2025
 
 ## Abstract
 
@@ -28,7 +28,7 @@ Some requirements defined in this document are explicitly specified as optional.
 
 It is outside the scope of this document to specify individual CCF-based formats or protocols (e.g., events).  For example, CCF-based formats or protocols MUST specify when encoders are required to emit CCF encodings that satisfy "Deterministic CCF Encoding Requirements."
 
-It is outside the scope of this document to specify the encoding of version numbers of CCF itself, CCF-based formats, or CCF-based protocols.  For example, CCF-based formats and protocols can specify an encoding that uses SemVer, sequence-based versioning, other versioning, or no versioning.  Some CCF-based formats or protocols may want to specify using CBOR Sequences ([RFC 8742](https://www.rfc-editor.org/rfc/rfc8742.html)) to provide a version number in the first CBOR data item, followed by CBOR data item(s) encoded in CCF.
+This document does not specify how to encode version numbers of CCF itself, CCF-based formats, or CCF-based protocols.  CCF-based formats and protocols can specify an encoding that uses CalVer, SemVer, sequence-based versioning, any other versioning, or no versioning.  Some CCF-based formats or protocols may want to use CBOR Sequences ([RFC 8742](https://www.rfc-editor.org/rfc/rfc8742.html)) to provide a version number in the first CBOR data item, followed by CBOR data item(s) encoded in CCF.
 
 ## Introduction
 
