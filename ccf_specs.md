@@ -1,27 +1,22 @@
 # Cadence Compact Format (CCF)
 
 Author: Faye Amacker  
-Status: RC3  
-Date: September 4, 2023  
-Revision: 20230904a
+Version: 1.0.0  
+Date: March 31, 2025
 
 ## Abstract
 
-Cadence Compact Format (CCF) is a data format designed for compact, efficient, and deterministic encoding of [Cadence](https://github.com/onflow/cadence) external values. Cadence is a modern resource-oriented programming language used by [Flow](https://github.com/onflow/flow-go) blockchain.
+Cadence Compact Format (CCF) is a binary data format designed for compact, efficient, and deterministic encoding of [Cadence](https://github.com/onflow/cadence) external values. Cadence is a modern resource-oriented programming language used by [Flow](https://github.com/onflow/flow-go) blockchain.
 
-CCF messages can be fully self-describing or partially self-describing. Both are more compact than JSON-based messages. CCF-based protocols can send Cadence metadata just once for all messages of that type. Malformed data can be detected without Cadence metadata and without creating Cadence objects.
+CCF messages can be fully self-describing or partially self-describing. Both are more compact than JSON-based messages. CCF-based protocols can send Cadence metadata once, and CCF messages can reuse it. Malformed data can be detected without Cadence metadata and without creating Cadence objects.
 
-CCF defines "Deterministic CCF Encoding Requirements" and makes it optional. CCF codecs implemented in different programming languages can produce the same deterministic encodings. CCF-based formats and protocols can balance trade-offs by specifying how they use CCF options.
+CCF specifies "Deterministic CCF Encoding Requirements" and makes it optional. CCF codecs implemented in different programming languages can produce the same deterministic encodings. CCF-based protocols can balance trade-offs by specifying how they use optional CCF requirements.
 
 CCF obsoletes [JSON-Cadence Data Interchange Format](https://developers.flow.com/cadence/json-cadence-spec) (JSON-CDC) for use cases that do not require JSON.
 
-## Status of this Document
-
-This document is a release candidate (RC3).
-
 ## Copyright Notice
 
-Copyright (c) 2022-2023 Dapper Labs, Inc. and the persons identified as the document authors.
+Copyright © 2022-2025 Flow Foundation and the persons identified as the document authors.
 
 This document is licensed under the terms of the Apache License, Version 2.0. See [LICENSE](LICENSE) for more information.
 
@@ -29,61 +24,63 @@ This document is licensed under the terms of the Apache License, Version 2.0. Se
 
 This document specifies Cadence Compact Format.
 
-It is outside the scope of this document to specify individual CCF-based formats or protocols (e.g. events).
+This document explicitly specifies some requirements as optional. 
+
+It is outside the scope of this document to specify individual CCF-based protocols (e.g., events). For example, CCF-based protocols MUST specify when encoders are required to emit CCF encodings that satisfy "Deterministic CCF Encoding Requirements."
+
+This document does not specify how to encode version numbers of CCF itself or CCF-based protocols. CCF-based protocols can specify an encoding that uses CalVer, SemVer, sequence-based versioning, any other versioning, or no versioning. Some CCF-based protocols may want to use CBOR Sequences ([RFC 8742](https://www.rfc-editor.org/rfc/rfc8742.html)) to provide a version number in the first CBOR data item, followed by CBOR data item(s) representing CCF message(s).
 
 ## Introduction
 
-CCF is a data format that allows compact, efficient, and deterministic encoding of Cadence external values.
+CCF is a binary data format that allows compact, efficient, and deterministic encoding of Cadence external values.
 
-Cadence external values (e.g. events, transaction arguments, etc.) have been encoded using JSON-CDC, which is inefficient, verbose, and doesn't define deterministic encoding.
+Cadence external values (e.g., events, transaction arguments, etc.) have been encoded using JSON-CDC, which is inefficient, verbose, and doesn't define deterministic encoding.
 
-The same `FeesDeducted` event on the Flow blockchain can encode to:
+The same `FeesDeducted` event on the Flow blockchain can be encoded to:
 - 298 bytes in JSON-CDC (minified).
 - 118 bytes in CCF (fully self-describing mode).
 - &nbsp;20 bytes in CCF (partially self-describing mode).
 
-CCF defines all requirements for deterministic encoding (sort orders, smallest encoded forms, and Cadence-specific requirements) to allow CCF codecs implemented in different programming languages to produce the same deterministic encodings.
+CCF defines all requirements for deterministic encoding (sort orders, shortest forms, and Cadence-specific requirements) so that CCF codecs implemented in different programming languages can produce the same deterministic encodings.
 
-Some requirements (such as "Deterministic CCF Encoding Requirements") are defined as optional. Each CCF-based format or protocol can have its specification state how CCF options are used. This allows each protocol to balance trade-offs such as compatibility, determinism, speed, encoded data size, etc.
+Some requirements (such as "Deterministic CCF Encoding Requirements") are specified as optional. The specification of each CCF-based protocol determines how it uses optional CCF requirements. This allows each protocol to balance trade-offs such as compatibility, determinism, speed, encoded data size, etc.
 
-CCF uses CBOR and is designed to allow efficient detection and rejection of malformed messages without creating Cadence objects. This allows more costly checks for validity, etc. to be performed only on well-formed messages.
+CCF allows efficient detection of malformed messages without creating Cadence objects. More costly validation is performed only on well-formed messages.
 
-CBOR is an [Internet Standard](https://www.ietf.org/rfc/std-index.txt) defined by [IETF&nbsp;STD&nbsp;94](https://www.rfc-editor.org/info/std94). CBOR is designed to be relevant for decades and is used by data formats and protocols such as [W3C&nbsp;WebAuthn](https://www.w3.org/TR/webauthn-2/), C-DNS&nbsp;([IETF&nbsp;RFC&nbsp;8618](https://www.rfc-editor.org/rfc/rfc8618.html)), COSE&nbsp;([IETF&nbsp;STD&nbsp;96](https://www.rfc-editor.org/info/std96)), CWT&nbsp;([IETF&nbsp;RFC&nbsp;8392](https://www.rfc-editor.org/info/rfc8392)), etc.
+CCF uses a subset of the Concise Binary Object Representation (CBOR) format. CBOR is a binary data format specified by [RFC 8949](https://www.rfc-editor.org/info/std94) and designated by IETF as an [Internet Standard](https://www.ietf.org/rfc/std-index.txt) (STD&nbsp;94). CBOR is designed to be relevant for decades and is used by data formats and protocols such as [W3C&nbsp;WebAuthn](https://www.w3.org/TR/webauthn-2/), Compacted-DNS&nbsp;([RFC&nbsp;8618](https://www.rfc-editor.org/rfc/rfc8618.html)), COSE&nbsp;([IETF&nbsp;STD&nbsp;96](https://www.rfc-editor.org/info/std96)), CWT&nbsp;([RFC&nbsp;8392](https://www.rfc-editor.org/info/rfc8392)), etc.
 
 ### Objectives
 
-The goal of CCF is to provide compact, efficient, and deterministic encoding of Cadence external values. To achieve this:
-- CCF uses CBOR's data model with [Preferred Serialization](https://www.rfc-editor.org/rfc/rfc8949.html#name-preferred-serialization) to deterministically encode values to their smallest form.
+The goal of CCF is to provide compact, efficient, and deterministic encoding of Cadence external values with:
+- Fully self-describing mode: CCF messages include Cadence types and values.
+- Partially self-describing mode: CCF messages include Cadence values referencing omitted Cadence types by unique type ID.
 
-- CCF separates Cadence type encoding from Cadence value encoding. This has two distinct advantages:
+CCF supports:
 
-  - More compact encoding. Cadence type info is not repeatedly encoded unnecessarily in a message. E.g. for a homogeneous array of a Cadence composite type, each element will not have its Cadence composite type info encoded repeatedly.
+- Cadence external values: CCF supports all Cadence built-in types and user-defined types (e.g., composite types). For extensibility, CCF reserves multiple ranges of CBOR tag numbers (unassigned by IANA) for future Cadence built-in data types.
 
-  - Detachable Cadence type info. Although Cadence type info is required for decoding, CCF-based protocols can send a message's type info once instead of repeatedly sending it to the same client for all messages of that type.
+- Compact encoding:
+  - CCF uses a subset of the CBOR data model with [Preferred Serialization](https://www.rfc-editor.org/rfc/rfc8949.html#name-preferred-serialization) to encode values to their shortest form.
+  - CCF separately encodes Cadence types and values to avoid repeatedly encoding the same Cadence types when feasible. For example, the element type of a homogeneous array is only encoded once.
 
-CCF is designed to support:
+- Compact communications: Detachable Cadence types allow CCF-based protocols to optionally avoid resending the same Cadence types for all messages. CCF-based protocols can cache and uniquely identify a Cadence type so it can be matched to a Cadence value during decoding.
 
-- All current and future Cadence types, including composite types. CCF supports schemaless encoding and is extensible for new Cadence types.
+  For example, CCF encodes Cadence composite types separately from Cadence values. Encoded values refer to their composite type by unique type ID, encoded as bytes. If the Cadence composite type (metadata) can be stored on-chain, it doesn't need to be sent with the value. Type ID can be a universal counter, hash digest, or other unique identifier specified by CCF-based protocols.
 
-- Compact encoding. Smaller encoded size is produced by:
-  - CBOR's data model with CBOR Preferred Serialization, which produces more compact encoding than JSON.
-  - Separate encoding of Cadence types and values to avoid repeatedly encoding the same Cadence type info unnecessarily.
+- Deterministic encoding: CCF uses CBOR's Preferred Serialization to achieve deterministic encoding. Other parts of CBOR's Core Deterministic Encoding Requirements are not needed by this specification.
 
-- Compact communications. Detachable Cadence type info allows CCF-based protocols to optionally avoid resending the same Cadence type info for all messages matching that type. CCF-based protocols can cache and uniquely identify a Cadence type so it can be matched to Cadence value (such as an event) during decoding.
+- Early detection of malformed data: CCF decoders can detect malformed data without having Cadence type information. CCF decoders can detect and reject malformed data without creating Cadence objects. If data is well-formed, CCF decoders can proceed to detect and reject invalid CCF data as described in this document.
 
-- Deterministic encoding. CCF uses CBOR's Preferred Serialization to achieve deterministic encoding. Other parts of CBOR's Core Deterministic Encoding Requirements are not needed by this specification.
+- Interoperability and reuse: CCF uses CBOR, so CCF codecs can use generic CBOR codecs that are well-tested and widely used by other projects.
 
-- Early detection of malformed data. CCF decoders can detect and reject malformed data without creating Cadence objects. CCF decoders can detect malformed data without having Cadence type info. If data is not malformed, then CCF decoders can proceed to detect and reject invalid CCF data as described in this document.
+- Converting Data Between CCF and JSON: CCF uses a subset of the CBOR data model. So the guidance in RFC 8949 on [converting data between CBOR and JSON](https://www.rfc-editor.org/rfc/rfc8949.html#name-converting-data-between-cbo) is applicable to CCF.
 
-- Extensibility. CCF encodes composite type information in a header (separate from data). Data refers to composite types by unique type ID, encoded as bytes. In the future, composite type information can be stored on-chain and header isn't necessary to be sent with data. Type ID can be an universal counter or hash value.
-
-- Interoperability and Reuse. CCF uses the same approach taken by COSE (RFC 9052) leveraging CBOR (RFC 8949). CCF leverages CBOR, which allows CCF codecs to use CBOR codecs under the hood.
-
-- Translation to JSON. CCF uses a subset of CBOR data model and RFC 8949 specifies how to convert data between CBOR and JSON.
 
 ### Why CBOR
 
-CBOR is an [Internet Standard](https://www.ietf.org/rfc/std-index.txt) defined by [IETF&nbsp;STD&nbsp;94 (RFC 8949)](https://www.rfc-editor.org/info/std94):
+CBOR is a binary data format specified by [RFC 8949](https://www.rfc-editor.org/info/std94) and designated by IETF as an [Internet Standard](https://www.ietf.org/rfc/std-index.txt) (STD&nbsp;94).
+
+Design goals of CBOR balances trade-offs, making it useful as a building block for new data formats and protocols:
 
 > The Concise Binary Object Representation (CBOR) is a data format
    whose design goals include the possibility of extremely small code
@@ -91,7 +88,9 @@ CBOR is an [Internet Standard](https://www.ietf.org/rfc/std-index.txt) defined b
    for version negotiation. These design goals make it different from
    earlier binary serializations such as ASN.1 and MessagePack.
 
-In addition to the aspects listed in CBOR's design goals, CBOR-based formats can support:
+CBOR is used by data formats and protocols such as [W3C&nbsp;WebAuthn](https://www.w3.org/TR/webauthn-2/), Compacted-DNS&nbsp;([RFC&nbsp;8618](https://www.rfc-editor.org/rfc/rfc8618.html)), COSE&nbsp;([IETF&nbsp;STD&nbsp;96](https://www.rfc-editor.org/info/std96)), CWT&nbsp;([RFC&nbsp;8392](https://www.rfc-editor.org/info/rfc8392)), etc.
+
+Notably, CBOR-based data formats like CCF can be specified to support:
 - Deterministic encodings across programming languages. Encoders implemented in different languages can produce identical deterministic encodings.
 - Separate detection of malformed data and invalid data. Decoders can efficiently reject malformed inputs without creating Cadence objects.
 
@@ -100,53 +99,40 @@ CBOR is well-suited to replace JSON in data formats and protocols. CBOR's data m
 - extension points (CBOR Tags and Simple Values)
 - deterministic encoding (Core Deterministic Encoding Requirements)
 
-Published comparisons between CBOR and other binary data formats such as Protocol Buffers, etc. include:
+Published comparisons between CBOR and other binary data formats, such as Protocol Buffers, etc., include:
 - Appendix C of RFC 8618 Compacted-DNS: [Comparison of Binary Formats](https://www.rfc-editor.org/rfc/rfc8618#appendix-C)
 - Appendix E of RFC 8949 (STD 94) CBOR: [Comparison of Other Binary Formats to CBOR's Design Objectives](https://www.rfc-editor.org/rfc/rfc8949.html#name-comparison-of-other-binary-)
 
-CBOR is used in data formats and protocols such as [W3C&nbsp;WebAuthn](https://www.w3.org/TR/webauthn-2/), Compacted-DNS&nbsp;([IETF&nbsp;RFC&nbsp;8618](https://www.rfc-editor.org/rfc/rfc8618.html)), COSE&nbsp;([IETF&nbsp;STD&nbsp;96](https://www.rfc-editor.org/info/std96)), CWT&nbsp;([IETF&nbsp;RFC&nbsp;8392](https://www.rfc-editor.org/info/rfc8392)), etc.
+Although using a 100% custom data format can sometimes produce smaller encodings than CBOR, that alone doesn't outweigh the combination of other qualities and considerations such as maturity of specification, security, maintainability, risks, etc.
 
-Although using a 100% custom data format can sometimes produce smaller encodings than CBOR, that alone doesn't outweigh the combination of other qualities and considerations such as security, maintainability, risks, etc.
-
-Lastly, Cadence is [already using CBOR](https://github.com/onflow/cadence/blob/master/runtime/interpreter/encode.go) to encode internal values, so using CBOR to encode external values added to the list of stronger reasons making CBOR a good fit.
-
-Other considerations for using CBOR include availability and quality of CBOR codecs in various programming languages.
+Other considerations for using CBOR include the availability and quality of CBOR codecs in various programming languages.
 
 ### Interoperability and Reuse of CBOR Codecs
 
-CBOR data can be exchanged between standards compliant CBOR codecs implemented in any programming language.
-
-CBOR-based formats and protocols can use existing CBOR codecs. For example, [CCF codec](https://github.com/onflow/cadence/tree/master/encoding/ccf) in Cadence uses [fxamacker/cbor](https://github.com/fxamacker/cbor):
-  - `fxamacker/cbor` was designed with security in mind and passed multiple security assessments in 2022. A [nonconfidential security assessment](https://github.com/veraison/go-cose/blob/v1.0.0-rc.1/reports/NCC_Microsoft-go-cose-Report_2022-05-26_v1.0.pdf) produced by NCC Group for Microsoft Corporation includes parts of fxamacker/cbor.
-  - `fxamacker/cbor` is used in projects by Arm Ltd., Cisco, Dapper Labs, EdgeX&nbsp;Foundry, Fraunhofer&#8209;AISEC, Linux&nbsp;Foundation, Microsoft, Mozilla, Tailscale, Teleport, [and&nbsp;others](https://github.com/fxamacker/cbor#who-uses-fxamackercbor). Notably, it was already [used by Cadence](https://github.com/onflow/cadence/blob/master/runtime/interpreter/encode.go) for internal value encoding.
-  - `fxamacker/cbor` is maintained by the author of this document.
-
-CBOR codecs are available in various programming languages. Examples include:
-
-- __.NET Languages__: Microsoft maintains [System.Formats.Cbor namespace](https://learn.microsoft.com/en-us/dotnet/api/system.formats.cbor), which is the CBOR codec in .Net Platform Extensions.
-- __C/C++__: Intel maintains [TinyCBOR](https://github.com/intel/tinycbor), a CBOR codec optimized for very fast operation with very small footprint.
-- __Javascript__: [hildjj/node-cbor](https://github.com/hildjj/node-cbor) and its successor [hildji/cbor2](https://github.com/hildjj/cbor2) are maintained by Joe Hildebrand (former VP of Engineering at Mozilla).
+CBOR data can be exchanged between standards-compliant CBOR codecs implemented in any programming language.
 
 Projects implementing a CCF codec should evaluate more than one CBOR codec for standards compliance, security, and other factors.
 
-### Terminology
+When evaluating or comparing codecs, benchmarks should include decoding malicious data.
+
+### Notations and Terminology
+
+This document uses CDDL and EDN notations:
+- Concise Data Definition Language (CDDL) is defined by [RFC 8610](https://www.rfc-editor.org/rfc/rfc8610.html). CDDL is a notation for unambiguously expressing CBOR and JSON data structures.
+- Extended Diagnostic Notation (EDN) is defined by [Appendix G of RFC 8610](https://www.rfc-editor.org/rfc/rfc8610.html#appendix-G). EDN is a "diagnostic notation" used to converse about encoded CBOR data items.
 
 This specification uses requirements terminology, CBOR terminology, and CDDL terminology.
 
-This specification also uses the following notations:
-- Concise Data Definition Language (CDDL) defined by [RFC 8610](https://www.rfc-editor.org/rfc/rfc8610.html). CDDL is a notation for unambiguously expressing CBOR and JSON data structures.
-- Extended Diagnostic Notation (EDN) defined by [Appendix G of RFC 8610](https://www.rfc-editor.org/rfc/rfc8610.html#appendix-G). EDN is a "diagnostic notation" used for conversing about encoded CBOR data items.
-
 #### Requirements Terminology
 
-The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in BCP 14 [[RFC2119](https://www.rfc-editor.org/info/rfc2119)] [[RFC8174](https://www.rfc-editor.org/info/rfc8174)] when, and only when, they appear in all capitals, as shown here.
+The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in [BCP 14](https://www.rfc-editor.org/info/bcp14) [[RFC2119](https://www.rfc-editor.org/info/rfc2119)] [[RFC8174](https://www.rfc-editor.org/info/rfc8174)] when, and only when, they appear in all capitals, as shown here.
 
 #### CBOR Terminology
 
 This specification uses this subset of CBOR data items as defined in RFC 8949:
 - nil
 - bool
-- positive integer
+- unsigned integer
 - negative integer
 - byte string
 - text string
@@ -168,13 +154,13 @@ This specification uses CDDL notation to express CBOR data items:
 - `(Foo)`: Foo is a group
 - `Foo / Bar`: either Foo or Bar
 - `Foo Bar`: Foo followed by Bar
-- `[+ Foo]`: one or more Foo in CBOR array
-- `[* Foo]`: zero or more Foo in CBOR array
-- `#6.nnn(type)`: CBOR tag with tag number nnn and content type of "type".
+- `[+ Foo]`: one or more Foo in a CBOR array
+- `[* Foo]`: zero or more Foo in a CBOR array
+- `#6.nnn(type)`: CBOR tag with tag number nnn and content type of "type"
 
 ## Serialization Considerations
 
-CCF is a data format that uses a subset of CBOR with additional requirements for validity and deterministic encoding.
+CCF is a binary data format that uses a subset of CBOR with additional requirements for validity and deterministic encoding.
 
 ### Cadence Types and Values Encoding
 
@@ -185,36 +171,36 @@ CCF is a data format that uses a subset of CBOR with additional requirements for
 - `let aoa: [AnyStruct] = ["hello", true]` declares `aoa` of type `[AnyStruct]`.
 
 CCF encoding decouples value encoding from type encoding. For example:
-- Cadence booleans is encoded as a tuple of type and value: the `Bool` type and its value.
-- Cadence strings is encoded as a tuple of type and value: the `String` type and its value.
+- Cadence boolean is encoded as a tuple of type and value: the `Bool` type and its value.
+- Cadence string is encoded as a tuple of type and value: the `String` type and its value.
 
 For compactness, encoders can omit encodings of Cadence type when:
 - Optional value is nil, provided that the optional type information is encoded in the outer container.
 - Element's type matches the outer container's element type.
 
 For example, when encoding a Cadence container such as `Array`:
-- `[String]`: each element's type matches the outer container's element type, so encoders can omit encoding each element's type.
+- `[String]`: each element's type matches the outer container's element type, so encoders can omit each element's type.
 - `[AnyStruct]`: each element's type cannot match the outer container's element type, so encoders must encode the type for each element.
 
 ### Valid CCF Encoding Requirements
 
-A CCF encoding is valid if it complies with "Valid CCF Encoding Requirements".
+A CCF encoding is valid if it complies with "Valid CCF Encoding Requirements."
 
-Encoders MUST produce valid CCF encodings from valid input items. Encoders are not required to check for invalid input items (e.g. invalid UTF-8 strings, duplicate dictionary keys, etc.) Applications MUST NOT provide invalid items to encoders.
+Encoders MUST produce valid CCF encodings from valid input items. Encoders are not required to check for invalid input items (e.g., invalid UTF-8 strings, duplicate dictionary keys, etc.) Applications MUST NOT provide invalid items to encoders.
 
 Decoders MUST reject CCF encodings that are not valid unless otherwise specified in this section.
 
 A CCF encoding complies with "Valid CCF Encoding Requirements" if it complies with the following restrictions:
 
-- CBOR data items MUST be well-formed and valid as defined in RFC 8949. E.g. CBOR text strings MUST contain valid UTF-8. As an exception, RFC 8949 requirements for CBOR maps are not applicable because CCF does not use CBOR maps.
+- CBOR data items MUST be well-formed and valid as defined in RFC 8949. For example, CBOR text strings MUST contain valid UTF-8. As an exception, RFC 8949 requirements for CBOR maps are not applicable because CCF does not use CBOR maps.
 
-- CCF encodings must comply with specifications in "CCF Specified in CDDL Notation" section of this document.
+- CCF encodings MUST comply with specifications in the "CCF Specified in CDDL Notation" section of this document.
 
 - `composite-type.id` MUST be unique in `ccf-typedef-message` or `ccf-typedef-and-value-message`.
 
 - `composite-type.cadence-type-id` MUST be unique in `ccf-typedef-message` or `ccf-typedef-and-value-message`.
 
-- `field-name` MUST be unique in `composite-type`.
+- `field-name` MUST be unique in `composite-type.fields`.
 
 - `type-ref.id` MUST refer to `composite-type.id`.
 
@@ -226,21 +212,25 @@ A CCF encoding complies with "Valid CCF Encoding Requirements" if it complies wi
 
 - `name` MUST be unique in `function-value.type-parameters`. 
 
-- All parameter lists MUST have unique `identifier`. For example, `indentifier` MUST be unique in
+- All parameter lists MUST have a unique `identifier`. For example, `identifier` MUST be unique in
   - `composite-type-value.initializers`
   - `function-value.parameters`
 
-- Elements MUST be unique in `restricted-type` or `restricted-type-value`.
+- Elements MUST be unique in `intersection-type` or `intersection-type-value`.
 
-- Keys MUST be unique in `dict-value`. Decoders are not always required to check for duplicate dictionary keys. In some cases, checking for duplicate dictionary key is not necessary or it may be delegated to the application.
+- Elements MUST be unique in `entitlement-set-authorization-type.entitlements` or `entitlement-set-authorization-type-value.entitlements`.
+ 
+- Keys MUST be unique in `dict-value`. Decoders are not always required to check for duplicate dictionary keys. In some cases, checking for duplicate dictionary keys is not necessary, or the checking may be delegated to the application.
 
 ### Deterministic CCF Encoding Requirements
 
-A CCF encoding is deterministic if it satisfies the "Deterministic CCF Encoding Requirements".
+A CCF encoding is deterministic if it satisfies the "Deterministic CCF Encoding Requirements."
 
-Encoders SHOULD emit CCF encodings that are deterministic. CCF-based protocols MUST specify when encoders are required to emit deterministic CCF encodings. For example:
-- a CCF-based protocol for encoding transaction arguments might want to specify that encoders MUST produce deterministic encodings of the values.
-- a CCF-based protocol for encoding script results might want to specify that encoders are not required to produce deterministic encodings of the values (if results are sent to clients that don't care about the values being deterministically encoded). 
+Encoders SHOULD emit deterministic CCF encodings. However, some CCF-based protocols may not require deterministic CCF encodings.
+
+CCF-based protocols MUST specify when encoders are required to emit deterministic CCF encodings. For example:
+- A CCF-based protocol that prioritizes security above performance (or requires explicitly sorted fields) might want to specify that encoders MUST produce deterministic encodings of the values.
+- A CCF-based protocol for encoding unsorted fields might want to specify that encoders are not required to produce deterministic encodings of the values (if compatibility with legacy systems is a higher priority than "Deterministic CCF Encoding Requirements"). 
 
 Decoders SHOULD check CCF encodings to determine whether they are deterministic encodings. CCF-based protocols MUST specify when decoders are required to check for deterministic encodings and how to handle nondeterministic encodings.
 
@@ -248,64 +238,66 @@ A CCF encoding satisfies the "Deterministic CCF Encoding Requirements" if it sat
 
 - CCF encodings MUST satisfy "Valid CCF Encoding Requirements" defined in this document.
 
-- CCF encodings MUST satisfy "Core Deterministic Encoding Requirements" defined in RFC 8948 Section 4.2.1. As an exception, RFC 8949 requirements for CBOR maps are not applicable because CCF does not use CBOR maps.
+- CCF encodings MUST satisfy the Core Deterministic Encoding Requirements defined in [Section 4.2.1](https://www.rfc-editor.org/rfc/rfc8949.html#name-core-deterministic-encoding) of RFC 8949. As an exception, RFC 8949 requirements for CBOR maps are not applicable because CCF does not use CBOR maps.
 
 - `composite-type.id` in `ccf-typedef-and-value-message` MUST be identical to its zero-based index in `composite-typedef`.
 
 - `composite-type-value.id` MUST be identical to the zero-based encoding order `type-value`.
 
-- `inline-type-and-value` MUST NOT be used when type can be omitted as described in "Cadence Types and Values Encoding".
+- `inline-type-and-value` MUST NOT be used when type can be omitted as described in "Cadence Types and Values Encoding."
 
 - The following data items MUST be sorted using bytewise lexicographic order of their deterministic encodings:
   - Type definitions MUST be sorted by `cadence-type-id` in `composite-typedef`.
   - `dict-value` key-value pairs MUST be sorted by key.
   - `composite-type.fields` MUST be sorted by `name`
   - `composite-type-value.fields` MUST be sorted by `name`.
-  - `restricted-type.restrictions` MUST be sorted by restriction's `cadence-type-id`.
-  - `restricted-type-value.restrictions` MUST be sorted by restriction's `cadence-type-id`.
+  - `intersection-type.types` MUST be sorted by restriction's `cadence-type-id`.
+  - `intersection-type-value.types` MUST be sorted by restriction's `cadence-type-id`.
+  - `entitlement-set-authorization-type.entitlements` MUST be sorted.
+  - `entitlement-set-authorization-type-value.entitlements` MUST be sorted.
 
 ## Security Considerations
 
-CBOR security considerations in [Section 10 of RFC 8949 (CBOR)](https://www.rfc-editor.org/rfc/rfc8949.html#name-security-considerations) apply to CCF.
+CBOR security considerations in [Section 10](https://www.rfc-editor.org/rfc/rfc8949.html#name-security-considerations) of RFC 8949 apply to CCF.
 
-There are two types of checks for acceptable data:
-- Checks for well-formedness
-- Checks for validity
+There are two types of checks for acceptable data: well-formedness and validity.
 
-CBOR defines data [well-formedness](https://www.rfc-editor.org/rfc/rfc8949.html#name-well-formedness-errors-and-) and a CBOR decoder MUST detect and reject malformed data before checking for validity.
-
-CCF decoders MUST detect and reject malformed data before checking for validity.
+CCF decoders MUST detect and reject malformed data items before checking for validity. [Section 1.2](https://www.rfc-editor.org/rfc/rfc8949.html#section-1.2) of RFC 8949 defines "well-formed" data items.
 
 CCF decoders SHOULD detect and reject malformed data before creating Cadence objects and without requiring Cadence type information.
 
-CCF decoders can handle invalid CCF messages as required by each CCF-based protocol. In some cases, it may be more practical for the application to check if the decoded data is acceptable.
+Each CCF-based protocol MUST specify how to handle invalid CCF messages. In some cases, it may be more practical for the application to check if the decoded data is acceptable.
 
 CCF decoders SHOULD allow CBOR limits to be specified and enforced, such as:
-- Max number of array elements
-- Max number of map pairs
-- Max nested levels
+- maximum number of array elements
+- maximum number of map pairs
+- maximum nested levels
 
-For example, max number of array elements would forbid any single array in a CCF message from exceeding that many elements.
+For example, the maximum number of array elements would forbid any single array in a CCF message from exceeding that many elements.
 
 The main trade-off for decoder limits:
-- limits set too high can allow memory exhaustion and other attacks to succeed.
-- limits set too low creates the possibility of being unable to decode non-malicious messages that exceeds limits.
+- Limits set too high can allow memory exhaustion and other attacks to succeed.
+- Limits set too low create the possibility of being unable to decode non-malicious messages that exceed limits.
 
 Encoders usually don't enforce limits because it's simpler and more efficient for applications to enforce limits before providing the data to encoders.
 
 ## CCF Examples
 
-Examples of JSON are in JSON-Cadence Data Interchange Format:
-- Minified JSON encoding size is used for comparisons.
-- Non-minified JSON encoding is shown for readability.
+Examples show Cadence data encoded in:
+- [JSON-Cadence Data Interchange Format](https://developers.flow.com/cadence/json-cadence-spec) (JSON-CDC)
+- CCF in fully self-describing mode
 
-Examples of CCF encoded data are shown in hex or Extended Diagnostic Notation (EDN) for readability.
+CCF in partially self-describing mode is not shown here. CCF in partially self-describing mode can omit type definitions, so it can be significantly more compact than CCF in self-describing mode.
 
-For more info about EDN, see [Appendix G of RFC 8610 (CDDL)](https://www.rfc-editor.org/rfc/rfc8610.html#appendix-G).
+CCF encodings are shown in hex and described using Extended Diagnostic Notation (EDN). For more information about EDN, see [Appendix G](https://www.rfc-editor.org/rfc/rfc8610.html#appendix-G) of RFC 8610.
 
 ### Cadence Simple Type Value
 
-Cadence `Int` type with value `42` encoded to JSON is 27 bytes when minified.
+Cadence `Int` type with value `42` encodes to:
+- 27 bytes in JSON-CDC (minified)
+- 9 bytes in CCF (fully self-describing mode)
+
+JSON-CDC encoding (not minified for readability):
 
 ```json
 {
@@ -314,19 +306,23 @@ Cadence `Int` type with value `42` encoded to JSON is 27 bytes when minified.
 }
 ```
 
-CCF encoding is 9 bytes:
+CCF encoding (in hex for readability):
 
-```
-d88282d88904c2412a
-```
+`d88282d88904c2412a`
 
-It represents `130([137(4), 42])`, where:
-- `137(4)` is Cadence `Int`.
-- `42` is raw value.
+The CCF data item in diagnostic notation is `130([137(4), 42])`:
+- `137(4)` is the Cadence `Int`.
+- `42` is the raw value.
+
+A type definition is not needed because Cadence `Int` is a Simple Type (e.g., not a user-defined composite).
 
 ### Cadence Homogeneous Array with Simple Type Elements
 
-Cadence `[Int]` type of value `[1, 2, 3]` encoded to JSON is 107 bytes when minified:
+Cadence `[Int]` type of value `[1, 2, 3]` encodes to:
+- 107 bytes in JSON-CDC (minified)
+- 18 bytes in CCF (fully self-describing mode)
+
+JSON-CDC encoding (not minified for readability):
 
 ```json
 {
@@ -348,19 +344,21 @@ Cadence `[Int]` type of value `[1, 2, 3]` encoded to JSON is 107 bytes when mini
 }
 ```
 
-CCF encoding is 18 bytes:
+CCF encoding (in hex for readability):
 
-```
-d88282d88bd8890483c24101c24102c24103
-```
+`d88282d88bd8890483c24101c24102c24103`
 
-It represents `130([139(137(4)), [1, 2, 3]])`, where:
-- `139(137(4))` is Cadence array of `Int`.
-- `[1, 2, 3]` is raw value.
+The CCF data item in diagnostic notation is `130([139(137(4)), [1, 2, 3]])`, where:
+- `139(137(4))` is the Cadence array of `Int`.
+- `[1, 2, 3]` is the raw value.
 
 ### Cadence Heterogeneous Array with Simple Type Elements
 
-Cadence `[AnyStruct]` type of value `[1, "a", true]` encoded to JSON is 112 bytes when minified:
+Cadence `[AnyStruct]` type of value `[1, "a", true]` encodes to:
+- 112 bytes in JSON-CDC (minified)
+- 34 bytes in CCF (fully self-describing mode)
+
+JSON-CDC encoding (not minified for readability)
 
 ```json
 {
@@ -382,25 +380,27 @@ Cadence `[AnyStruct]` type of value `[1, "a", true]` encoded to JSON is 112 byte
 }
 ```
 
-CCF encoding is 34 bytes:
+CCF encoding (in hex for readability):
 
-```
-d88282d88bd889182783d88282d88904c24101d88282d889016161d88282d88900f5
-```
+`d88282d88bd889182783d88282d88904c24101d88282d889016161d88282d88900f5`
 
-It represents `130([139(137(39)), [130([137(4), 1]), 130([137(1), "a"]), 130([137(0), true])]])`, where:
-- `139(137(39))` is Cadence array of `AnyStruct`.
-- `130([137(4), 1])` is first element (`137(4)` is Cadence `Int`, `1` is raw value).
-- `130([137(1), "a"])` is second element (`137(1)` is Cadence `String`, `"a"` is raw value).
-- `130([137(0), true]` is third element (`137(0)` is Cadence `Boolean`, `true` is raw value).
+The CCF data item in diagnostic notation is `130([139(137(39)), [130([137(4), 1]), 130([137(1), "a"]), 130([137(0), true])]])`, where:
+- `139(137(39))` is the Cadence array of `AnyStruct`.
+- `130([137(4), 1])` is the first element. `137(4)` is the Cadence `Int`, `1` is the raw value.
+- `130([137(1), "a"])` is the second element. `137(1)` is the Cadence `String`, `"a"` is the raw value.
+- `130([137(0), true]` is the third element. `137(0)` is the Cadence `Boolean`, `true` is the raw value.
 
 ### Cadence Homogeneous Array with Composite Type Elements
 
-This example is for CCF in fully self-describing mode (partially self-describing mode encodes smaller messages).
+Cadence composite types, such as struct, resource, and event, are not inlined as type information. Each encoded composite type information has a unique ID that is used to bind with a Cadence value.
 
-Cadence composite types, such as struct, resource, and event, are not inlined as type info. Each encoded composite type info has a unique ID which is used to bind with Cadence value.
+This example uses a Cadence homogeneous array `[Foo]`. The elements have the same Cadence composite type `Foo`, which has a field named `bar` of type Cadence `Int`.
 
-Cadence `[Foo]` type encoded to JSON is 353 bytes when minified:
+Cadence `[Foo]` type encodes to:
+- 353 bytes in JSON-CDC (minified)
+- 47 bytes in CCF (fully self-describing mode)
+
+JSON-CDC encoding (not minified for readability):
 
 ```json
 {
@@ -455,30 +455,34 @@ Cadence `[Foo]` type encoded to JSON is 353 bytes when minified:
 }
 ```
 
-CCF encoding is 47 bytes (in fully self-describing mode):
+CCF encoding (in hex for readability):
 
-```
-d8818281d8a183406a532e746573742e466f6f818263626172d8890482d88bd888408381c2410181c2410281c24103
-```
+`d8818281d8a183406a532e746573742e466f6f818263626172d8890482d88bd888408381c2410181c2410281c24103`
 
-It represents `129([[161([h'', "S.test.Foo", [["bar", 137(4)]]])], [139(136(h'')), [[1], [2], [3]]]])`, which contains type and value.
+In fully self-describing mode, a CCF data item can contain the value and type definition(s) used by the value.
 
-Type data item represents `161([h'', "S.test.Foo", [["bar", 137(4)]]])` , which defines a resource type:
-- `h''` is CCF type ID `0`. This ID is used inside value data item to bind type with raw value.
-- `"S.test.Foo"` is Cadence type ID.
-- `[["bar", 137(4)]]` is field definition of one field: `"bar"` field of Cadence `Int`.
+The CCF data item in diagnostic notation is:
 
-Value data item represents `[139(136(h'')), [[1], [2], [3]]]]`, where:
-- `139(136(h''))` is Cadence array of type identified by ID `0`.
-- `[[1], [2], [3]]]` is array of `Foo` resource raw field data.
+`129([[161([h'', "S.test.Foo", [["bar", 137(4)]]])], [139(136(h'')), [[1], [2], [3]]]])`
+
+Within the CCF data item, the type is `161([h'', "S.test.Foo", [["bar", 137(4)]]])` which defines a resource type:
+- `h''` is CCF type ID `0`. This ID is used inside the value data item to bind the type with the raw value.
+- `"S.test.Foo"` is the Cadence type ID.
+- `[["bar", 137(4)]]` is the field definition of the `"bar"` field of Cadence `Int`.
+
+Within the CCF data item, the value is `[139(136(h'')), [[1], [2], [3]]]]`, where:
+- `139(136(h''))` is the Cadence array of the type identified by ID `0`.
+- `[[1], [2], [3]]]` is the array of raw field data of the `Foo` resource.
 
 ### Cadence Homogeneous Array with Composite Type Elements (One Field Type Is Abstract)
 
-This example is for CCF in fully self-describing mode (partially self-describing mode encodes smaller messages).
+This example uses a Cadence homogeneous array `[Foo]`. The elements have the same Cadence composite type. The `baz` field of the composite is an abstract type.
 
-Composite field `baz` is abstract type.
+This example encodes to:
+- 508 bytes in JSON-CDC (minified)
+-  80 bytes in CCF (fully self-describing mode)
 
-Cadence `[Foo]` type encoded to JSON is 508 bytes when minified:
+JSON-CDC encoding (not minified for readability):
 
 ```json
 {
@@ -554,31 +558,35 @@ Cadence `[Foo]` type encoded to JSON is 508 bytes when minified:
 }
 ```
 
-CCF encoding is 80 bytes (in fully self-describing mode):
+CCF encoding (in fully self-describing mode):
 
-```
-d8818281d8a183406a532e746573742e466f6f828263626172d88904826362617ad889182782d88bd888408382c24101d88282d88904c2410182c24102d88282d88901616182c24103d88282d88900f5
-```
+`d8818281d8a183406a532e746573742e466f6f828263626172d88904826362617ad889182782d88bd888408382c24101d88282d88904c2410182c24102d88282d88901616182c24103d88282d88900f5`
 
-It represents `129([[161([h'', "S.test.Foo", [["bar", 137(4)], ["baz", 137(39)]]])], [139(136(h'')), [[1, 130([137(4), 1])], [2, 130([137(1), "a"])], [3, 130([137(0), true])]]]])`, which contains type and value.
+In fully self-describing mode, a CCF data item can contain the value and type definition(s) used by the value.
 
-Type data item represents `161([h'', "S.test.Foo", [["bar", 137(4)], ["baz", 137(39)]]])` , which defines a resource type:
-- `h''` is CCF type ID `0`. This ID is used inside value data item to bind type with raw value.
-- `"S.test.Foo"` is Cadence type ID.
-- `["bar", 137(4)]` is first field definition: `"bar"` field of Cadence `Int`.
-- `["baz", 137(39)]` is second field definition: `"baz"` field of Cadence `AnyStruct`.
+The CCF data item in diagnostic notation is:
 
-Value data item represents `[139(136(h'')), [[1, 130([137(4), 1])], [2, 130([137(1), "a"])], [3, 130([137(0), true])]]]`, where:
-- `139(136(h''))` is Cadence array of type identified by ID `0`.
-- `[1, 130([137(4), 1])]` is first resource raw field data.
-- `[2, 130([137(1), "a"])]` is second resource raw field data.
-- `[3, 130([137(0), true])]` is third resource raw field data.
+`129([[161([h'', "S.test.Foo", [["bar", 137(4)], ["baz", 137(39)]]])], [139(136(h'')), [[1, 130([137(4), 1])], [2, 130([137(1), "a"])], [3, 130([137(0), true])]]]])`
+
+Within the CCF data item, the type is `161([h'', "S.test.Foo", [["bar", 137(4)], ["baz", 137(39)]]])` , which defines a resource type:
+- `h''` is CCF type ID `0`. This ID is used inside the value data item to bind the type with the raw value.
+- `"S.test.Foo"` is the Cadence type ID.
+- `["bar", 137(4)]` is the first field: `"bar"` field of Cadence `Int`.
+- `["baz", 137(39)]` is the second field: `"baz"` field of Cadence `AnyStruct`.
+
+Within the CCF data item, the value is `[139(136(h'')), [[1, 130([137(4), 1])], [2, 130([137(1), "a"])], [3, 130([137(0), true])]]]`, where:
+- `139(136(h''))` is the Cadence array of the type identified by ID `0`.
+- `[1, 130([137(4), 1])]` is the raw field data of the first resource.
+- `[2, 130([137(1), "a"])]` is the raw field data of the second resource.
+- `[3, 130([137(0), true])]` is the raw field data of the third resource.
 
 ### `FeesDeducted` Event
 
-This example is for CCF in fully self-describing mode (partially self-describing mode encodes smaller messages).
+Cadence `FeesDeducted` event encodes to:
+- 298 bytes in JSON-CDC (minified):
+- 118 bytes in CCF (fully self-describing mode)
 
-This example of `FeesDeducted` event encoded to JSON is 298 bytes when minified:
+JSON-CDC encoding (not minified for readability):
 
 ```json
 {
@@ -612,42 +620,46 @@ This example of `FeesDeducted` event encoded to JSON is 298 bytes when minified:
 }
 ```
 
-CCF encoding is 118 bytes (in fully self-describing mode):
+CCF encoding (in hex for readability):
 
-```
-d8818281d8a283407828412e663931396565373734343762373439372e466c6f77466565732e466565734465647563746564838266616d6f756e74d88917826f657865637574696f6e4566666f7274d88917826f696e636c7573696f6e4566666f7274d8891782d8884083190b9919023f1a05f5e100
-```
+`d8818281d8a283407828412e663931396565373734343762373439372e466c6f77466565732e466565734465647563746564838266616d6f756e74d88917826f657865637574696f6e4566666f7274d88917826f696e636c7573696f6e4566666f7274d8891782d8884083190b9919023f1a05f5e100`
 
-It represents `129([[162([h'', "A.f919ee77447b7497.FlowFees.FeesDeducted", [["amount", 137(23)], ["executionEffort", 137(23)], ["inclusionEffort", 137(23)]]])], [136(h''), [2969, 575, 100000000]]])`, which contains type and value.
+The CCF data item in diagnostic notation is:
 
-Type data item represents `162([h'', "A.f919ee77447b7497.FlowFees.FeesDeducted", [["amount", 137(23)], ["executionEffort", 137(23)], ["inclusionEffort", 137(23)]]])` , which defines an event type:
-- `h''` is CCF type ID `0`. This ID is used inside value data item to bind type with raw value.
-- `"A.f919ee77447b7497.FlowFees.FeesDeducted"` is Cadence type ID.
+`129([[162([h'', "A.f919ee77447b7497.FlowFees.FeesDeducted", [["amount", 137(23)], ["executionEffort", 137(23)], ["inclusionEffort", 137(23)]]])], [136(h''), [2969, 575, 100000000]]])`.
+
+CCF data items contain type definition and value in fully self-describing mode.
+
+Within the CCF data item, the type is `162([h'', "A.f919ee77447b7497.FlowFees.FeesDeducted", [["amount", 137(23)], ["executionEffort", 137(23)], ["inclusionEffort", 137(23)]]])`:
+- `h''` is CCF type ID `0`. This ID is used inside the value data item to bind the type with the raw value.
+- `"A.f919ee77447b7497.FlowFees.FeesDeducted"` is the Cadence type ID.
 - `[["amount", 137(23)], ["executionEffort", 137(23)], ["inclusionEffort", 137(23)]]` is field definition with 3 fields: `"amount"` field of Cadence `UFix64`, `"inclusionEffort"` field of Cadence `UFix64`, and `"executionEffort"` field of Cadence `UFix64`. Fields are sorted by field name.
 
-Value data item represents `[136(h''), [2969, 575, 100000000]]`, where:
-- `136(h'')` is type identified by ID `0`.
+Within the CCF data item, the value is  `[136(h''), [2969, 575, 100000000]]`, where:
+- `136(h'')` is the type identified by ID `0`.
 - `[2969, 575, 100000000]` is `FeesDeducted` event raw field data.
 
 ## Specifications
 
-There are 3 top level CCF messages: `ccf-typedef-message`, `ccf-typedef-and-value-message`, and `ccf-type-and-value-message`.
+There are 3 top-level CCF messages: `ccf-typedef-message`, `ccf-typedef-and-value-message`, and `ccf-type-and-value-message`.
 
 - `ccf-typedef-message` is a list of type definitions for Cadence composite types.
 - `ccf-typedef-and-value-message` is a Cadence value preceded by a list of type definitions of referenced Cadence composite types.
-- `ccf-type-and-value-message` is a Cadence value preceded by builtin or known composite Cadence type(s).
+- `ccf-type-and-value-message` is a Cadence value preceded by built-in or known composite Cadence type(s).
 
 Cadence types are encoded as `inline-type` (inlined) or as `composite-typedef` (not inlined).
 
-Cadence data is encoded depending on its type. For example, Cadence `UInt8` is encoded as CBOR positive integer, Cadence `String` is encoded as CBOR text string, Cadence `Address` is encoded as CBOR byte string, and Cadence struct data is encoded as an array of its raw field data.
+Cadence data is encoded depending on its type. For example, Cadence `UInt8` is encoded as a CBOR unsigned integer, Cadence `String` is encoded as a CBOR text string, Cadence `Address` is encoded as a CBOR byte string, and Cadence struct data is encoded as an array of its raw field data.
 
 ### Cadence Types and Type Values
 
-Cadence types and Cadence type values (run-time types) are encoded differently. They contain different data because they are used differently.
+Cadence has types and values. A "type value" is a value that represents a type.
 
-Cadence types are used to decode Cadence data, so they only contain information needed for decoding. For example, composite type's field info is needed to decode composite value. However, interface type's field info isn't needed to decode values implementing interface type.
+Cadence types and Cadence type values are encoded differently. They contain different data because they are used differently.
 
-Cadence type value is a Cadence value which provides comprehensive information about a type. For example, composite type value and interface type value contain info about both fields and initializers.
+Cadence types are used to decode Cadence data, so they only contain information needed for decoding. For example, field information of a composite type is needed to decode the composite value. However, field information of an interface type isn't needed to decode values implementing the interface type.
+
+Cadence type value is a Cadence value that provides comprehensive information about a type. For example, composite type value and interface type value contain information about both fields and initializers.
 
 ### CCF Specified in CDDL Notation
 
@@ -675,9 +687,12 @@ cbor-tag-varsized-array-type = 139
 cbor-tag-constsized-array-type = 140
 cbor-tag-dict-type = 141
 cbor-tag-reference-type = 142
-cbor-tag-restricted-type = 143
+cbor-tag-intersection-type = 143
 cbor-tag-capability-type = 144
-; 145-159 are reserved
+cbor-tag-inclusiverange-type = 145
+cbor-tag-entitlement-set-authorization-type = 146
+cbor-tag-entitlement-map-authorization-type = 147
+; 148-159 are reserved
 
 ; composite types
 cbor-tag-struct-type = 160
@@ -685,7 +700,8 @@ cbor-tag-resource-type = 161
 cbor-tag-event-type = 162
 cbor-tag-contract-type = 163
 cbor-tag-enum-type = 164
-; 165-175 are reserved
+cbor-tag-attachment-type = 165
+; 166-175 are reserved
 
 ; interface types
 cbor-tag-struct-interface-type = 176
@@ -703,10 +719,13 @@ cbor-tag-varsized-array-type-value = 187
 cbor-tag-constsized-array-type-value = 188
 cbor-tag-dict-type-value = 189
 cbor-tag-reference-type-value = 190
-cbor-tag-restricted-type-value = 191
+cbor-tag-intersection-type-value = 191
 cbor-tag-capability-type-value = 192
 cbor-tag-function-type-value = 193
-; 194-207 are reserved
+cbor-tag-inclusiverange-type-value = 194
+cbor-tag-entitlement-set-authorization-type-value = 195
+cbor-tag-entitlement-map-authorization-type-value = 196
+; 197-207 are reserved
 
 ; composite type values
 cbor-tag-struct-type-value = 208
@@ -714,7 +733,8 @@ cbor-tag-resource-type-value = 209
 cbor-tag-event-type-value = 210
 cbor-tag-contract-type-value = 211
 cbor-tag-enum-type-value = 212
-; 213-223 are reserved
+cbor-tag-attachment-type-value = 213
+; 214-223 are reserved
 
 ; interface type values
 cbor-tag-struct-interface-type-value = 224
@@ -742,6 +762,7 @@ composite-typedef = [
         / contract-type
         / event-type
         / enum-type
+        / attachment-type
         / struct-interface-type
         / resource-interface-type
         / contract-interface-type
@@ -761,12 +782,12 @@ composite-type = [
     fields: [
         * [
             field-name: tstr,
-            field-type: inline-type
+            field-type: inline-type,
         ]
     ]
 ]
 
-; interface-type doesn't include field info because it's not needed for
+; interface-type doesn't include field information because it's not needed for
 ; decoding values implementing interface type.
 interface-type = [
     id: id,
@@ -793,6 +814,10 @@ enum-type =
     ; cbor-tag-enum-type
     #6.164(composite-type)
 
+attachment-type =
+    ; cbor-tag-attachment-type
+    #6.165(composite-type)
+
 struct-interface-type =
     ; cbor-tag-struct-interface-type
     #6.176(interface-type)
@@ -812,8 +837,9 @@ inline-type =
     / constsized-array-type
     / dict-type
     / reference-type
-    / restricted-type
+    / intersection-type
     / capability-type
+    / inclusiverange-type
     / type-ref
 
 simple-type =
@@ -832,28 +858,27 @@ constsized-array-type =
     ; cbor-tag-constsized-array-type
     #6.140([
         array-size: uint,
-        element-type: inline-type
+        element-type: inline-type,
     ])
 
 dict-type =
     ; cbor-tag-dict-type
     #6.141([
         key-type: inline-type,
-        element-type: inline-type
+        element-type: inline-type,
     ])
 
 reference-type =
     ; cbor-tag-reference-type
     #6.142([
-      authorized: bool,
+      authorized: authorization-type,
       type: inline-type,
     ])
 
-restricted-type =
-    ; cbor-tag-restricted-type
+intersection-type =
+    ; cbor-tag-intersection-type
     #6.143([
-      type: inline-type / nil,
-      restrictions: [* inline-type]
+      types: [+ inline-type],
     ])
 
 capability-type =
@@ -861,8 +886,30 @@ capability-type =
     ; use an array as an extension point
     #6.144([
         ; borrow-type
-        inline-type / nil
+        inline-type / nil,
     ])
+
+inclusiverange-type =
+    ; cbor-tag-inclusiverange-type
+    #6.145(inline-type)
+
+authorization-type =
+    unauthorized-type
+    / entitlement-set-authorization-type
+    / entitlement-map-authorization-type
+
+unauthorized-type = nil
+
+entitlement-set-authorization-type =
+	; cbor-tag-entitlement-set-authorization-type
+	#6.146([
+	    kind: uint,
+	    entitlements: [+ tstr],
+	])
+
+entitlement-map-authorization-type =
+	; cbor-tag-entitlement-map-authorization-type
+	#6.147(tstr)
 
 type-ref =
     ; cbor-tag-type-ref
@@ -895,18 +942,11 @@ simple-type-id = &(
     fix64-type-id: 22,
     ufix64-type-id: 23,
     path-type-id: 24,
-    capability-path-type-id: 25,
+    capability-type-id: 25,
     storage-path-type-id: 26,
     public-path-type-id: 27,
     private-path-type-id: 28,
-    auth-account-type-id: 29,
-    public-account-type-id: 30,
-    auth-account-keys-type-id: 31,
-    public-account-keys-type-id: 32,
-    auth-account-contracts-type-id: 33,
-    public-account-contracts-type-id: 34,
     deployed-contract-type-id: 35,
-    account-key-type-id: 36,
     block-type-id: 37,
     any-type-id: 38,
     any-struct-type-id: 39,
@@ -926,13 +966,56 @@ simple-type-id = &(
     word256-type-id: 53,
     any-struct-attachment-type-id: 54,
     any-resource-attachment-type-id: 55,
+    storage-capability-controller-type-id: 56,
+    account-capability-controller-type-id: 57,
+    account-type-id: 58,
+    account-contracts-type-id: 59,
+    account-keys-type-id: 60,
+    account-inbox-type-id: 61,
+    account-storage-capabilities-type-id: 62,
+    account-account-capabilities-type-id: 63,
+    account-capabilities-type-id: 64,
+    account-storage-type-id: 65,
+    mutate-type-id: 66,
+    insert-type-id: 67,
+    remove-type-id: 68,
+    identity-type-id: 69,
+    storage-type-id: 70,
+    save-value-type-id: 71,
+    load-value-type-id: 72,
+    copy-value-type-id: 73,
+    borrow-value-type-id: 74,
+    contracts-type-id: 75,
+    add-contract-type-id: 76,
+    update-contract-type-id: 77,
+    remove-contract-type-id: 78,
+    keys-type-id: 79,
+    add-key-type-id: 80,
+    revoke-key-type-id: 81,
+    inbox-type-id: 82,
+    publish-inbox-capability-type-id: 83,
+    unpublish-inbox-capability-type-id: 84,
+    claim-inbox-capability-type-id: 85,
+    capabilities-type-id: 86,
+    storage-capabilities-type-id: 87,
+    account-capabilities-type-id: 88,
+    publish-capability-type-id: 89,
+    unpublish-capability-type-id: 90,
+    get-storage-capability-controller-type-id: 91,
+    issue-storage-capability-controller-type-id: 92,
+    get-account-capability-controller-type-id: 93,
+    issue-account-capability-controller-type-id: 94,
+    capabilities-mapping-type-id: 95,
+    account-mapping-type-id: 96,
+    hashable-struct-type-id: 97,
+    fixedSize-unsigned-integer-type-id: 98,
 )
 
 ccf-typedef-and-value-message =
     ; cbor-tag-typedef-and-value
     #6.129([
       typedef: composite-typedef,
-      type-and-value: inline-type-and-value 
+      type-and-value: inline-type-and-value,
     ])
     
 ccf-type-and-value-message =
@@ -953,6 +1036,7 @@ value =
     / composite-value
     / path-value
     / capability-value
+    / inclusiverange-value
     / function-value
     / type-value
 
@@ -962,7 +1046,7 @@ array-value = [* value]
 
 dict-value = [* (key: value, value: value)]
 
-; composite-value is used to encode struct, contract, enum, event, and resource.
+; composite-value is used to encode struct, contract, enum, event, resource, and attachment.
 composite-value = [* (field: value)]
 
 path-value = [
@@ -970,18 +1054,15 @@ path-value = [
     identifier: tstr,
 ]
 
-capability-value = 
-    path-capability-value
-    / id-capability-value
-
-path-capability-value = [
+capability-value = [
     address: address-value,
-    path: path-value
+    id: uint64-value,
 ]
 
-id-capability-value = [
-    address: address-value,
-    id: uint64-value
+inclusiverange-value = [
+    start: value,
+    end: value,
+    step: value,
 ]
 
 simple-value =
@@ -1045,17 +1126,18 @@ function-value = [
     type-parameters: [
         * [
            name: tstr,
-           type-bound: type-value / nil
+           type-bound: type-value / nil,
         ]
-    ]
+    ],
     parameters: [
         * [
             label: tstr,
             identifier: tstr,
-            type: type-value
+            type: type-value,
         ]
-    ]
-    return-type: type-value
+    ],
+    return-type: type-value,
+    purity: int,
 ]
 
 type-value = simple-type-value
@@ -1068,13 +1150,15 @@ type-value = simple-type-value
     / contract-type-value
     / event-type-value
     / enum-type-value
+    / attachment-type-value
     / struct-interface-type-value
     / resource-interface-type-value
     / contract-interface-type-value
     / function-type-value
     / reference-type-value
-    / restricted-type-value
+    / intersection-type-value
     / capability-type-value
+    / inclusiverange-type-value
     / type-value-ref
 
 simple-type-value =
@@ -1093,14 +1177,14 @@ constsized-array-type-value =
     ; cbor-tag-constsized-array-type-value
     #6.188([
         array-size: uint,
-        element-type: type-value
+        element-type: type-value,
     ])
 
 dict-type-value =
     ; cbor-tag-dict-type-value
     #6.189([
         key-type: type-value,
-        element-type: type-value
+        element-type: type-value,
     ])
 
 struct-type-value =
@@ -1123,6 +1207,10 @@ enum-type-value =
     ; cbor-tag-enum-type-value
     #6.212(composite-type-value)
 
+attachment-type-value =
+    ; cbor-tag-attachment-type-value
+    #6.213(composite-type-value)
+
 struct-interface-type-value =
     ; cbor-tag-struct-interface-type-value
     #6.224(composite-type-value)
@@ -1143,18 +1231,18 @@ composite-type-value = [
     fields: [
         * [
             name: tstr,
-            type: type-value
+            type: type-value,
         ]
-    ]
+    ],
     initializers: [
         ? [
             * [
                 label: tstr,
                 identifier: tstr,
-                type: type-value
+                type: type-value,
             ]
         ]
-    ]
+    ],
 ]
 
 function-type-value =
@@ -1164,15 +1252,14 @@ function-type-value =
 reference-type-value =
     ; cbor-tag-reference-type-value
     #6.190([
-      authorized: bool,
+      authorized: authorization-type-value,
       type: type-value,
     ])
 
-restricted-type-value =
-    ; cbor-tag-restricted-type-value
+intersection-type-value =
+    ; cbor-tag-intersection-type-value
     #6.191([
-      type: type-value / nil,
-      restrictions: [* type-value]
+      types: [+ type-value]
     ])
 
 capability-type-value =
@@ -1182,6 +1269,28 @@ capability-type-value =
       ; borrow-type
       type-value / nil
     ])
+
+inclusiverange-type-value =
+    ; cbor-tag-inclusiverange-type-value
+    #6.194(type-value)
+
+authorization-type-value =
+    unauthorized-type-value
+    / entitlement-set-authorization-type-value
+    / entitlement-map-authorization-type-value
+
+unauthorized-type-value = nil
+
+entitlement-set-authorization-type-value =
+	; cbor-tag-entitlement-set-authorization-type-value
+	#6.195([
+	    kind: uint,
+	    entitlements: [+ tstr],
+	])
+
+entitlement-map-authorization-type-value =
+	; cbor-tag-entitlement-map-authorization-type-value
+	#6.196(tstr)
 
 type-value-ref =
     ; cbor-tag-type-value-ref
@@ -1194,7 +1303,7 @@ type-value-ref =
 
 This document would not exist without Ramtin M. Seraj and Bastian Müller.
 
-Ramtin and Bastian's contributions on this effort is hard to list exhaustively because they inspire individuals and teams to produce impactful results.
+Ramtin and Bastian's contributions to this effort are hard to list exhaustively because they inspire individuals and teams to produce impactful results.
 
 Ramtin M. Seraj led the effort to require a deterministic and more compact alternative to JSON-Cadence Data Interchange Format. This document's "Objectives" section includes and adds to the initial objectives Ramtin listed (in a notion) for a binary format for Cadence external values.
 
