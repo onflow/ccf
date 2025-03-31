@@ -2,15 +2,15 @@
 
 Author: Faye Amacker  
 Version: 1.0.0  
-Date: March 27, 2025
+Date: March 30, 2025
 
 ## Abstract
 
-Cadence Compact Format (CCF) is a data format designed for compact, efficient, and deterministic encoding of [Cadence](https://github.com/onflow/cadence) external values. Cadence is a modern resource-oriented programming language used by [Flow](https://github.com/onflow/flow-go) blockchain.
+Cadence Compact Format (CCF) is a binary data format designed for compact, efficient, and deterministic encoding of [Cadence](https://github.com/onflow/cadence) external values. Cadence is a modern resource-oriented programming language used by [Flow](https://github.com/onflow/flow-go) blockchain.
 
-CCF messages can be fully self-describing or partially self-describing. Both are more compact than JSON-based messages. CCF-based protocols can send Cadence metadata just once for all messages of that type. Malformed data can be detected without Cadence metadata and without creating Cadence objects.
+CCF messages can be fully self-describing or partially self-describing. Both are more compact than JSON-based messages. CCF-based protocols can send Cadence metadata once, and CCF messages can reuse it. Malformed data can be detected without Cadence metadata and without creating Cadence objects.
 
-CCF defines "Deterministic CCF Encoding Requirements" and makes it optional. CCF codecs implemented in different programming languages can produce the same deterministic encodings. CCF-based formats and protocols can balance trade-offs by specifying how they use CCF options.
+CCF specifies "Deterministic CCF Encoding Requirements" and makes it optional. CCF codecs implemented in different programming languages can produce the same deterministic encodings. CCF-based protocols can balance trade-offs by specifying how they use optional CCF requirements.
 
 CCF obsoletes [JSON-Cadence Data Interchange Format](https://developers.flow.com/cadence/json-cadence-spec) (JSON-CDC) for use cases that do not require JSON.
 
@@ -24,67 +24,63 @@ This document is licensed under the terms of the Apache License, Version 2.0. Se
 
 This document specifies Cadence Compact Format.
 
-Some requirements defined in this document are explicitly specified as optional.  
+This document explicitly specifies some requirements as optional. 
 
-It is outside the scope of this document to specify individual CCF-based formats or protocols (e.g., events).  For example, CCF-based formats or protocols MUST specify when encoders are required to emit CCF encodings that satisfy "Deterministic CCF Encoding Requirements."
+It is outside the scope of this document to specify individual CCF-based protocols (e.g., events).  For example, CCF-based protocols MUST specify when encoders are required to emit CCF encodings that satisfy "Deterministic CCF Encoding Requirements."
 
-This document does not specify how to encode version numbers of CCF itself, CCF-based formats, or CCF-based protocols.  CCF-based formats and protocols can specify an encoding that uses CalVer, SemVer, sequence-based versioning, any other versioning, or no versioning.  Some CCF-based formats or protocols may want to use CBOR Sequences ([RFC 8742](https://www.rfc-editor.org/rfc/rfc8742.html)) to provide a version number in the first CBOR data item, followed by CBOR data item(s) encoded in CCF.
+This document does not specify how to encode version numbers of CCF itself or CCF-based protocols.  CCF-based protocols can specify an encoding that uses CalVer, SemVer, sequence-based versioning, any other versioning, or no versioning.  Some CCF-based protocols may want to use CBOR Sequences ([RFC 8742](https://www.rfc-editor.org/rfc/rfc8742.html)) to provide a version number in the first CBOR data item, followed by CBOR data item(s) representing CCF message(s).
 
 ## Introduction
 
-CCF is a data format that allows compact, efficient, and deterministic encoding of Cadence external values.
+CCF is a binary data format that allows compact, efficient, and deterministic encoding of Cadence external values.
 
 Cadence external values (e.g., events, transaction arguments, etc.) have been encoded using JSON-CDC, which is inefficient, verbose, and doesn't define deterministic encoding.
 
-The same `FeesDeducted` event on the Flow blockchain can encode to:
+The same `FeesDeducted` event on the Flow blockchain can be encoded to:
 - 298 bytes in JSON-CDC (minified).
 - 118 bytes in CCF (fully self-describing mode).
 - &nbsp;20 bytes in CCF (partially self-describing mode).
 
-CCF defines all requirements for deterministic encoding (sort orders, shortest forms, and Cadence-specific requirements) to allow CCF codecs implemented in different programming languages to produce the same deterministic encodings.
+CCF defines all requirements for deterministic encoding (sort orders, shortest forms, and Cadence-specific requirements) so that CCF codecs implemented in different programming languages can produce the same deterministic encodings.
 
-Some requirements (such as "Deterministic CCF Encoding Requirements") are defined as optional. The specification of each CCF-based format or protocol can specify how CCF options are used. This allows each protocol to balance trade-offs such as compatibility, determinism, speed, encoded data size, etc.
+Some requirements (such as "Deterministic CCF Encoding Requirements") are specified as optional. The specification of each CCF-based protocol determines how it uses optional CCF requirements. This allows each protocol to balance trade-offs such as compatibility, determinism, speed, encoded data size, etc.
 
-CCF uses CBOR to efficiently detect and reject malformed messages without creating Cadence objects. This allows more costly checks for validity, etc., to be performed only on well-formed messages.
+CCF allows efficient detection of malformed messages without creating Cadence objects. More costly validation is performed only on well-formed messages.
 
-CBOR is a binary data format specified by [RFC 8949](https://www.rfc-editor.org/info/std94) and designated by IETF as an [Internet Standard](https://www.ietf.org/rfc/std-index.txt) (STD&nbsp;94). CBOR is designed to be relevant for decades and is used by data formats and protocols such as [W3C&nbsp;WebAuthn](https://www.w3.org/TR/webauthn-2/), Compacted-DNS&nbsp;([RFC&nbsp;8618](https://www.rfc-editor.org/rfc/rfc8618.html)), COSE&nbsp;([IETF&nbsp;STD&nbsp;96](https://www.rfc-editor.org/info/std96)), CWT&nbsp;([RFC&nbsp;8392](https://www.rfc-editor.org/info/rfc8392)), etc.
+CCF uses a subset of the Concise Binary Object Representation (CBOR) format.  CBOR is a binary data format specified by [RFC 8949](https://www.rfc-editor.org/info/std94) and designated by IETF as an [Internet Standard](https://www.ietf.org/rfc/std-index.txt) (STD&nbsp;94). CBOR is designed to be relevant for decades and is used by data formats and protocols such as [W3C&nbsp;WebAuthn](https://www.w3.org/TR/webauthn-2/), Compacted-DNS&nbsp;([RFC&nbsp;8618](https://www.rfc-editor.org/rfc/rfc8618.html)), COSE&nbsp;([IETF&nbsp;STD&nbsp;96](https://www.rfc-editor.org/info/std96)), CWT&nbsp;([RFC&nbsp;8392](https://www.rfc-editor.org/info/rfc8392)), etc.
 
 ### Objectives
 
-The goal of CCF is to provide compact, efficient, and deterministic encoding of Cadence external values. To achieve this:
-- CCF uses CBOR's data model with [Preferred Serialization](https://www.rfc-editor.org/rfc/rfc8949.html#name-preferred-serialization) to deterministically encode values to their shortest form.
+The goal of CCF is to provide compact, efficient, and deterministic encoding of Cadence external values with:
+- Fully self-describing mode: CCF messages include Cadence types and values.
+- Partially self-describing mode: CCF messages include Cadence values referencing omitted Cadence types by unique type ID.
 
-- CCF separates Cadence type encoding from Cadence value encoding. This has two distinct advantages:
+CCF supports:
 
-  - More compact encoding. Cadence type information is not repeatedly encoded unnecessarily in a message. For example, for a homogeneous array of a Cadence composite type, each element will not have its Cadence composite type information encoded repeatedly.
+- Cadence external values: CCF supports all Cadence built-in types and user-defined types (e.g., composite types).  For extensibility, CCF reserves multiple ranges of CBOR tag numbers (unassigned by IANA) for future Cadence built-in data types.
 
-  - Detachable Cadence type information. Although Cadence type information is required for decoding, CCF-based protocols can send a message's type information once instead of repeatedly sending it to the same client for all messages of that type.
+- Compact encoding:
+  - CCF uses a subset of the CBOR data model with [Preferred Serialization](https://www.rfc-editor.org/rfc/rfc8949.html#name-preferred-serialization) to encode values to their shortest form.
+  - CCF separately encodes Cadence types and values to avoid repeatedly encoding the same Cadence types when feasible. For example, the element type of a homogeneous array is only encoded once.
 
-CCF is designed to support:
+- Compact communications: Detachable Cadence types allow CCF-based protocols to optionally avoid resending the same Cadence types for all messages. CCF-based protocols can cache and uniquely identify a Cadence type so it can be matched to a Cadence value during decoding.
 
-- All current and future Cadence types, including composite types. CCF supports schemaless encoding and is extensible for new Cadence types.
+  For example, CCF encodes Cadence composite types separately from Cadence values.  Encoded values refer to their composite type by unique type ID, encoded as bytes. If the Cadence composite type (metadata) can be stored on-chain, it doesn't need to be sent with the value. Type ID can be a universal counter, hash digest, or other unique identifier specified by CCF-based protocols.
 
-- Compact encoding. Smaller encoded size is produced by:
-  - CBOR's data model with CBOR Preferred Serialization (more compact encoding of CBOR data items).
-  - Separate encoding of Cadence types and values to avoid repeatedly encoding the same Cadence type information unnecessarily.
+- Deterministic encoding: CCF uses CBOR's Preferred Serialization to achieve deterministic encoding.  Other parts of CBOR's Core Deterministic Encoding Requirements are not needed by this specification.
 
-- Compact communications. Detachable Cadence type information allows CCF-based protocols to optionally avoid resending the same Cadence type information for all messages matching that type. CCF-based protocols can cache and uniquely identify a Cadence type so it can be matched to a Cadence value (such as an event) during decoding.
+- Early detection of malformed data: CCF decoders can detect malformed data without having Cadence type information.  CCF decoders can detect and reject malformed data without creating Cadence objects.  If data is well-formed, CCF decoders can proceed to detect and reject invalid CCF data as described in this document.
 
-- Deterministic encoding. CCF uses CBOR's Preferred Serialization to achieve deterministic encoding. Other parts of CBOR's Core Deterministic Encoding Requirements are not needed by this specification.
+- Interoperability and reuse: CCF uses CBOR, so CCF codecs can use generic CBOR codecs that are well-tested and widely used by other projects.
 
-- Early detection of malformed data. CCF decoders can detect and reject malformed data without creating Cadence objects. CCF decoders can detect malformed data without having Cadence type information. If data is not malformed, then CCF decoders can proceed to detect and reject invalid CCF data as described in this document.
+- Converting Data Between CCF and JSON: CCF uses a subset of the CBOR data model.  So the guidance in RFC 8949 on [converting data between CBOR and JSON](https://www.rfc-editor.org/rfc/rfc8949.html#name-converting-data-between-cbo) is applicable to CCF.
 
-- Extensibility. CCF encodes composite type information in a header (separate from data). Data refers to composite types by unique type ID, encoded as bytes. If the composite type information can be stored on-chain, the header won't need to be sent with the data. Type ID can be a universal counter, hash digest, or other unique identifier specified by CCF-based protocols.
-
-- Interoperability and Reuse. CCF uses the same approach taken by COSE (RFC 9052) leveraging CBOR (RFC 8949). CCF leverages CBOR, which allows CCF codecs to use CBOR codecs under the hood.
-
-- Translation to JSON. CCF uses a subset of CBOR data model and RFC 8949 specifies how to convert data between CBOR and JSON.
 
 ### Why CBOR
 
 CBOR is a binary data format specified by [RFC 8949](https://www.rfc-editor.org/info/std94) and designated by IETF as an [Internet Standard](https://www.ietf.org/rfc/std-index.txt) (STD&nbsp;94).
 
-Design goals of CBOR balances trade-offs, making it useful as a building block for new formats and protocols:
+Design goals of CBOR balances trade-offs, making it useful as a building block for new data formats and protocols:
 
 > The Concise Binary Object Representation (CBOR) is a data format
    whose design goals include the possibility of extremely small code
@@ -119,13 +115,13 @@ Projects implementing a CCF codec should evaluate more than one CBOR codec for s
 
 When evaluating or comparing codecs, benchmarks should include decoding malicious data.
 
-### Terminology
+### Notations and Terminology
+
+This document uses CDDL and EDN notations:
+- Concise Data Definition Language (CDDL) is defined by [RFC 8610](https://www.rfc-editor.org/rfc/rfc8610.html). CDDL is a notation for unambiguously expressing CBOR and JSON data structures.
+- Extended Diagnostic Notation (EDN) is defined by [Appendix G of RFC 8610](https://www.rfc-editor.org/rfc/rfc8610.html#appendix-G). EDN is a "diagnostic notation" used to converse about encoded CBOR data items.
 
 This specification uses requirements terminology, CBOR terminology, and CDDL terminology.
-
-This specification also uses the following notations:
-- Concise Data Definition Language (CDDL) defined by [RFC 8610](https://www.rfc-editor.org/rfc/rfc8610.html). CDDL is a notation for unambiguously expressing CBOR and JSON data structures.
-- Extended Diagnostic Notation (EDN) defined by [Appendix G of RFC 8610](https://www.rfc-editor.org/rfc/rfc8610.html#appendix-G). EDN is a "diagnostic notation" used to converse about encoded CBOR data items.
 
 #### Requirements Terminology
 
@@ -164,7 +160,7 @@ This specification uses CDDL notation to express CBOR data items:
 
 ## Serialization Considerations
 
-CCF is a data format that uses a subset of CBOR with additional requirements for validity and deterministic encoding.
+CCF is a binary data format that uses a subset of CBOR with additional requirements for validity and deterministic encoding.
 
 ### Cadence Types and Values Encoding
 
@@ -198,13 +194,13 @@ A CCF encoding complies with "Valid CCF Encoding Requirements" if it complies wi
 
 - CBOR data items MUST be well-formed and valid as defined in RFC 8949. For example, CBOR text strings MUST contain valid UTF-8. As an exception, RFC 8949 requirements for CBOR maps are not applicable because CCF does not use CBOR maps.
 
-- CCF encodings MUST comply with specifications in "CCF Specified in CDDL Notation" section of this document.
+- CCF encodings MUST comply with specifications in the "CCF Specified in CDDL Notation" section of this document.
 
 - `composite-type.id` MUST be unique in `ccf-typedef-message` or `ccf-typedef-and-value-message`.
 
 - `composite-type.cadence-type-id` MUST be unique in `ccf-typedef-message` or `ccf-typedef-and-value-message`.
 
-- `field-name` MUST be unique in `composite-type`.
+- `field-name` MUST be unique in `composite-type.fields`.
 
 - `type-ref.id` MUST refer to `composite-type.id`.
 
@@ -224,7 +220,7 @@ A CCF encoding complies with "Valid CCF Encoding Requirements" if it complies wi
 
 - Elements MUST be unique in `entitlement-set-authorization-type.entitlements` or `entitlement-set-authorization-type-value.entitlements`.
  
-- Keys MUST be unique in `dict-value`. Decoders are not always required to check for duplicate dictionary keys. In some cases, checking for duplicate dictionary key is not necessary or it may be delegated to the application.
+- Keys MUST be unique in `dict-value`. Decoders are not always required to check for duplicate dictionary keys. In some cases, checking for duplicate dictionary keys is not necessary, or the checking may be delegated to the application.
 
 ### Deterministic CCF Encoding Requirements
 
@@ -233,7 +229,7 @@ A CCF encoding is deterministic if it satisfies the "Deterministic CCF Encoding 
 Encoders SHOULD emit deterministic CCF encodings.  However, some CCF-based protocols may not require deterministic CCF encodings.
 
 CCF-based protocols MUST specify when encoders are required to emit deterministic CCF encodings. For example:
-- A CCF-based protocol for encoding transaction arguments might want to specify that encoders MUST produce deterministic encodings of the values.
+- A CCF-based protocol that prioritizes security above performance (or requires explicitly sorted fields) might want to specify that encoders MUST produce deterministic encodings of the values.
 - A CCF-based protocol for encoding unsorted fields might want to specify that encoders are not required to produce deterministic encodings of the values (if compatibility with legacy systems is a higher priority than "Deterministic CCF Encoding Requirements"). 
 
 Decoders SHOULD check CCF encodings to determine whether they are deterministic encodings. CCF-based protocols MUST specify when decoders are required to check for deterministic encodings and how to handle nondeterministic encodings.
@@ -242,7 +238,7 @@ A CCF encoding satisfies the "Deterministic CCF Encoding Requirements" if it sat
 
 - CCF encodings MUST satisfy "Valid CCF Encoding Requirements" defined in this document.
 
-- CCF encodings MUST satisfy "Core Deterministic Encoding Requirements" defined in RFC 8948 Section 4.2.1. As an exception, RFC 8949 requirements for CBOR maps are not applicable because CCF does not use CBOR maps.
+- CCF encodings MUST satisfy the Core Deterministic Encoding Requirements defined in [Section 4.2.1](https://www.rfc-editor.org/rfc/rfc8949.html#name-core-deterministic-encoding) of RFC 8949. As an exception, RFC 8949 requirements for CBOR maps are not applicable because CCF does not use CBOR maps.
 
 - `composite-type.id` in `ccf-typedef-and-value-message` MUST be identical to its zero-based index in `composite-typedef`.
 
@@ -262,19 +258,15 @@ A CCF encoding satisfies the "Deterministic CCF Encoding Requirements" if it sat
 
 ## Security Considerations
 
-CBOR security considerations in [Section 10 of RFC 8949 (CBOR)](https://www.rfc-editor.org/rfc/rfc8949.html#name-security-considerations) apply to CCF.
+CBOR security considerations in [Section 10](https://www.rfc-editor.org/rfc/rfc8949.html#name-security-considerations) of RFC 8949 apply to CCF.
 
-There are two types of checks for acceptable data:
-- well-formedness
-- validity
+There are two types of checks for acceptable data: well-formedness and validity.
 
-CBOR defines data [well-formedness](https://www.rfc-editor.org/rfc/rfc8949.html#name-well-formedness-errors-and-), and a CBOR decoder MUST detect and reject malformed data before checking for validity.
-
-CCF decoders MUST detect and reject malformed data before checking for validity.
+CCF decoders MUST detect and reject malformed data items before checking for validity.  [Section 1.2](https://www.rfc-editor.org/rfc/rfc8949.html#section-1.2) of RFC 8949 defines "well-formed" data items.
 
 CCF decoders SHOULD detect and reject malformed data before creating Cadence objects and without requiring Cadence type information.
 
-CCF decoders can handle invalid CCF messages as required by each CCF-based protocol. In some cases, it may be more practical for the application to check if the decoded data is acceptable.
+Each CCF-based protocol MUST specify how to handle invalid CCF messages.  In some cases, it may be more practical for the application to check if the decoded data is acceptable.
 
 CCF decoders SHOULD allow CBOR limits to be specified and enforced, such as:
 - maximum number of array elements
@@ -643,7 +635,7 @@ Cadence types and Cadence type values (run-time types) are encoded differently. 
 
 Cadence types are used to decode Cadence data, so they only contain information needed for decoding. For example, field information of a composite type is needed to decode the composite value. However, field information of an interface type isn't needed to decode values implementing the interface type.
 
-Cadence type value is a Cadence value which provides comprehensive information about a type. For example, composite type value and interface type value contain information about both fields and initializers.
+Cadence type value is a Cadence value that provides comprehensive information about a type. For example, composite type value and interface type value contain information about both fields and initializers.
 
 ### CCF Specified in CDDL Notation
 
@@ -1287,7 +1279,7 @@ type-value-ref =
 
 This document would not exist without Ramtin M. Seraj and Bastian Müller.
 
-Ramtin and Bastian's contributions on this effort is hard to list exhaustively because they inspire individuals and teams to produce impactful results.
+Ramtin and Bastian's contributions to this effort are hard to list exhaustively because they inspire individuals and teams to produce impactful results.
 
 Ramtin M. Seraj led the effort to require a deterministic and more compact alternative to JSON-Cadence Data Interchange Format. This document's "Objectives" section includes and adds to the initial objectives Ramtin listed (in a notion) for a binary format for Cadence external values.
 
