@@ -2,11 +2,11 @@
 
 CCF is a binary data format defined in [ccf_specs.md](ccf_specs.md) at https://github.com/onflow/ccf.
 
-CCF-basesd protocols can balance trade-offs in their own specifications. For example:
+CCF-based protocols can balance trade-offs in their own specifications. For example:
 - CCF specifies deterministic encoding requirements and makes it optional.
 - CCF-based protocols MUST specify when to comply with the optional CCF requirements.
 
-It is outside the scope of CCF to specify each CCF-based protocol (e.g., Events).  Protocols are responsible for specifying aspects outside the scope of CCF (e.g., when to comply with each optional CCF requirement and how to encode version numbers).
+It is outside the scope of CCF to specify each CCF-based protocol (e.g., Events). Protocols are responsible for specifying aspects outside the scope of CCF (e.g., when to comply with each optional CCF requirement and how to encode version numbers).
 
 ## CBOR (RFC 8949) and CBOR Sequences (RFC 8742)
 
