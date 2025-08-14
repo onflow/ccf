@@ -1009,6 +1009,8 @@ simple-type-id = &(
     account-mapping-type-id: 96,
     hashable-struct-type-id: 97,
     fixedSize-unsigned-integer-type-id: 98,
+    fix128-type-id: 99,
+    ufix128-type-id: 101,
 )
 
 ccf-typedef-and-value-message =
@@ -1092,7 +1094,9 @@ simple-value =
     / word128-value
     / word256-value
     / fix64-value
+    / fix128-value
     / ufix64-value
+    / ufix128-value
 
 void-value = nil
 bool-value = bool
@@ -1121,6 +1125,16 @@ word128-value = bigint .ge 0
 word256-value = bigint .ge 0
 fix64-value = (int .ge -9223372036854775808) .le 9223372036854775807
 ufix64-value = uint .le 18446744073709551615
+
+fix128-value = [
+    high: uint .le 18446744073709551615,
+    low: uint .le 18446744073709551615,
+]
+
+ufix128-value = [
+    high: uint .le 18446744073709551615,
+    low: uint .le 18446744073709551615,
+]
 
 function-value = [
     type-parameters: [
